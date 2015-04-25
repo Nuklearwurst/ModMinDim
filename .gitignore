@@ -16,3 +16,5 @@ run
 ## Idea
 .idea
 *.iml
+*.ipr
+*.iws
