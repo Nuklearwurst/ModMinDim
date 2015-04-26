@@ -23,7 +23,7 @@ archivesBaseName = "modid"
 
 minecraft {
     version = "1.7.10-10.13.3.1391-1710ls"
-    runDir = "eclipse"
+    runDir = "run"
 }
 
 dependencies {

@@ -2,12 +2,9 @@ package com.fravokados.mindim.dimension;
 
 import com.fravokados.mindim.ModMiningDimension;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.biome.WorldChunkManagerHell;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.ChunkProviderFlat;
 import net.minecraft.world.gen.ChunkProviderGenerate;
 
 /**
@@ -24,7 +21,7 @@ public class WorldProviderMiningDimension extends WorldProvider {
 
     public IChunkProvider createChunkGenerator()
     {
-        return new ChunkProviderGenerate(worldObj, worldObj.getSeed(), true);
+        return new ChunkProviderGenerate(worldObj, worldObj.getSeed() + 42, true);
     }
 
     public String getDimensionName()

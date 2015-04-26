@@ -21,10 +21,6 @@ public class BlockPortalFrame extends BlockContainer {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float j, float k, float l) {
         if(!world.isRemote) {
-            /*
-            if(player instanceof EntityPlayerMP) {
-                Utils.teleportPlayerToDimension((EntityPlayerMP) player, world.provider.dimensionId == ModMiningDimension.dimensionId ? 0 : ModMiningDimension.dimensionId);
-            }*/
             TileEntity tile = world.getTileEntity(x, y, z);
             if(tile != null && tile instanceof TileEntityPortalControllerEntity) {
                 ((TileEntityPortalControllerEntity)tile).onActivated(world, x, y, z, player, side);
