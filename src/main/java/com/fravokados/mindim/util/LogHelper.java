@@ -1,4 +1,4 @@
-package com.fravokados.mindim.lib;
+package com.fravokados.mindim.util;
 
 import com.fravokados.mindim.lib.Reference;
 import cpw.mods.fml.common.FMLLog;

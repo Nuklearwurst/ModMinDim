@@ -1,14 +1,14 @@
 [
 {
   "modid": "MiningDimension",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "name": "Mining Dimension",
+  "description": "Mining Dimension and Portals",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["Nuklearwurst"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

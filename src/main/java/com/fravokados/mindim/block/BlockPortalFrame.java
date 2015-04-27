@@ -1,21 +1,24 @@
 package com.fravokados.mindim.block;
 
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 /**
  * @author Nuklearwurst
  */
-public class BlockPortalFrame extends BlockContainer {
+public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 
     public BlockPortalFrame() {
         super(Material.rock);
-        this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     @Override
@@ -42,4 +45,12 @@ public class BlockPortalFrame extends BlockContainer {
     public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
         return new TileEntityPortalControllerEntity();
     }
+
+    @Override
+    public void getSubBlocks(Item item, CreativeTabs creativeTab, List list) {
+        list.add(new ItemStack(item, 1, 0));
+        list.add(new ItemStack(item, 1, 1));
+    }
+
+
 }

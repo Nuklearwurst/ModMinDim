@@ -1,7 +1,7 @@
 package com.fravokados.mindim.event;
 
 import com.fravokados.mindim.ModMiningDimension;
-import com.fravokados.mindim.lib.LogHelper;
+import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.mindim.portal.PortalManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

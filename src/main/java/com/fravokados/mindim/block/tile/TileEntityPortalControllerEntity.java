@@ -2,6 +2,8 @@ package com.fravokados.mindim.block.tile;
 
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.portal.BlockPositionDim;
+import com.fravokados.mindim.portal.PortalMetrics;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
@@ -21,13 +23,19 @@ public class TileEntityPortalControllerEntity extends TileEntity {
             id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
         }
         if(dest == -1) {
-            dest = ModMiningDimension.instance.portalManager.createPortal(id);
+            dest = ModMiningDimension.instance.portalManager.createPortal(id, null);
         }
         if(dest != -1 && player instanceof EntityPlayerMP) {
-            ModMiningDimension.instance.portalManager.teleportPlayerToEntityPortal((EntityPlayerMP) player, dest);
+            teleportEntity(player);
             return;
         }
         player.addChatComponentMessage(new ChatComponentText("No Destination Found!"));
+    }
+
+    public void teleportEntity(Entity entity) {
+
+        PortalMetrics metrics = new PortalMetrics(this.xCoord, this.yCoord, this.zCoord);
+        ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, dest, id, null);
     }
 
     public int onBlockPlaced() {

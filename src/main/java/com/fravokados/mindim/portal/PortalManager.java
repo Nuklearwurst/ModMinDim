@@ -4,6 +4,7 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.util.TeleportUtils;
 import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -69,14 +70,17 @@ public class PortalManager extends WorldSavedData {
         entityPortals.put(portal, pos);
     }
 
-    public void teleportPlayerToEntityPortal(EntityPlayerMP player, int portalId, int parent) {
-        if(!entityPortalExists(portalId)) {
-            portalId = createPortal(parent);
-        }
-        teleportPlayerToEntityPortal(player, portalId);
-    }
 
-    public void teleportPlayerToEntityPortal(EntityPlayerMP player, int portalId) {
+	/**
+	 *
+	 * @param entity entity to teleport
+	 * @param portalId destination portal id
+	 * @param metrics used to calculate Entity Position in the destination portal
+	 */
+    public void teleportEntityToEntityPortal(Entity entity, int portalId, int parent, PortalMetrics metrics) {
+	    if(!entityPortalExists(portalId)) {
+		    return;
+	    }
         if(portalId == -1) {
             return;
         }
@@ -84,17 +88,35 @@ public class PortalManager extends WorldSavedData {
         if(pos == null) {
             return;
         }
+	    double offsetX = entity.posX - metrics.originX;
+	    double offsetY = entity.posY - metrics.originY;
+	    double offsetZ = entity.posZ - metrics.originZ;
+	    //TODO: update player rotation
+		//TODO: update portal boundaries
+	    double x = pos.x + offsetX;
+	    double y = pos.y + offsetY;
+	    double z = pos.z + offsetZ;
+
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-        if(pos.dimension == player.dimension) {
-            player.mountEntity(null); //needed?
-            player.setPositionAndUpdate(pos.x, pos.y, pos.z);
-        } else {
-            TeleportUtils.transferPlayerToDimension(player, pos.dimension, pos.x, pos.y, pos.z, player.rotationYaw, player.rotationPitch);
-        }
+		if(entity instanceof EntityPlayerMP) {
+			if (pos.dimension == entity.dimension) {
+				entity.mountEntity(null); //needed?
+				((EntityPlayerMP)entity).setPositionAndUpdate(x, y, z);
+			} else {
+				TeleportUtils.transferPlayerToDimension((EntityPlayerMP) entity, pos.dimension, x, y, z, entity.rotationYaw, entity.rotationPitch);
+			}
+		} else {
+			if (pos.dimension == entity.dimension) {
+				entity.mountEntity(null); //needed?
+				entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+			} else {
+				TeleportUtils.transferEntityToDimension(entity, pos.dimension, x, y, z, entity.rotationYaw);
+			}
+		}
     }
 
-    public int createPortal(int parentID) {
-        BlockPositionDim pos = entityPortals.get(parentID);
+    public int createPortal(int parent, PortalMetrics metrics) {
+        BlockPositionDim pos = entityPortals.get(parent);
         if(pos == null) {
             return -1;
         }
@@ -102,10 +124,11 @@ public class PortalManager extends WorldSavedData {
 
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
         WorldServer worldServer = server.worldServerForDimension(dim);
+	    //TODO portal generation
         worldServer.setBlock(pos.x, pos.y, pos.z, ModMiningDimension.instance.portalFrame);
         TileEntity te = worldServer.getTileEntity(pos.x, pos.y, pos.z);
         if(te != null && te instanceof TileEntityPortalControllerEntity) {
-            ((TileEntityPortalControllerEntity) te).setDest(parentID);
+            ((TileEntityPortalControllerEntity) te).setDest(parent);
             return ((TileEntityPortalControllerEntity) te).onBlockPlaced();
         }
         return -1;
@@ -113,5 +136,9 @@ public class PortalManager extends WorldSavedData {
 
     public BlockPositionDim getEntityPortalForId(int id) {
         return entityPortals.get(id);
+    }
+
+    public static PortalManager getInstance() {
+	    return ModMiningDimension.instance.portalManager;
     }
 }

@@ -1,7 +1,10 @@
 package com.fravokados.mindim;
 
 import com.fravokados.mindim.block.BlockPortalFrame;
+import com.fravokados.mindim.block.BlockPortalMinDim;
+import com.fravokados.mindim.block.tile.TileEntityPortal;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.command.CommandEnterDimension;
 import com.fravokados.mindim.dimension.WorldProviderMiningDimension;
 import com.fravokados.mindim.event.ModEventHandler;
@@ -34,8 +37,12 @@ public class ModMiningDimension {
     public void preInit(FMLPreInitializationEvent evt) {
         portalFrame = new BlockPortalFrame();
         GameRegistry.registerBlock(portalFrame, "portalFrame");
+        portalBlock = new BlockPortalMinDim();
+	    GameRegistry.registerBlock(portalBlock, "portalBlock");
 
         GameRegistry.registerTileEntity(TileEntityPortalControllerEntity.class, "TileEntityPortalControllerEntity");
+	    GameRegistry.registerTileEntity(TileEntityPortal.class, "TileEntityPortal");
+	    GameRegistry.registerTileEntity(TileEntityPortalFrame.class, "TileEntityPortalFrame");
 
         MinecraftForge.EVENT_BUS.register(new ModEventHandler());
     }
