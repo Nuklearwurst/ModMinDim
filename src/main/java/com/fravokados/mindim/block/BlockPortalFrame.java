@@ -1,6 +1,7 @@
 package com.fravokados.mindim.block;
 
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -42,8 +43,14 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World p_149915_1_, int p_149915_2_) {
-        return new TileEntityPortalControllerEntity();
+    public TileEntity createNewTileEntity(World world, int meta) {
+	    switch (meta) {
+		    case 0:
+			    return new TileEntityPortalControllerEntity();
+		    case 1:
+			    return new TileEntityPortalFrame();
+	    }
+        return null;
     }
 
     @Override

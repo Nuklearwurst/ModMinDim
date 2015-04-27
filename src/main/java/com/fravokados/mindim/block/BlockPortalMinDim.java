@@ -18,6 +18,7 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 
 	public BlockPortalMinDim() {
 		super(Material.portal, Strings.Block.portal);
+		this.setCreativeTab(null);
 	}
 
 	@Override
