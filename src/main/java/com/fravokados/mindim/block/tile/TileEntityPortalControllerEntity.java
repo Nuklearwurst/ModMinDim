@@ -35,7 +35,7 @@ public class TileEntityPortalControllerEntity extends TileEntity {
     public void teleportEntity(Entity entity) {
 
         PortalMetrics metrics = new PortalMetrics(this.xCoord, this.yCoord, this.zCoord);
-        ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, dest, id, null);
+        ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, dest, id, metrics);
     }
 
     public int onBlockPlaced() {

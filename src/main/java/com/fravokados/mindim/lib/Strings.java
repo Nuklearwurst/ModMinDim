@@ -21,6 +21,8 @@ public class Strings {
 
 	public static final class Keys {
 
+		public static final String KEY_GENERAL_SETTINGS = "General Settings";
+
 		public static final class Debug {
 			public static final String DEBUG = "debug_deobf";
 			public static final String DEBUG_TESTING = "debug_testing";
