@@ -37,7 +37,6 @@ public class ItemMD extends Item {
 	
 	@Override
 	public void registerIcons(IIconRegister reg) {
-		//TODO having modid in unlocalized name
 		itemIcon = reg.registerIcon(getUnwrappedUnlocalizedName(getUnlocalizedName()));
 	}
 }

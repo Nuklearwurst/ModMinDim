@@ -6,6 +6,7 @@ import com.fravokados.mindim.block.tile.TileEntityPortal;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.command.CommandEnterDimension;
+import com.fravokados.mindim.common.CommonProxy;
 import com.fravokados.mindim.configuration.ConfigHandler;
 import com.fravokados.mindim.dimension.WorldProviderMiningDimension;
 import com.fravokados.mindim.event.ModEventHandler;
@@ -13,6 +14,7 @@ import com.fravokados.mindim.item.ItemBlockPortalFrame;
 import com.fravokados.mindim.lib.Reference;
 import com.fravokados.mindim.portal.PortalManager;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -33,6 +35,9 @@ public class ModMiningDimension {
     public PortalManager portalManager;
 
 	public static ConfigHandler config;
+
+	@SidedProxy(clientSide = Reference.PROXY_CLIENT, serverSide = Reference.PROXY_SERVER, modId = Reference.MOD_ID)
+	public CommonProxy proxy;
 
     @Mod.Instance(value = Reference.MOD_ID)
     public static ModMiningDimension instance;

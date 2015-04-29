@@ -14,6 +14,8 @@ public class GuiEntityPortalController extends GuiContainer {
 
 	public GuiEntityPortalController(TileEntityPortalControllerEntity te, Container container) {
 		super(container);
+		this.xSize = 176;
+		this.ySize = 191;
 		this.te = te;
 	}
 
