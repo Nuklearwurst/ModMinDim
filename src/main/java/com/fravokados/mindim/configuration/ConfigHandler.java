@@ -6,7 +6,6 @@ import com.fravokados.mindim.util.LogHelper;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 
 import java.io.File;
 
@@ -28,7 +27,6 @@ public class ConfigHandler {
 			}
 		}
 		//read config
-		Property prop;
 
 		////////////
 		// DEBUG //

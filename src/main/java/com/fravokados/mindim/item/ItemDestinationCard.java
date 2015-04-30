@@ -18,6 +18,7 @@ public class ItemDestinationCard extends ItemMDMultiType {
 		super(Strings.Item.destinationCard);
 	}
 
+	@SuppressWarnings(value = {"unchecked"})
 	@Override
 	public void getSubItems(Item item, CreativeTabs creativeTab, List list) {
 		list.add(new ItemStack(item, 1, 0));
@@ -28,6 +29,7 @@ public class ItemDestinationCard extends ItemMDMultiType {
 		return "destinationCard";
 	}
 
+	@SuppressWarnings(value = {"unchecked"})
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List info, boolean b) {
 		super.addInformation(stack, player, info, b);

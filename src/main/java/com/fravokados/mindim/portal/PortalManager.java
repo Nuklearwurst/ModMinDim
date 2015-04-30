@@ -98,7 +98,6 @@ public class PortalManager extends WorldSavedData {
 	    double y = pos.y + offsetY;
 	    double z = pos.z + offsetZ;
 
-        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		if(entity instanceof EntityPlayerMP) {
 			if (pos.dimension == entity.dimension) {
 				entity.mountEntity(null); //needed?

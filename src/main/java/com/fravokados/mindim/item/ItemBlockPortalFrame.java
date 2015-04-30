@@ -18,6 +18,7 @@ public class ItemBlockPortalFrame extends ItemMDBlockMultiType {
 		super(block);
 	}
 
+	@SuppressWarnings(value = {"unchecked"})
 	@Override
 	public void getSubItems(Item item, CreativeTabs tabs, List list) {
 		list.add(new ItemStack(item, 1, 0));

@@ -28,12 +28,6 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float j, float k, float l) {
 	    player.openGui(ModMiningDimension.instance, GUIIDs.ENTITY_PORTAL_CONTROLLER, world, x, y, z);
-        if(!world.isRemote) {
-            TileEntity tile = world.getTileEntity(x, y, z);
-            if(tile != null && tile instanceof TileEntityPortalControllerEntity) {
-                //((TileEntityPortalControllerEntity)tile).onActivated(world, x, y, z, player, side);
-            }
-        }
         return true;
     }
 
@@ -68,6 +62,7 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
         return null;
     }
 
+	@SuppressWarnings(value = {"unchecked"})
     @Override
     public void getSubBlocks(Item item, CreativeTabs creativeTab, List list) {
         list.add(new ItemStack(item, 1, 0));

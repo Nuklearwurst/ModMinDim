@@ -32,7 +32,7 @@ public class TileEntityPortal extends TileEntity {
 			collapseWholePortal();
 			return;
 		}
-		((TileEntityPortalControllerEntity)controller).teleportEntity(entity);
+		//((TileEntityPortalControllerEntity)controller).teleportEntity(entity);
 	}
 
 	public void collapseWholePortal() {

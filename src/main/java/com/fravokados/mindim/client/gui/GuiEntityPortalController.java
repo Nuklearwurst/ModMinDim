@@ -29,6 +29,7 @@ public class GuiEntityPortalController extends GuiContainer {
 		this.te = te;
 	}
 
+	@SuppressWarnings(value = {"unchecked"})
 	@Override
 	public void initGui() {
 		super.initGui();
