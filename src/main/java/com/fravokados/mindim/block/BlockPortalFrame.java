@@ -1,7 +1,9 @@
 package com.fravokados.mindim.block;
 
+import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
+import com.fravokados.mindim.lib.GUIIDs;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -24,10 +26,11 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float j, float k, float l) {
+	    player.openGui(ModMiningDimension.instance, GUIIDs.ENTITY_PORTAL_CONTROLLER, world, x, y, z);
         if(!world.isRemote) {
             TileEntity tile = world.getTileEntity(x, y, z);
             if(tile != null && tile instanceof TileEntityPortalControllerEntity) {
-                ((TileEntityPortalControllerEntity)tile).onActivated(world, x, y, z, player, side);
+                //((TileEntityPortalControllerEntity)tile).onActivated(world, x, y, z, player, side);
             }
         }
         return true;

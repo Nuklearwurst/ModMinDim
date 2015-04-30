@@ -7,6 +7,7 @@ import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.command.CommandEnterDimension;
 import com.fravokados.mindim.common.CommonProxy;
+import com.fravokados.mindim.common.GuiHandler;
 import com.fravokados.mindim.configuration.ConfigHandler;
 import com.fravokados.mindim.dimension.WorldProviderMiningDimension;
 import com.fravokados.mindim.event.ModEventHandler;
@@ -19,6 +20,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.DimensionManager;
@@ -37,7 +39,7 @@ public class ModMiningDimension {
 	public static ConfigHandler config;
 
 	@SidedProxy(clientSide = Reference.PROXY_CLIENT, serverSide = Reference.PROXY_SERVER, modId = Reference.MOD_ID)
-	public CommonProxy proxy;
+	public static CommonProxy proxy;
 
     @Mod.Instance(value = Reference.MOD_ID)
     public static ModMiningDimension instance;
@@ -62,6 +64,8 @@ public class ModMiningDimension {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent evt) {
+	    NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+
         DimensionManager.registerProviderType(dimensionId, WorldProviderMiningDimension.class, false);
         DimensionManager.registerDimension(dimensionId, dimensionId);
     }
