@@ -17,71 +17,108 @@ import net.minecraft.world.World;
  */
 public class TileEntityPortalControllerEntity extends TileEntity implements IInventory {
 
-    private int dest = -1;
-    private int id = -1;
+	private int dest = -1;
+	private int id = -1;
+
+	private ItemStack[] inventory = new ItemStack[getSizeInventory()];
 
 
-    public void onActivated(World world, int x, int y, int z, EntityPlayer player, int side) {
-        if(id == -1) {
-            id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
-        }
-        if(dest == -1) {
-            dest = ModMiningDimension.instance.portalManager.createPortal(id, null);
-        }
-        if(dest != -1 && player instanceof EntityPlayerMP) {
-            teleportEntity(player);
-            return;
-        }
-        player.addChatComponentMessage(new ChatComponentText("No Destination Found!"));
-    }
+	public void onActivated(World world, int x, int y, int z, EntityPlayer player, int side) {
+		if (id == -1) {
+			id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
+		}
+		if (dest == -1) {
+			dest = ModMiningDimension.instance.portalManager.createPortal(id, null);
+		}
+		if (dest != -1 && player instanceof EntityPlayerMP) {
+			teleportEntity(player);
+			return;
+		}
+		player.addChatComponentMessage(new ChatComponentText("No Destination Found!"));
+	}
 
-    public void teleportEntity(Entity entity) {
+	public void teleportEntity(Entity entity) {
 
-        PortalMetrics metrics = new PortalMetrics(this.xCoord, this.yCoord, this.zCoord);
-        ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, dest, id, metrics);
-    }
+		PortalMetrics metrics = new PortalMetrics(this.xCoord, this.yCoord, this.zCoord);
+		ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, dest, id, metrics);
+	}
 
-    public int onBlockPlaced() {
-        return id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
-    }
+	public int onBlockPlaced() {
+		return id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
+	}
 
-    public void setDest(int dest) {
-        this.dest = dest;
-    }
+	public void setDest(int dest) {
+		this.dest = dest;
+	}
 
 	@Override
 	public int getSizeInventory() {
-		return 0;
+		return 4;
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int p_70301_1_) {
+	public ItemStack getStackInSlot(int slot) {
+		if (slot < inventory.length) {
+			return inventory[slot];
+		}
 		return null;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int p_70298_1_, int p_70298_2_) {
-		return null;
+	public ItemStack decrStackSize(int slot, int amount) {
+		if (this.inventory[slot] != null) {
+			ItemStack itemstack;
+
+			if (this.inventory[slot].stackSize <= amount) {
+				itemstack = this.inventory[slot];
+				this.inventory[slot] = null;
+				return itemstack;
+			} else {
+				itemstack = this.inventory[slot].splitStack(amount);
+
+				if (this.inventory[slot].stackSize == 0) {
+					this.inventory[slot] = null;
+				}
+
+				return itemstack;
+			}
+		} else {
+			return null;
+		}
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int p_70304_1_) {
-		return null;
+	public ItemStack getStackInSlotOnClosing(int slot) {
+		if (this.inventory[slot] != null)
+		{
+			ItemStack itemstack = this.inventory[slot];
+			this.inventory[slot] = null;
+			return itemstack;
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	@Override
-	public void setInventorySlotContents(int p_70299_1_, ItemStack p_70299_2_) {
+	public void setInventorySlotContents(int slot, ItemStack itemStack) {
+		this.inventory[slot] = itemStack;
 
+		if (itemStack != null && itemStack.stackSize > this.getInventoryStackLimit())
+		{
+			itemStack.stackSize = this.getInventoryStackLimit();
+		}
 	}
 
 	@Override
 	public String getInventoryName() {
-		return "asdasd";
+		return "Portal Controller";
 	}
 
 	@Override
 	public boolean hasCustomInventoryName() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -91,17 +128,20 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double) this.xCoord + 0.5D, (double) this.yCoord + 0.5D, (double) this.zCoord + 0.5D) <= 64.0D;
 	}
 
 	@Override
-	public void openInventory() {}
+	public void openInventory() {
+	}
 
 	@Override
-	public void closeInventory() {}
+	public void closeInventory() {
+	}
 
 	@Override
-	public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
-		return false;
+	public boolean isItemValidForSlot(int slot, ItemStack p_94041_2_) {
+		//TODO improve slot validation
+		return slot != 3;
 	}
 }
