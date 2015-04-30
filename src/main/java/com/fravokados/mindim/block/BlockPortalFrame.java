@@ -4,6 +4,7 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.lib.GUIIDs;
+import com.fravokados.mindim.portal.PortalManager;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -36,16 +37,27 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
         return true;
     }
 
-    @Override
-    public int onBlockPlaced(World world, int x, int y, int z, int p_149660_5_, float p_149660_6_, float p_149660_7_, float p_149660_8_, int p_149660_9_) {
-        TileEntity te = world.getTileEntity(x, y, z);
-        if(te != null && te instanceof TileEntityPortalControllerEntity) {
-            ((TileEntityPortalControllerEntity) te).onBlockPlaced();
-        }
-        return super.onBlockPlaced(world, x, y, z, p_149660_5_, p_149660_6_, p_149660_7_, p_149660_8_, p_149660_9_);
-    }
+	@Override
+	public void onBlockPreDestroy(World world, int x, int y, int z, int meta) {
+		super.onBlockPreDestroy(world, x, y, z, meta);
+		TileEntity te = world.getTileEntity(x, y, z);
+		if(te != null && te instanceof TileEntityPortalControllerEntity) {
+			PortalManager.getInstance().removeEntityPortal(((TileEntityPortalControllerEntity) te).getId());
+		}
+	}
 
-    @Override
+	@Override
+	public void onPostBlockPlaced(World world, int x, int y, int z, int p_149714_5_) {
+		if(!world.isRemote) {
+			TileEntity te = world.getTileEntity(x, y, z);
+			if (te != null && te instanceof TileEntityPortalControllerEntity) {
+				((TileEntityPortalControllerEntity) te).onBlockPlaced();
+			}
+		}
+		super.onPostBlockPlaced(world, x, y, z, p_149714_5_);
+	}
+
+	@Override
     public TileEntity createNewTileEntity(World world, int meta) {
 	    switch (meta) {
 		    case 0:

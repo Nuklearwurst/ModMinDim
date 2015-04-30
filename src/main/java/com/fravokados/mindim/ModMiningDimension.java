@@ -12,7 +12,9 @@ import com.fravokados.mindim.configuration.ConfigHandler;
 import com.fravokados.mindim.dimension.WorldProviderMiningDimension;
 import com.fravokados.mindim.event.ModEventHandler;
 import com.fravokados.mindim.item.ItemBlockPortalFrame;
+import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.lib.Reference;
+import com.fravokados.mindim.network.NetworkManager;
 import com.fravokados.mindim.portal.PortalManager;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -23,14 +25,18 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, guiFactory = Reference.GUI_FACTORY, canBeDeactivated=false)
 public class ModMiningDimension {
 
     public Block portalFrame;
     public Block portalBlock;
+
+	public Item itemDestinationCard;
 
     public static int dimensionId = 20;
 
@@ -55,6 +61,9 @@ public class ModMiningDimension {
         portalBlock = new BlockPortalMinDim();
 	    GameRegistry.registerBlock(portalBlock, "portalBlock");
 
+	    itemDestinationCard = new ItemDestinationCard();
+	    GameRegistry.registerItem(itemDestinationCard, "destinationCard");
+
         GameRegistry.registerTileEntity(TileEntityPortalControllerEntity.class, "TileEntityPortalControllerEntity");
 	    GameRegistry.registerTileEntity(TileEntityPortal.class, "TileEntityPortal");
 	    GameRegistry.registerTileEntity(TileEntityPortalFrame.class, "TileEntityPortalFrame");
@@ -68,6 +77,8 @@ public class ModMiningDimension {
 
         DimensionManager.registerProviderType(dimensionId, WorldProviderMiningDimension.class, false);
         DimensionManager.registerDimension(dimensionId, dimensionId);
+
+	    NetworkManager.init();
     }
 
     @Mod.EventHandler

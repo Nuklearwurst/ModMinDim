@@ -33,11 +33,11 @@ public class PortalManager extends WorldSavedData {
 
         entityPortalCounter = nbt.getInteger("entityPortalCounter");
         int[] keys = nbt.getIntArray("entityPortalKeys");
-        for(int i : keys) {
-            if(nbt.hasKey("entityPortal_" + i)) {
+        for(int portalId : keys) {
+            if(nbt.hasKey("entityPortal_" + portalId)) {
                 BlockPositionDim pos = new BlockPositionDim();
-                pos.readFromNBT(nbt.getCompoundTag("entityPortal_" + i));
-                entityPortals.put(i, pos);
+                pos.readFromNBT(nbt.getCompoundTag("entityPortal_" + portalId));
+                entityPortals.put(portalId, pos);
             }
         }
     }
@@ -47,18 +47,18 @@ public class PortalManager extends WorldSavedData {
         nbt.setInteger("entityPortalCounter", entityPortalCounter);
         int[] entityPortalKeys = new int[entityPortals.size()];
         int i = 0;
-        for(int j : entityPortals.keySet()) {
-            entityPortalKeys[i] = j;
+        for(int portalId : entityPortals.keySet()) {
+            entityPortalKeys[i] = portalId;
             NBTTagCompound tag = new NBTTagCompound();
-            entityPortals.get(j).writeToNBT(tag);
-            nbt.setTag("entityPortal_" + i, tag);
+            entityPortals.get(portalId).writeToNBT(tag);
+            nbt.setTag("entityPortal_" + portalId, tag);
             i++;
         }
         nbt.setIntArray("entityPortalKeys", entityPortalKeys);
     }
 
     public int registerNewEntityPortal(BlockPositionDim pos) {
-        entityPortals.put(++entityPortalCounter, pos);
+        registerEntityPortal(++entityPortalCounter, pos);
         return entityPortalCounter;
     }
 
@@ -68,6 +68,7 @@ public class PortalManager extends WorldSavedData {
 
     public void registerEntityPortal(int portal, BlockPositionDim pos) {
         entityPortals.put(portal, pos);
+	    this.markDirty();
     }
 
 
@@ -137,6 +138,14 @@ public class PortalManager extends WorldSavedData {
     public BlockPositionDim getEntityPortalForId(int id) {
         return entityPortals.get(id);
     }
+
+	public boolean removeEntityPortal(int id) {
+		if(entityPortals.remove(id) != null) {
+			markDirty();
+			return true;
+		}
+		return false;
+	}
 
     public static PortalManager getInstance() {
 	    return ModMiningDimension.instance.portalManager;

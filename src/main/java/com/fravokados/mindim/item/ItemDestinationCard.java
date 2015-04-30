@@ -1,7 +1,9 @@
 package com.fravokados.mindim.item;
 
 import com.fravokados.mindim.lib.Strings;
+import com.fravokados.mindim.portal.PortalMetrics;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -24,5 +26,19 @@ public class ItemDestinationCard extends ItemMDMultiType {
 	@Override
 	public String getUnlocalizedNameForItem(ItemStack s) {
 		return "destinationCard";
+	}
+
+	@Override
+	public void addInformation(ItemStack stack, EntityPlayer player, List info, boolean b) {
+		super.addInformation(stack, player, info, b);
+		if(stack.stackTagCompound != null) {
+			if(stack.stackTagCompound.hasKey("destinationPortalType") && stack.stackTagCompound.hasKey("destinationPortal")) {
+				int type = stack.stackTagCompound.getInteger("destinationPortalType");
+				int dest = stack.stackTagCompound.getInteger("destinationPortal");
+				//TODO translation
+				info.add("Portal Type: " + PortalMetrics.Type.getType(type));
+				info.add("Portal Destination: " + dest);
+			}
+		}
 	}
 }
