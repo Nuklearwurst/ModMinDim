@@ -1,33 +1,33 @@
 package com.fravokados.mindim.block.tile;
 
 import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.portal.BlockPositionDim;
+import com.fravokados.mindim.portal.PortalContructor;
 import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-
-import java.util.List;
+import net.minecraft.world.World;
 
 /**
  * @author Nuklearwurst
  */
-public class TileEntityPortalControllerEntity extends TileEntity implements IInventory {
+public class TileEntityPortalControllerEntity extends TileEntity implements IInventory, IBlockPlacedListener, IEntityPortalOptionalComponent {
 
 	private int id = -1;
 
 	private String name = null;
 	private ItemStack[] inventory = new ItemStack[getSizeInventory()];
+
+	private PortalMetrics metrics;
 
 
 	public void createPortal() {
@@ -38,6 +38,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			int dest = ModMiningDimension.instance.portalManager.createPortal(id, null);
 			if(dest >= 0)
 				setDest(dest);
+		}
+	}
+
+	public void openPortal() {
+		if(metrics != null) {
+			metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 		}
 	}
 
@@ -65,22 +71,16 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		return -2;
 	}
 
-	public void teleportPlayerToPortal(EntityPlayer player) {
-		if (getDestination() != -1 && player instanceof EntityPlayerMP) {
-			teleportEntity(player);
-			return;
-		}
-		player.addChatComponentMessage(new ChatComponentText("No Destination Found!"));
-	}
-
 	public void teleportEntity(Entity entity) {
-
-		PortalMetrics metrics = new PortalMetrics(this.xCoord, this.yCoord, this.zCoord);
-		ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics);
+		if(metrics != null && metrics.isEntityInsidePortal(entity, 0)) {
+			ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics);
+		}
 	}
 
-	public int onBlockPlaced() {
-		return id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
+	@Override
+	public void onBlockPostPlaced(World world, int x, int y, int z, int meta) {
+		id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
+		PortalContructor.createPortalMultiBlock(world, x, y, z);
 	}
 
 	public void setDest(int dest) {
@@ -90,6 +90,14 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		nbt.setInteger("destinationPortal", dest);
 		inventory[0] = card;
 		markDirty();
+	}
+
+	public boolean isActive() {
+		return false;
+	}
+
+	public void updateMetrics(PortalMetrics metrics) {
+		this.metrics = metrics;
 	}
 
 	@Override
@@ -239,14 +247,16 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@SuppressWarnings(value = "unchecked")
 	public void handleStartButton(ContainerEntityPortalController containerEntityPortalController) {
 		createPortal();
-		List<EntityPlayerMP> list = worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, AxisAlignedBB.getBoundingBox(xCoord - 8, yCoord - 4, zCoord - 8, xCoord + 8, yCoord + 4, zCoord + 8));
-		for (EntityPlayerMP player : list) {
-			player.closeScreen();
-			teleportPlayerToPortal(player);
-		}
+		openPortal();
 	}
 
 	public void handleStopButton(ContainerEntityPortalController containerEntityPortalController) {
+		collapseWholePortal();
+	}
 
+	public void collapseWholePortal() {
+		if(metrics != null) {
+			metrics.removePortalsInsideFrame(worldObj);
+		}
 	}
 }

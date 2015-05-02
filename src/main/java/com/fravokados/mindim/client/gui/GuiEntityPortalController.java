@@ -36,7 +36,7 @@ public class GuiEntityPortalController extends GuiContainer {
 		this.guiLeft = (this.width - 176) / 2 - 47;
 		this.buttonList.add(new GuiButton(BUTTON_ID_START, guiLeft + 75, guiTop + 78, 56, 20, "Start"));
 		btnStop = new GuiButton(BUTTON_ID_STOP, guiLeft + 133, guiTop + 78, 56, 20, "Stop");
-		btnStop.enabled = false;
+		//btnStop.enabled = false;
 		this.buttonList.add(btnStop);
 	}
 

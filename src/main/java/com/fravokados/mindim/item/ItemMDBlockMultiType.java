@@ -3,12 +3,8 @@ package com.fravokados.mindim.item;
 import com.fravokados.techmobs.lib.Textures;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-
-import java.util.List;
 
 /**
  * @author Nuklearwurst
@@ -24,9 +20,6 @@ public abstract class ItemMDBlockMultiType extends ItemBlock {
 	public int getMetadata(int damage) {
 		return damage;
 	}
-
-	@Override
-	public abstract void getSubItems(Item item, CreativeTabs tabs, List list);
 
 	protected String getUnwrappedUnlocalizedName(String unlocalizedName)
 	{

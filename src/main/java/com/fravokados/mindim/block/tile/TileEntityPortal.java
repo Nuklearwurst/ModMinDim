@@ -1,7 +1,7 @@
 package com.fravokados.mindim.block.tile;
 
+import com.fravokados.mindim.util.LogHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 
 /**
@@ -27,18 +27,27 @@ public class TileEntityPortal extends TileEntity {
 			collapseWholePortal();
 			return;
 		}
-		TileEntity controller = this.worldObj.getTileEntity(coreX, coreY, coreZ);
-		if(controller == null || !(controller instanceof TileEntityPortal)) {
-			collapseWholePortal();
-			return;
+		TileEntityPortalControllerEntity controller = getController();
+		if(controller != null) {
+			controller.teleportEntity(entity);
 		}
-		//((TileEntityPortalControllerEntity)controller).teleportEntity(entity);
 	}
 
 	public void collapseWholePortal() {
-		//TODO: collapse whole portal
-		this.worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
+		TileEntityPortalControllerEntity controller = getController();
+		if(controller != null) {
+			controller.collapseWholePortal();
+		}
+	}
 
+	public TileEntityPortalControllerEntity getController() {
+		TileEntity controller = this.worldObj.getTileEntity(coreX, coreY, coreZ);
+		if(controller == null || !(controller instanceof TileEntityPortalControllerEntity)) {
+			LogHelper.warn("Invalid Controller Found!");
+			this.worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+			return null;
+		}
+		return (TileEntityPortalControllerEntity) controller;
 	}
 
 }

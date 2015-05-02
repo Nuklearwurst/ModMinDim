@@ -9,4 +9,7 @@ public class Settings {
 	public static boolean DEBUG_TESTING = false;
 	public static boolean DEBUG = false;
 
+	public static int MAX_PORTAL_SIZE = 20;
+	public static int MIN_PORTAL_SIZE = 4;
+
 }
