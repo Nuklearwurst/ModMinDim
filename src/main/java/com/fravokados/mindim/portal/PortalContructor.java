@@ -30,18 +30,7 @@ public class PortalContructor {
 		//settings up
 		SimpleObjectReference<TileEntityPortalControllerEntity> controller = new SimpleObjectReference<TileEntityPortalControllerEntity>();
 		PortalMetrics metrics = new PortalMetrics();
-//
-//		TileEntity te = world.getTileEntity(x, y, z);
-//		if (te != null) {
-//			if (te instanceof TileEntityPortalFrame) {
-//				frames.add((TileEntityPortalFrame) te);
-//			} else if (te instanceof TileEntityPortalControllerEntity) {
-//				controller.set((TileEntityPortalControllerEntity) te);
-//			} else {
-//				return Result.ERROR_INVALID_STRUCTURE;
-//			}
-//			metrics.addCoord(x, y, z);
-//		}
+
 		Result result = createPortalMultiBlock(world, x, y, z, ForgeDirection.UNKNOWN, frames, controller, metrics, new ArrayList<ForgeDirection>());
 		if (result != Result.SUCCESS) {
 			LogHelper.info("MultiBlock forming failed: " + result);
@@ -51,7 +40,7 @@ public class PortalContructor {
 			LogHelper.info("MultiBlock is missing a controller!");
 			return Result.ERROR_MISSING_CONTOLLER;
 		}
-		if (metrics.smallestDimension() < Settings.MIN_PORTAL_SIZE) {
+		if (metrics.smallestDimension() <= Settings.MIN_PORTAL_SIZE) {
 			LogHelper.info("MultiBlock to small!");
 			return Result.ERROR_TO_SMALL;
 		}
@@ -126,125 +115,6 @@ public class PortalContructor {
 			}
 		}
 		return success ? Result.SUCCESS : Result.ERROR_NO_PORTAL_BLOCK;
-
-		/*
-		//add self
-		TileEntity te = world.getTileEntity(x, y, z);
-		boolean flag = false;
-		if (te != null) {
-			//We don't add coord to portal metrics, nor update used axis for a controller as it might not be part of the portal frame
-			if (te instanceof TileEntityPortalControllerEntity) {
-				flag = true;
-				if (controller.isNull()) {
-					controller.set((TileEntityPortalControllerEntity) te);
-				} else {
-					if (controller.get() == te) {
-						//check to find non optional block
-					} else {
-						return Result.ERROR_MULTIPLE_CONTROLLERS;
-					}
-				}
-			} else if (te instanceof TileEntityPortalFrame) {
-				if (frames.contains(te)) {
-					return Result.SUCCESS;
-				} else {
-					//Add frame to the list
-					frames.add((TileEntityPortalFrame) te);
-					metrics.addCoord(x, y, z);
-					if (!fromOptionalBlock && from != ForgeDirection.UNKNOWN && !finishedAxis.contains(from)) {
-						finishedAxis.add(from);
-					}
-				}
-			} else {
-				return Result.ERROR_NO_PORTAL_BLOCK;
-			}
-		} else {
-			return Result.ERROR_NO_PORTAL_BLOCK;
-		}
-		for(ForgeDirection dir : ForgeDirection.values()) {
-			if(dir == from.getOpposite()) {
-				continue;
-			}
-			if (!fromOptionalBlock && from != ForgeDirection.UNKNOWN) {
-				finishedAxis.add(from);
-			}
-		}
-		*/
-		/*
-		for (int i = 0; i < 6; i++) {
-			//don't go back
-			if (i == from) {
-				continue;
-			}
-			if (finishedAxis.size() > 1) {
-				if (!finishedAxis.contains(ForgeDirection.getOrientation(i)) && !finishedAxis.contains(ForgeDirection.getOrientation(i).getOpposite())) {
-					continue;
-				}
-			}
-			ForgeDirection dir = ForgeDirection.getOrientation(i);
-			TileEntity te = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-			if (te != null) {
-				//handle contoller
-				if (te instanceof TileEntityPortalControllerEntity) {
-					//there already was a controller
-					if (!controller.isNull()) {
-						if (te.equals(controller.get())) {
-							//already been here
-							return Result.SUCCESS;
-						}
-						return Result.ERROR_MULTIPLE_CONTROLLERS;
-					}
-					if (((TileEntityPortalControllerEntity) te).isActive()) {
-						return Result.ERROR_OPEN_PORTAL;
-					}
-					//setting found controller
-					controller.set((TileEntityPortalControllerEntity) te);
-					//continue without changes, as controller don't need to be part of the portal
-					Result result = PortalContructor.createPortalMultiBlock(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, dir.getOpposite().ordinal(), frames, controller, metrics, finishedAxis);
-					//cancel on error
-					if (result != Result.ERROR_NO_PORTAL_BLOCK) {
-						return result;
-					}
-				} else if (te instanceof TileEntityPortalFrame) {
-					if (frames.contains(te)) {
-						return Result.SUCCESS;
-					}
-					//open portal
-					if (((TileEntityPortalFrame) te).isActive()) {
-						return Result.ERROR_OPEN_PORTAL;
-					}
-					//inside Portal
-					if (metrics.isBlockInsideFrame(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)) {
-						LogHelper.info("Block inside Portal found!");
-						return Result.ERROR_INVALID_STRUCTURE;
-					}
-					//outside portal
-					if (finishedAxis.contains(dir) && !metrics.isBlockInside(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)) {
-						LogHelper.info("Block outside portal found!");
-						return Result.ERROR_INVALID_STRUCTURE;
-					}
-					//frame
-					//direction change
-					if (ForgeDirection.getOrientation(from) != ForgeDirection.UNKNOWN && dir != ForgeDirection.getOrientation(from).getOpposite()) {
-						finishedAxis.add(ForgeDirection.getOrientation(from).getOpposite());
-					}
-					//add position to portal metrics
-					metrics.addCoord(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-					//check size
-					if (metrics.biggestDimension() > Settings.MAX_PORTAL_SIZE) {
-						return Result.ERROR_TO_BIG;
-					}
-					frames.add((TileEntityPortalFrame) te);
-					//continue
-					Result result = PortalContructor.createPortalMultiBlock(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, dir.getOpposite().ordinal(), frames, controller, metrics, finishedAxis);
-					//return result
-					return result;
-				}
-
-			}
-		}
-		return Result.ERROR_NO_PORTAL_BLOCK;
-		*/
 	}
 
 	private static Result findPortalBockAt(World world, int x, int y, int z, ForgeDirection from, List<IEntityPortalMandatoryComponent> frames, SimpleObjectReference<TileEntityPortalControllerEntity> controller, PortalMetrics metrics, List<ForgeDirection> finishedAxis, boolean isNewAxis) {
@@ -280,7 +150,8 @@ public class PortalContructor {
 		return Result.ERROR_NO_PORTAL_BLOCK;
 	}
 
-	private void cleanUsedAxis(List<ForgeDirection> axis, ForgeDirection currentAxis) {
-
+	public static boolean createPortalFromMetrics() {
+		//TODO implement portal placer
+		return false;
 	}
 }

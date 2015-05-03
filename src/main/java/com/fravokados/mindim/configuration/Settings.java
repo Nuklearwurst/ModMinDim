@@ -12,4 +12,5 @@ public class Settings {
 	public static int MAX_PORTAL_SIZE = 20;
 	public static int MIN_PORTAL_SIZE = 4;
 
+	public static int PORTAL_CONNECTION_TIME = 100; //in ticks
 }

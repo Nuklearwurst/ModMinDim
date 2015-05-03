@@ -1,8 +1,7 @@
 package com.fravokados.mindim.item;
 
-import com.fravokados.techmobs.lib.Textures;
+import com.fravokados.mindim.lib.Textures;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
@@ -29,16 +28,18 @@ public abstract class ItemMDBlockMultiType extends ItemBlock {
 	@Override
 	public String getUnlocalizedName()
 	{
-		return String.format("item.%s%s", Textures.TEXTURE_PREFIX, getUnwrappedUnlocalizedName(super.getUnlocalizedName()));
+		//Using tile here, as it is an itemBlock
+		return String.format("tile.%s%s", Textures.TEXTURE_PREFIX, getUnwrappedUnlocalizedName(super.getUnlocalizedName()));
 	}
 
 	@Override
 	public String getUnlocalizedName(ItemStack s) {
-		return String.format("item.%s%s", Textures.TEXTURE_PREFIX, getUnwrappedUnlocalizedName(getUnlocalizedNameForItem(s)));
+		//Using tile here, as it is an itemBlock
+		return String.format("tile.%s%s", Textures.TEXTURE_PREFIX, getUnwrappedUnlocalizedName(getUnlocalizedNameForItem(s)));
 	}
 
 	protected abstract String getUnlocalizedNameForItem(ItemStack stack);
 
-	@Override
-	public abstract void registerIcons(IIconRegister register);
+//	@Override
+//	public abstract void registerIcons(IIconRegister register);
 }

@@ -4,14 +4,20 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.lib.GUIIDs;
+import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.portal.PortalManager;
+import com.fravokados.mindim.util.MachineUtils;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -23,6 +29,9 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 
 	public static final int META_FRAME_ENTITY = 0;
 	public static final int META_CONTROLLER_ENTITY = 1;
+
+	private IIcon iconFrame;
+	private IIcon iconController;
 
 	public BlockPortalFrame() {
 		super(Material.rock);
@@ -78,5 +87,43 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 		list.add(new ItemStack(item, 1, 1));
 	}
 
+	@Override
+	public void registerBlockIcons(IIconRegister iconRegister) {
+		iconFrame = iconRegister.registerIcon(Textures.BLOCK_PORTAL_FRAME);
+		iconController = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER);
+	}
 
+	@Override
+	public IIcon getIcon(int side, int meta) {
+		switch (meta) {
+			case META_FRAME_ENTITY:
+				return iconFrame;
+			case META_CONTROLLER_ENTITY:
+				return iconController;
+		}
+		return iconFrame;
+	}
+
+	@Override
+	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
+		TileEntity te = world.getTileEntity(x, y, z);
+		if(te != null && te instanceof TileEntityPortalControllerEntity) {
+			byte facing = ((IFacingSix) te).getFacing();
+			if(side == facing) {
+				return iconController;
+			} else {
+				return iconFrame;
+			}
+		}
+		return super.getIcon(world, x, y, z, side);
+	}
+
+	@Override
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack stack) {
+		super.onBlockPlacedBy(world, x, y, z, entityLivingBase, stack);
+		TileEntity te = world.getTileEntity(x, y, z);
+		if(te != null && te instanceof IFacingSix) {
+			MachineUtils.updateFacing((IFacingSix) te, entityLivingBase, x, y, z);
+		}
+	}
 }

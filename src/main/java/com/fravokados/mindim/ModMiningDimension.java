@@ -14,6 +14,7 @@ import com.fravokados.mindim.event.ModEventHandler;
 import com.fravokados.mindim.item.ItemBlockPortalFrame;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.lib.Reference;
+import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.network.NetworkManager;
 import com.fravokados.mindim.portal.PortalManager;
 import cpw.mods.fml.common.Mod;
@@ -57,16 +58,16 @@ public class ModMiningDimension {
 	    config.load(true);
 
         portalFrame = new BlockPortalFrame();
-        GameRegistry.registerBlock(portalFrame, ItemBlockPortalFrame.class, "portalMachine");
+        GameRegistry.registerBlock(portalFrame, ItemBlockPortalFrame.class, Strings.Block.portalMachineBase);
         portalBlock = new BlockPortalMinDim();
-	    GameRegistry.registerBlock(portalBlock, "portalBlock");
+	    GameRegistry.registerBlock(portalBlock, Strings.Block.portal);
 
 	    itemDestinationCard = new ItemDestinationCard();
 	    GameRegistry.registerItem(itemDestinationCard, "destinationCard");
 
-        GameRegistry.registerTileEntity(TileEntityPortalControllerEntity.class, "TileEntityPortalControllerEntity");
-	    GameRegistry.registerTileEntity(TileEntityPortal.class, "TileEntityPortal");
-	    GameRegistry.registerTileEntity(TileEntityPortalFrame.class, "TileEntityPortalFrame");
+        GameRegistry.registerTileEntity(TileEntityPortalControllerEntity.class, Strings.TileEntity.TILE_ENTITY_PORTAL_CONTROLLER_ENTITY);
+	    GameRegistry.registerTileEntity(TileEntityPortal.class, Strings.TileEntity.TILE_ENTITY_PORTAL);
+	    GameRegistry.registerTileEntity(TileEntityPortalFrame.class, Strings.TileEntity.TILE_ENTITY_PORTAL_FRAME);
 
         MinecraftForge.EVENT_BUS.register(new ModEventHandler());
     }

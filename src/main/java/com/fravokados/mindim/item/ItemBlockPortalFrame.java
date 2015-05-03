@@ -3,7 +3,6 @@ package com.fravokados.mindim.item;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.lib.Strings;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -27,8 +26,8 @@ public class ItemBlockPortalFrame extends ItemMDBlockMultiType {
 		return super.getUnlocalizedName(stack);
 	}
 
-	@Override
-	public void registerIcons(IIconRegister register) {
-
-	}
+//	@Override
+//	public void registerIcons(IIconRegister register) {
+//
+//	}
 }

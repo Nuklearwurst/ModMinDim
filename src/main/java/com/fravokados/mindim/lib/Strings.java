@@ -19,6 +19,13 @@ public class Strings {
 		public static final String destinationCard = "destinationCard";
 	}
 
+	public static final class TileEntity {
+
+		public static final String TILE_ENTITY_PORTAL_CONTROLLER_ENTITY = "TileEntityPortalControllerEntity";
+		public static final String TILE_ENTITY_PORTAL = "TileEntityPortal";
+		public static final String TILE_ENTITY_PORTAL_FRAME = "TileEntityPortalFrame";
+	}
+
 	public static final class Keys {
 
 		public static final String KEY_GENERAL_SETTINGS = "General Settings";

@@ -1,20 +1,27 @@
 package com.fravokados.mindim.block.tile;
 
 import com.fravokados.mindim.block.IBlockPlacedListener;
+import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.portal.PortalContructor;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 /**
  * @author Nuklearwurst
  */
-public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedListener, IEntityPortalMandatoryComponent {
+public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedListener, IEntityPortalMandatoryComponent, IFacingSix {
 
 	private boolean validPortal = false;
 
 	private int coreX;
 	private int coreY;
 	private int coreZ;
+
+	private byte facing = 1;
 
 	public void setPortalController(int x, int y, int z) {
 		this.coreX = x;
@@ -33,5 +40,48 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 		return validPortal && te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).isActive();
 	}
 
+	@Override
+	public void readFromNBT(NBTTagCompound nbt) {
+		super.readFromNBT(nbt);
+		coreX = nbt.getInteger("coreX");
+		coreY = nbt.getInteger("coreY");
+		coreZ = nbt.getInteger("coreZ");
+		facing = nbt.getByte("facing");
+	}
 
+	@Override
+	public void writeToNBT(NBTTagCompound nbt) {
+		super.writeToNBT(nbt);
+		nbt.setInteger("coreX", coreX);
+		nbt.setInteger("coreY", coreY);
+		nbt.setInteger("coreZ", coreZ);
+		nbt.setByte("facing", facing);
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setByte("facing", facing);
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		NBTTagCompound nbt = pkt.func_148857_g();
+		if(nbt != null && nbt.hasKey("facing")) {
+			int old = facing;
+			facing = nbt.getByte("facing");
+			if(old != facing) {
+				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			}
+		}
+	}
+
+	public void setFacing(byte facing) {
+		this.facing = facing;
+	}
+
+	public byte getFacing() {
+		return facing;
+	}
 }

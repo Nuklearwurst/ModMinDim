@@ -1,7 +1,7 @@
 package com.fravokados.mindim.item;
 
 import com.fravokados.mindim.creativetab.CreativeTabMinDim;
-import com.fravokados.techmobs.lib.Textures;
+import com.fravokados.mindim.lib.Textures;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

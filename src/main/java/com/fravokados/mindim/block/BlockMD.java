@@ -41,7 +41,7 @@ public class BlockMD extends Block {
 	@Override
 	public String getUnlocalizedName()
 	{
-		return String.format("tile.%s%s", Textures.TEXTURE_PREFIX, getUnwrappedUnlocalizedName(super.getUnlocalizedName()));
+		return String.format("tile.%s%s", Textures.TEXTURE_PREFIX, getUnwrappedUnlocalizedName(super.getUnlocalizedName())); //tile.MOD_ID:BLOCK_NAME
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.fravokados.mindim.portal;
 
 import com.fravokados.mindim.block.BlockPortalMinDim;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 /**
@@ -157,6 +158,39 @@ public class PortalMetrics {
 		return  e.posX >= minX - padding && e.posX <= maxX + padding + 1
 				&& e.posY >= minY - padding && e.posY <= maxY + padding + 1
 				&& e.posZ >= minZ - padding && e.posZ <= maxZ + padding + 1;
+	}
+
+	public void writeToNBT(NBTTagCompound nbt) {
+		nbt.setDouble("originX", originX);
+		nbt.setDouble("originY", originY);
+		nbt.setDouble("originZ", originZ);
+		nbt.setInteger("minX", minX);
+		nbt.setInteger("minY", minY);
+		nbt.setInteger("minZ", minZ);
+		nbt.setInteger("maxX", maxX);
+		nbt.setInteger("maxY", maxY);
+		nbt.setInteger("maxZ", maxZ);
+	}
+
+	public void readFromNBT(NBTTagCompound nbt) {
+		originX = nbt.getDouble("originX");
+		originY = nbt.getDouble("originY");
+		originZ = nbt.getDouble("originZ");
+		minX = nbt.getInteger("minX");
+		minY = nbt.getInteger("minY");
+		minZ = nbt.getInteger("minZ");
+		maxX = nbt.getInteger("maxX");
+		maxY = nbt.getInteger("maxY");
+		maxZ = nbt.getInteger("maxZ");
+	}
+
+	public static PortalMetrics getMetricsFromNBT(NBTTagCompound nbt) {
+		if(nbt == null) {
+			return null;
+		}
+		PortalMetrics metrics = new PortalMetrics();
+		metrics.readFromNBT(nbt);
+		return metrics;
 	}
 }
 

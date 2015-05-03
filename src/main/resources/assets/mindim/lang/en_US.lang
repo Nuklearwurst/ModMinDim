@@ -1,0 +1,9 @@
+
+
+
+#Blocks
+tile.mindim:portalController.name=Portal Controller
+tile.mindim:portalFrame.name=Portal Frame
+
+#Items
+item.mindim:destinationCard.name=Destination Card
