@@ -1,9 +1,14 @@
 package com.fravokados.mindim.portal;
 
 import com.fravokados.mindim.block.BlockPortalMinDim;
+import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
+import com.fravokados.mindim.util.RotationUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.List;
 
 /**
  * @author Nuklearwurst
@@ -24,6 +29,9 @@ public class PortalMetrics {
 			return Type.values()[i].name;
 		}
 	}
+
+	public ForgeDirection top = ForgeDirection.UP;
+	public ForgeDirection front = ForgeDirection.EAST;
 
 	public double originX;
 	public double originY;
@@ -98,7 +106,7 @@ public class PortalMetrics {
 		return 0;
 	}
 
-	public void placePortalsInsideFrame(World world, int x, int y, int z) {
+	public boolean placePortalsInsideFrame(World world, int x, int y, int z) {
 		for(int j = minX; j <= maxX; j++) { //X
 			for(int k = minY; k <= maxY; k++) { //Y
 				for(int l = minZ; l <= maxZ; l++) { //Z
@@ -115,6 +123,7 @@ public class PortalMetrics {
 				}
 			}
 		}
+		return true;
 	}
 
 	public void removePortalsInsideFrame(World world) {
@@ -144,7 +153,7 @@ public class PortalMetrics {
 		originZ = z;
 	}
 
-	public void calculateOrigin() {
+	public void calculateOrigin(List<IEntityPortalMandatoryComponent> list) {
 		if(maxY - minY == 0) {
 			originY = minY + 1.5;
 		} else {
@@ -152,6 +161,36 @@ public class PortalMetrics {
 		}
 		originX = minX + (maxX - minX) / 2 + 0.5;
 		originZ = minZ + (maxZ - minZ) / 2 + 0.5;
+		//Orientation
+		int[] orientation = {0, 0, 0, 0, 0, 0};
+		for(IEntityPortalMandatoryComponent frame : list) {
+			orientation[frame.getFacing()]++;
+		}
+		int facing = 0;
+		int max = 0;
+		for(int i = 0; i < 6; i++) {
+			if(orientation[i] > max) {
+				facing = i;
+				max = orientation[i];
+			}
+		}
+		front = ForgeDirection.getOrientation(facing);
+		if(maxX - minX == 0) {
+			top = ForgeDirection.UP;
+			if(front != ForgeDirection.EAST && front != ForgeDirection.WEST) {
+				front = ForgeDirection.EAST;
+			}
+		} else if(maxY - minY == 0) {
+			top = ForgeDirection.EAST;
+			if(front != ForgeDirection.DOWN && front != ForgeDirection.UP) {
+				front = ForgeDirection.UP;
+			}
+		} else if(maxZ - minZ == 0) {
+			top = ForgeDirection.UP;
+			if(front != ForgeDirection.NORTH && front != ForgeDirection.SOUTH) {
+				front = ForgeDirection.NORTH;
+			}
+		}
 	}
 
 	public boolean isEntityInsidePortal(Entity e, double padding) {
@@ -170,6 +209,8 @@ public class PortalMetrics {
 		nbt.setInteger("maxX", maxX);
 		nbt.setInteger("maxY", maxY);
 		nbt.setInteger("maxZ", maxZ);
+		nbt.setInteger("top", top.ordinal());
+		nbt.setInteger("front", front.ordinal());
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
@@ -182,6 +223,8 @@ public class PortalMetrics {
 		maxX = nbt.getInteger("maxX");
 		maxY = nbt.getInteger("maxY");
 		maxZ = nbt.getInteger("maxZ");
+		top = ForgeDirection.getOrientation(nbt.getInteger("top"));
+		front = ForgeDirection.getOrientation(nbt.getInteger("front"));
 	}
 
 	public static PortalMetrics getMetricsFromNBT(NBTTagCompound nbt) {
@@ -190,6 +233,78 @@ public class PortalMetrics {
 		}
 		PortalMetrics metrics = new PortalMetrics();
 		metrics.readFromNBT(nbt);
+		return metrics;
+	}
+
+	public double getMaxUp() {
+		if(top.offsetX != 0) {
+			return maxX - originX;
+		} else if(top.offsetY != 0) {
+			return  maxY - originY;
+		} else if(top.offsetZ != 0) {
+			return maxZ - originZ;
+		}
+		return 0;
+	}
+
+	public double getMinUp() {
+		if(top.offsetX != 0) {
+			return minX - originX;
+		} else if(top.offsetY != 0) {
+			return  minY - originY;
+		} else if(top.offsetZ != 0) {
+			return minZ - originZ;
+		}
+		return 0;
+	}
+
+	public double getMaxSide() {
+		ForgeDirection side = top.getRotation(front);
+		if(side.offsetX != 0) {
+			return maxX - originX;
+		} else if(side.offsetY != 0) {
+			return  maxY - originY;
+		} else if(side.offsetZ != 0) {
+			return maxZ - originZ;
+		}
+		return 0;
+	}
+
+	public double getMinSide() {
+		ForgeDirection side = top.getRotation(front);
+		if(side.offsetX != 0) {
+			return minX - originX;
+		} else if(side.offsetY != 0) {
+			return  minY - originY;
+		} else if(side.offsetZ != 0) {
+			return minZ - originZ;
+		}
+		return 0;
+	}
+
+	/**
+	 * not working?
+	 * @param target
+	 * @return
+	 */
+	@Deprecated
+	public PortalMetrics getRotatedMetrics(PortalMetrics target) {
+		PortalMetrics metrics = new PortalMetrics();
+		metrics.minX = (int) RotationUtils.getOffsetXForRotation(minX, top, target.top, front, target.front);
+		metrics.minY = (int) RotationUtils.getOffsetYForRotation(minY, top, target.top, front, target.front);
+		metrics.minZ = (int) RotationUtils.getOffsetZForRotation(minZ, top, target.top, front, target.front);
+
+		metrics.maxX = (int) RotationUtils.getOffsetXForRotation(maxX, top, target.top, front, target.front);
+		metrics.maxY = (int) RotationUtils.getOffsetYForRotation(maxY, top, target.top, front, target.front);
+		metrics.maxZ = (int) RotationUtils.getOffsetZForRotation(maxZ, top, target.top, front, target.front);
+
+		metrics.originX = RotationUtils.getOffsetXForRotation(originX, top, target.top, front, target.front);
+		metrics.originY = RotationUtils.getOffsetYForRotation(originY, top, target.top, front, target.front);
+		metrics.originZ = RotationUtils.getOffsetZForRotation(originZ, top, target.top, front, target.front);
+
+		metrics.init = true;
+		metrics.top = target.top;
+		metrics.front = target.front;
 		return metrics;
 	}
 }

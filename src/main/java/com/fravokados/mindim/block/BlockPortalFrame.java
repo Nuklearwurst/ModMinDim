@@ -6,7 +6,7 @@ import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.lib.GUIIDs;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.portal.PortalManager;
-import com.fravokados.mindim.util.MachineUtils;
+import com.fravokados.mindim.util.RotationUtils;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -123,7 +123,7 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 		super.onBlockPlacedBy(world, x, y, z, entityLivingBase, stack);
 		TileEntity te = world.getTileEntity(x, y, z);
 		if(te != null && te instanceof IFacingSix) {
-			MachineUtils.updateFacing((IFacingSix) te, entityLivingBase, x, y, z);
+			RotationUtils.updateFacing((IFacingSix) te, entityLivingBase, x, y, z);
 		}
 	}
 }

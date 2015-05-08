@@ -19,6 +19,9 @@ public class ContainerEntityPortalController extends Container implements IEleme
 
 	private TileEntityPortalControllerEntity te;
 
+	private TileEntityPortalControllerEntity.Error lastError = TileEntityPortalControllerEntity.Error.NO_ERROR;
+	private TileEntityPortalControllerEntity.State lastState = TileEntityPortalControllerEntity.State.READY;
+
 
 	public ContainerEntityPortalController(InventoryPlayer player, TileEntityPortalControllerEntity te) {
 		super();
@@ -46,12 +49,26 @@ public class ContainerEntityPortalController extends Container implements IEleme
 		//TODO update energy
 		super.addCraftingToCrafters(crafter);
 		crafter.sendProgressBarUpdate(this, 0, te.getId());
+		crafter.sendProgressBarUpdate(this, 1, te.getState().ordinal());
+		crafter.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
 	}
 
 	@Override
 	public void detectAndSendChanges() {
 		//TODO update energy
 		super.detectAndSendChanges();
+		for (int i = 0; i < this.crafters.size(); ++i)
+		{
+			ICrafting icrafting = (ICrafting)this.crafters.get(i);
+			if(this.lastState != te.getState()) {
+				icrafting.sendProgressBarUpdate(this, 1, te.getState().ordinal());
+			}
+			if(this.lastError != te.getLastError()){
+				icrafting.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
+			}
+		}
+		this.lastState = te.getState();
+		this.lastError = te.getLastError();
 	}
 
 
@@ -62,6 +79,12 @@ public class ContainerEntityPortalController extends Container implements IEleme
 		switch (index) {
 			case 0:
 				this.te.setId(value);
+				break;
+			case 1:
+				this.te.setState(TileEntityPortalControllerEntity.State.values()[value]);
+				break;
+			case 2:
+				this.te.setLastError(TileEntityPortalControllerEntity.Error.values()[value]);
 				break;
 		}
 	}

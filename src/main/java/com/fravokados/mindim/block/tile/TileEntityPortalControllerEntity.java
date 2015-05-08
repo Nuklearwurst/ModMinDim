@@ -12,14 +12,20 @@ import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 /**
  * @author Nuklearwurst
@@ -38,7 +44,8 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	public enum Error {
 		//TODO: translation
-		NO_ERROR("No Error"), INVALID_DESTINATION("Invalid Destination");
+		NO_ERROR("No Error"), INVALID_DESTINATION("Invalid Destination"),
+		INVALID_PORTAL_STRUCTURE("Portal Structure is not intact!"), CONNECTION_INTERRUPED("Connection Interrupted!");
 
 		/** unlocalized name */
 		public final String name;
@@ -85,14 +92,31 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 	}
 
-	public void openPortal() {
+	public boolean openPortal() {
 		if(metrics != null) {
-			metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
+			return metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 		}
+		return false;
 	}
 
 	public PortalMetrics getMetrics() {
 		return metrics;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public Error getLastError() {
+		return lastError;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	public void setLastError(Error lastError) {
+		this.lastError = lastError;
 	}
 
 	public int getId() {
@@ -128,8 +152,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * @param entity
 	 */
 	public void teleportEntity(Entity entity) {
-		if(metrics != null && metrics.isEntityInsidePortal(entity, 0)) {
-			ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics);
+		if(state == State.OUTGOING_PORTAL && metrics != null && metrics.isEntityInsidePortal(entity, 0)) {
+			if(!ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics)) {
+				state = State.READY;
+				lastError = Error.CONNECTION_INTERRUPED;
+				collapseWholePortal();
+			}
 		}
 	}
 
@@ -171,6 +199,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
+		if(worldObj.isRemote) {
+			return;
+		}
 		if(id > -1 && inventory[2] != null && inventory[3] == null) {
 			inventory[3] = inventory[2];
 			inventory[2] = null;
@@ -187,15 +218,28 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 					portalDestination = PortalManager.getInstance().createPortal(id, metrics);
 				}
 				//TODO: better portal connection
-				if(portalDestination < 0) {
+				if(portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 					if(pos == null) {
 						state = State.READY;
 						lastError = Error.INVALID_DESTINATION;
 					} else {
-						state = State.OUTGOING_PORTAL;
-						lastError = Error.NO_ERROR;
-						openPortal();
+						if(!openPortal()) {
+							state = State.READY;
+							lastError = Error.INVALID_PORTAL_STRUCTURE;
+						} else {
+							MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+							WorldServer world = server.worldServerForDimension(pos.dimension);
+							TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+							if(te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).openPortal()) {
+								((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
+								state = State.OUTGOING_PORTAL;
+								lastError = Error.NO_ERROR;
+							} else {
+								state = State.READY;
+								lastError = Error.CONNECTION_INTERRUPED;
+							}
+						}
 					}
 				} else {
 					//connection failed
@@ -321,7 +365,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 		id = nbt.getInteger("PortalID");
 		facing = nbt.getByte("facing");
-		metrics = PortalMetrics.getMetricsFromNBT(nbt.getCompoundTag("metrics"));
+		if(nbt.hasKey("metrics")) {
+			metrics = PortalMetrics.getMetricsFromNBT(nbt.getCompoundTag("metrics"));
+		}
 	}
 
 	@Override
@@ -344,10 +390,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 		nbt.setInteger("PortalID", id);
 		nbt.setByte("facing", facing);
-
-		NBTTagCompound metricsTag = new NBTTagCompound();
-		metrics.writeToNBT(metricsTag);
-		nbt.setTag("metrics", metricsTag);
+		if(metrics != null) {
+			NBTTagCompound metricsTag = new NBTTagCompound();
+			metrics.writeToNBT(metricsTag);
+			nbt.setTag("metrics", metricsTag);
+		}
 	}
 
 	@Override
@@ -379,7 +426,26 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	public void handleStopButton(ContainerEntityPortalController containerEntityPortalController) {
-		collapseWholePortal();
+		switch (state) {
+			case OUTGOING_PORTAL:
+				BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
+				if(pos != null) {
+					MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+					WorldServer world = server.worldServerForDimension(pos.dimension);
+					TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+					if(te != null && te instanceof TileEntityPortalControllerEntity) {
+						((TileEntityPortalControllerEntity) te).setState(State.READY);
+						((TileEntityPortalControllerEntity) te).collapseWholePortal();
+					}
+				}
+				state = State.READY;
+				collapseWholePortal();
+				break;
+			case CONNECTING:
+				state = State.READY;
+				break;
+
+		}
 	}
 
 	public void collapseWholePortal() {
@@ -396,5 +462,24 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public byte getFacing() {
 		return facing;
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setByte("facing", facing);
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		NBTTagCompound nbt = pkt.func_148857_g();
+		if(nbt != null && nbt.hasKey("facing")) {
+			int old = facing;
+			facing = nbt.getByte("facing");
+			if(old != facing) {
+				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			}
+		}
 	}
 }

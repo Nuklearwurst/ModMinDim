@@ -48,7 +48,7 @@ public class PortalContructor {
 		for (IEntityPortalMandatoryComponent frame : frames) {
 			frame.setPortalController(controller.get().xCoord, controller.get().yCoord, controller.get().zCoord);
 		}
-		metrics.calculateOrigin();
+		metrics.calculateOrigin(frames);
 		//update controller
 		controller.get().updateMetrics(metrics);
 
@@ -88,13 +88,13 @@ public class PortalContructor {
 					finishedAxis.add(from);
 				}
 			} else if (result != Result.ERROR_NO_PORTAL_BLOCK) {
-				//backtrace if portal could not be completed in that direction
+				//backtrace if portal could not be completed in that top
 				return result;
 			}
 
 		}
 		if (!from.equals(ForgeDirection.UNKNOWN) && !finishedAxis.contains(from)) {
-			//finish direction
+			//finish top
 			finishedAxis.add(from);
 		}
 		//start search
@@ -110,7 +110,7 @@ public class PortalContructor {
 					finishedAxis.add(from);
 				}
 			} else if (result != Result.ERROR_NO_PORTAL_BLOCK) {
-				//backtrace if portal could not be completed in that direction
+				//backtrace if portal could not be completed in that top
 				return result;
 			}
 		}

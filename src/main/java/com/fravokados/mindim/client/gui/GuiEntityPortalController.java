@@ -21,6 +21,7 @@ public class GuiEntityPortalController extends GuiContainer {
 	private TileEntityPortalControllerEntity te;
 
 	private GuiButton btnStop;
+	private GuiButton btnStart;
 
 	public GuiEntityPortalController(InventoryPlayer inv, TileEntityPortalControllerEntity te) {
 		super(new ContainerEntityPortalController(inv, te));
@@ -34,9 +35,10 @@ public class GuiEntityPortalController extends GuiContainer {
 	public void initGui() {
 		super.initGui();
 		this.guiLeft = (this.width - 176) / 2 - 47;
-		this.buttonList.add(new GuiButton(BUTTON_ID_START, guiLeft + 75, guiTop + 78, 56, 20, "Start"));
+
+		btnStart = new GuiButton(BUTTON_ID_START, guiLeft + 75, guiTop + 78, 56, 20, "Start");
+		this.buttonList.add(btnStart);
 		btnStop = new GuiButton(BUTTON_ID_STOP, guiLeft + 133, guiTop + 78, 56, 20, "Stop");
-		//btnStop.enabled = false;
 		this.buttonList.add(btnStop);
 	}
 
@@ -55,6 +57,13 @@ public class GuiEntityPortalController extends GuiContainer {
 	}
 
 	@Override
+	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
+		btnStart.enabled = te.getState() == TileEntityPortalControllerEntity.State.READY;
+		btnStop.enabled = te.getState() == TileEntityPortalControllerEntity.State.CONNECTING || te.getState() == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL;
+		super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
+	}
+
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		mc.getTextureManager().bindTexture(Textures.GUI_ENTITY_PORTAL_CONTROLLER);
@@ -65,7 +74,9 @@ public class GuiEntityPortalController extends GuiContainer {
 	protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_) {
 		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
 		drawString(this.fontRendererObj, "ID: " + te.getId(), 58, 18, 4210752);
-		drawString(this.fontRendererObj, "Destination: " + te.getDestination(), 58, 40, 4210752);
+		drawString(this.fontRendererObj, "Destination: " + te.getDestination(), 58, 30, 4210752);
+		drawString(this.fontRendererObj, "State: " + te.getState(), 58, 40, 4210752);
+		drawString(this.fontRendererObj, "Last Error: " + te.getLastError().name, 58, 50, 4210752);
 	}
 
 

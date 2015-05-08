@@ -10,7 +10,7 @@ public class Settings {
 	public static boolean DEBUG = false;
 
 	public static int MAX_PORTAL_SIZE = 20;
-	public static int MIN_PORTAL_SIZE = 4;
+	public static int MIN_PORTAL_SIZE = 2; //FIXME: portal size seems to be not working properly, this value will allow sizes of 4 or more!
 
 	public static int PORTAL_CONNECTION_TIME = 100; //in ticks
 }

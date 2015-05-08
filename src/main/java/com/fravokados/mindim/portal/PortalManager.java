@@ -10,8 +10,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -101,9 +103,6 @@ public class PortalManager extends WorldSavedData {
 		if (pos == null) {
 			return false;
 		}
-		double offsetX = entity.posX - metrics.originX;
-		double offsetY = entity.posY - metrics.originY;
-		double offsetZ = entity.posZ - metrics.originZ;
 
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 		WorldServer worldServer = server.worldServerForDimension(pos.dimension);
@@ -113,9 +112,56 @@ public class PortalManager extends WorldSavedData {
 			if(m != null) {
 				//TODO: update player rotation
 				//TODO: update portal boundaries
-				double x = m.originX + offsetX;
-				double y = m.originY + offsetY;
-				double z = m.originZ + offsetZ;
+				ForgeDirection zAxis = metrics.top.getRotation(metrics.front);
+				ForgeDirection zAxisTarget = m.top.getRotation(m.front);
+
+				double offsetX = entity.posX - metrics.originX;
+				double offsetY = entity.posY - metrics.originY;
+				double offsetZ = entity.posZ - metrics.originZ;
+//
+//				//make sure player spawns inside the portal
+//				if(metrics.front.offsetX != 0) {
+//					offsetX = 0;
+//				} else if(metrics.front.offsetY != 0) {
+//					offsetY = 0;
+//				} else if(metrics.front.offsetZ != 0) {
+//					offsetZ = 0;
+//				}
+
+				double maxUp = m.getMaxUp();
+				double minUp = m.getMinUp();
+				double maxSide = m.getMaxSide();
+				double minSide = m.getMinSide();
+
+				//relative coordinate system
+//				double a1 = offsetX * metrics.front.offsetX + offsetY * metrics.front.offsetY + offsetZ * metrics.front.offsetZ;
+				double a2 = offsetY * metrics.top.offsetX + offsetY * metrics.top.offsetY + offsetZ * metrics.top.offsetZ;
+				double a3 = offsetZ * zAxis.offsetX + offsetY * zAxis.offsetY + offsetZ * zAxis.offsetZ;
+
+
+				//make sure player spawns inside portal
+				a2 = MathHelper.clamp_double(a2, minUp, maxUp);
+				a3 = MathHelper.clamp_double(a3, minSide, maxSide);
+
+				double x = m.originX /*+ m.front.offsetX * a1*/ + m.top.offsetX * a2 + zAxisTarget.offsetX * a3;
+				double y = m.originY /*+ m.front.offsetY * a1*/ + m.top.offsetY * a2 + zAxisTarget.offsetY * a3;
+				double z = m.originZ /*+ m.front.offsetZ * a1*/ + m.top.offsetZ * a2 + zAxisTarget.offsetZ * a3;
+
+//				double x = m.originX + offsetX * RotationUtils.getTransformationDirection(metrics.front, m.front).offsetX + offsetY * RotationUtils.getTransformationDirection(metrics.top, m.top).offsetX + offsetZ * RotationUtils.getTransformationDirection(zAxis, zAxisTarget).offsetX;
+//				double y = m.originX + offsetX * RotationUtils.getTransformationDirection(metrics.front, m.front).offsetY + offsetY * RotationUtils.getTransformationDirection(metrics.top, m.top).offsetY + offsetZ * RotationUtils.getTransformationDirection(zAxis, zAxisTarget).offsetY;
+//				double z = m.originX + offsetX * RotationUtils.getTransformationDirection(metrics.front, m.front).offsetZ + offsetY * RotationUtils.getTransformationDirection(metrics.top, m.top).offsetZ + offsetZ * RotationUtils.getTransformationDirection(zAxis, zAxisTarget).offsetZ;
+//				double x = m.originX
+//						+ RotationUtils.getOffsetXForRotation(offsetX, metrics.top, m.top, metrics.front, m.front)
+//						+ RotationUtils.getOffsetXForRotation(offsetY, metrics.top, m.top, metrics.front, m.front)
+//						+ RotationUtils.getOffsetXForRotation(offsetZ, metrics.top, m.top, metrics.front, m.front);
+//				double y = m.originY
+//						+ RotationUtils.getOffsetYForRotation(offsetX, metrics.top, m.top, metrics.front, m.front)
+//						+ RotationUtils.getOffsetYForRotation(offsetY, metrics.top, m.top, metrics.front, m.front)
+//						+ RotationUtils.getOffsetYForRotation(offsetZ, metrics.top, m.top, metrics.front, m.front);
+//				double z = m.originZ
+//						+ RotationUtils.getOffsetZForRotation(offsetX, metrics.top, m.top, metrics.front, m.front)
+//						+ RotationUtils.getOffsetZForRotation(offsetY, metrics.top, m.top, metrics.front, m.front)
+//						+ RotationUtils.getOffsetZForRotation(offsetZ, metrics.top, m.top, metrics.front, m.front);
 
 				if (entity instanceof EntityPlayerMP) {
 					if (pos.dimension == entity.dimension) {

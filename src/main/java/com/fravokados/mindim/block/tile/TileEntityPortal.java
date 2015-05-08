@@ -3,6 +3,10 @@ package com.fravokados.mindim.block.tile;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.util.LogHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 /**
@@ -66,5 +70,24 @@ public class TileEntityPortal extends TileEntity implements IFacingSix {
 	@Override
 	public byte getFacing() {
 		return facing;
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setByte("facing", facing);
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		NBTTagCompound nbt = pkt.func_148857_g();
+		if(nbt != null && nbt.hasKey("facing")) {
+			int old = facing;
+			facing = nbt.getByte("facing");
+			if(old != facing) {
+				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			}
+		}
 	}
 }
