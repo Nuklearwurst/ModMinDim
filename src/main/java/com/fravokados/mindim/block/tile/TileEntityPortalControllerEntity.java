@@ -1,11 +1,14 @@
 package com.fravokados.mindim.block.tile;
 
 import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.block.tile.energy.EnergyStorage;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
+import com.fravokados.mindim.plugin.EnergyTypes;
 import com.fravokados.mindim.portal.BlockPositionDim;
 import com.fravokados.mindim.portal.PortalContructor;
 import com.fravokados.mindim.portal.PortalManager;
@@ -13,6 +16,10 @@ import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
 import cpw.mods.fml.common.FMLCommonHandler;
+import ic2.api.energy.event.EnergyTileLoadEvent;
+import ic2.api.energy.event.EnergyTileUnloadEvent;
+import ic2.api.energy.tile.IEnergySink;
+import ic2.api.tile.IWrenchable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -26,11 +33,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * @author Nuklearwurst
  */
-public class TileEntityPortalControllerEntity extends TileEntity implements IInventory, IBlockPlacedListener, IEntityPortalOptionalComponent, IFacingSix {
+public class TileEntityPortalControllerEntity extends TileEntity implements IInventory, IBlockPlacedListener, IEntityPortalOptionalComponent, IFacingSix, IEnergySink, IWrenchable {
 
 	/**
 	 * possible states of the controller
@@ -70,7 +79,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	private int portalDestination = PortalManager.PORTAL_NOT_CONNECTED;
 
 	/** block facing */
-	private byte facing = 0;
+	private short facing = 0;
 
 	/** controller state */
 	private State state = State.READY;
@@ -78,6 +87,14 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	/** current progress */
 	private int tick = 0;
+
+	/** gets set to true on first world tick, used for energy initialization */
+	private boolean init = false;
+
+	/** EnergyType of this block */
+	private EnergyTypes energyType = EnergyTypes.IC2; //TODO proper initialization of this value and support of different energy mods
+	/** Energy Storage */
+	private EnergyStorage energy;
 
 
 
@@ -202,6 +219,15 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		if(worldObj.isRemote) {
 			return;
 		}
+		//Do first tick initialization
+		if(!init) {
+			init = true;
+			energy = new EnergyStorage(100000); //TODO: proper values and conversion
+			if(energyType == EnergyTypes.IC2) {
+				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
+			}
+		}
+		//Write Destination Cards (Side GUI)
 		if(id > -1 && inventory[2] != null && inventory[3] == null) {
 			inventory[3] = inventory[2];
 			inventory[2] = null;
@@ -210,6 +236,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			nbt.setInteger("destinationPortal", id);
 			markDirty();
 		}
+		//Connect Portal
 		if(state == State.CONNECTING) {
 			if(tick >= Settings.PORTAL_CONNECTION_TIME) {
 				tick = 0;
@@ -249,6 +276,24 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			} else {
 				tick++;
 			}
+		}
+		//Use Energy
+	}
+
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		onChunkUnload();
+	}
+
+	/**
+	 * Unloads the IC2 Energy Sink
+	 */
+	@Override
+	public void onChunkUnload() {
+		if (init && energyType == EnergyTypes.IC2) {
+			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
+			init = false;
 		}
 	}
 
@@ -364,10 +409,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			name = nbt.getString("name");
 		}
 		id = nbt.getInteger("PortalID");
-		facing = nbt.getByte("facing");
+		facing = nbt.getShort("facing");
 		if(nbt.hasKey("metrics")) {
 			metrics = PortalMetrics.getMetricsFromNBT(nbt.getCompoundTag("metrics"));
 		}
+		//TODO: save energy stored to disk
 	}
 
 	@Override
@@ -389,17 +435,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			nbt.setString("name", name);
 		}
 		nbt.setInteger("PortalID", id);
-		nbt.setByte("facing", facing);
+		nbt.setShort("facing", facing);
 		if(metrics != null) {
 			NBTTagCompound metricsTag = new NBTTagCompound();
 			metrics.writeToNBT(metricsTag);
 			nbt.setTag("metrics", metricsTag);
 		}
-	}
-
-	@Override
-	public void invalidate() {
-		super.invalidate();
 	}
 
 	/**
@@ -455,19 +496,40 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	@Override
-	public void setFacing(byte b) {
+	public void setFacing(short b) {
 		facing = b;
 	}
 
 	@Override
-	public byte getFacing() {
+	public boolean wrenchCanSetFacing(EntityPlayer entityPlayer, int side) {
+		return true;
+	}
+
+	@Override
+	public short getFacing() {
 		return facing;
+	}
+
+
+	@Override
+	public boolean wrenchCanRemove(EntityPlayer entityPlayer) {
+		return true;
+	}
+
+	@Override
+	public float getWrenchDropRate() {
+		return 1;
+	}
+
+	@Override
+	public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
+		return new ItemStack(ModMiningDimension.instance.portalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
 	}
 
 	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setByte("facing", facing);
+		nbt.setShort("facing", facing);
 		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
 	}
 
@@ -476,10 +538,31 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		NBTTagCompound nbt = pkt.func_148857_g();
 		if(nbt != null && nbt.hasKey("facing")) {
 			int old = facing;
-			facing = nbt.getByte("facing");
+			facing = nbt.getShort("facing");
 			if(old != facing) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 		}
+	}
+
+
+	@Override
+	public double getDemandedEnergy() {
+		return Math.max(0, energy.getEnergyStored() - energy.getMaxEnergyStored());
+	}
+
+	@Override
+	public int getSinkTier() {
+		return 3; //TODO: proper ic2 tiers
+	}
+
+	@Override
+	public double injectEnergy(ForgeDirection directionFrom, double amount, double voltage) {
+		return amount - energy.receiveEnergy(amount, false);
+	}
+
+	@Override
+	public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction) {
+		return energyType == EnergyTypes.IC2;
 	}
 }

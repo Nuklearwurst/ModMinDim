@@ -21,7 +21,7 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 	private int coreY;
 	private int coreZ;
 
-	private byte facing = 1;
+	private short facing = 1;
 
 	public void setPortalController(int x, int y, int z) {
 		this.coreX = x;
@@ -46,7 +46,7 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 		coreX = nbt.getInteger("coreX");
 		coreY = nbt.getInteger("coreY");
 		coreZ = nbt.getInteger("coreZ");
-		facing = nbt.getByte("facing");
+		facing = nbt.getShort("facing");
 	}
 
 	@Override
@@ -55,13 +55,13 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 		nbt.setInteger("coreX", coreX);
 		nbt.setInteger("coreY", coreY);
 		nbt.setInteger("coreZ", coreZ);
-		nbt.setByte("facing", facing);
+		nbt.setShort("facing", facing);
 	}
 
 	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setByte("facing", facing);
+		nbt.setShort("facing", facing);
 		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
 	}
 
@@ -70,18 +70,18 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 		NBTTagCompound nbt = pkt.func_148857_g();
 		if(nbt != null && nbt.hasKey("facing")) {
 			int old = facing;
-			facing = nbt.getByte("facing");
+			facing = nbt.getShort("facing");
 			if(old != facing) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 		}
 	}
 
-	public void setFacing(byte facing) {
+	public void setFacing(short facing) {
 		this.facing = facing;
 	}
 
-	public byte getFacing() {
+	public short getFacing() {
 		return facing;
 	}
 }

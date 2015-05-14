@@ -108,7 +108,7 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
 		TileEntity te = world.getTileEntity(x, y, z);
 		if(te != null && te instanceof TileEntityPortalControllerEntity) {
-			byte facing = ((IFacingSix) te).getFacing();
+			short facing = ((IFacingSix) te).getFacing();
 			if(side == facing) {
 				return iconController;
 			} else {

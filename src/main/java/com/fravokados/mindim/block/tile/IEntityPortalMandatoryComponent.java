@@ -6,5 +6,5 @@ package com.fravokados.mindim.block.tile;
 public interface IEntityPortalMandatoryComponent extends IEntityPortalComponent {
 	void setPortalController(int xCoord, int yCoord, int zCoord);
 
-	byte getFacing();
+	short getFacing();
 }

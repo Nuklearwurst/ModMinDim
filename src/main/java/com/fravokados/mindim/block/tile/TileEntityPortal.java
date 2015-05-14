@@ -24,7 +24,7 @@ public class TileEntityPortal extends TileEntity implements IFacingSix {
 	private int coreY;
 	private int coreZ;
 
-	private byte facing = 0;
+	private short facing = 0;
 
 	public void setPortalController(int x, int y, int z) {
 		this.coreX = x;
@@ -63,19 +63,19 @@ public class TileEntityPortal extends TileEntity implements IFacingSix {
 	}
 
 	@Override
-	public void setFacing(byte b) {
+	public void setFacing(short b) {
 		facing = b;
 	}
 
 	@Override
-	public byte getFacing() {
+	public short getFacing() {
 		return facing;
 	}
 
 	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setByte("facing", facing);
+		nbt.setShort("facing", facing);
 		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
 	}
 
