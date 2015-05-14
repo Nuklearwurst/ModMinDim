@@ -128,10 +128,10 @@ public class PortalManager extends WorldSavedData {
 //					offsetZ = 0;
 //				}
 
-				double maxUp = m.getMaxUp();
-				double minUp = m.getMinUp();
-				double maxSide = m.getMaxSide();
-				double minSide = m.getMinSide();
+				double maxUp = m.getMaxUp() - 1;
+				double minUp = m.getMinUp() + 1;
+				double maxSide = m.getMaxSide() - 1;
+				double minSide = m.getMinSide() + 1;
 
 				//relative coordinate system
 //				double a1 = offsetX * metrics.front.offsetX + offsetY * metrics.front.offsetY + offsetZ * metrics.front.offsetZ;
