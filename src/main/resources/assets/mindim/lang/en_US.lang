@@ -7,3 +7,7 @@ tile.mindim:portalFrame.name=Portal Frame
 
 #Items
 item.mindim:destinationCard.name=Destination Card
+item.mindim:destinationCardMindim.name=Destination Card Mining Dimension
+
+#CreativeTab
+itemGroup.mindim=Mining Dimension

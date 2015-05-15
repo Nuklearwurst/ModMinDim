@@ -156,7 +156,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			return PortalManager.PORTAL_NOT_CONNECTED;
 		}
 		if(inventory[0].getItem() instanceof ItemDestinationCard) {
-			if(inventory[0].stackTagCompound != null && inventory[0].stackTagCompound.hasKey("destinationPortalType") && inventory[0].stackTagCompound.hasKey("destinationPortal")) {
+			if(inventory[0].getItemDamage() == ItemDestinationCard.META_MIN_DIM) {
+				return PortalManager.PORTAL_MINING_DIMENSION;
+			} else if(inventory[0].stackTagCompound != null && inventory[0].stackTagCompound.hasKey("destinationPortalType") && inventory[0].stackTagCompound.hasKey("destinationPortal")) {
 				if(inventory[0].stackTagCompound.getInteger("destinationPortalType") == PortalMetrics.Type.ENTITY_PORTAL.ordinal()) {
 					return inventory[0].stackTagCompound.getInteger("destinationPortal");
 				} else {
@@ -235,17 +237,17 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 		//Write Destination Cards (Side GUI)
 		if(id > -1 && inventory[2] != null && inventory[3] == null) {
-			inventory[3] = inventory[2];
-			inventory[2] = null;
-			NBTTagCompound nbt = ItemUtils.getNBTTagCompound(inventory[3]);
-			nbt.setInteger("destinationPortalType", PortalMetrics.Type.ENTITY_PORTAL.ordinal());
-			nbt.setInteger("destinationPortal", id);
-			markDirty();
+			if(inventory[2].getItem() instanceof ItemDestinationCard && inventory[2].getItemDamage() != ItemDestinationCard.META_MIN_DIM) {
+				inventory[3] = inventory[2];
+				inventory[2] = null;
+				ItemDestinationCard.writeDestination(inventory[3], id);
+				markDirty();
+			}
 		}
 		//Connect Portal
 		if(state == State.CONNECTING) {
 			if(tick == 0) { //update destination portal
-				int portalDestination = getDestination();
+				portalDestination = getDestination();
 				if(portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 					if (pos == null) { //invalid portal
@@ -264,6 +266,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 						}
 					}
 				}
+				tick++;
 			} else if(tick >= Settings.PORTAL_CONNECTION_TIME) { //Do connection
 				tick = 0;
 				int oldDestination = portalDestination;
@@ -276,6 +279,10 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 					//create portal if necessary
 					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
 						portalDestination = PortalManager.getInstance().createPortal(id, metrics);
+						if(portalDestination >= 0) {
+							//create destination card
+							inventory[0] = ItemDestinationCard.fromDestination(portalDestination);
+						}
 					}
 					if (portalDestination >= 0) { //if destination is valid
 						BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
