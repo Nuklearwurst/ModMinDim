@@ -8,7 +8,11 @@ import com.fravokados.mindim.network.network.MessageGuiElementClicked;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Nuklearwurst
@@ -57,10 +61,11 @@ public class GuiEntityPortalController extends GuiContainer {
 	}
 
 	@Override
-	public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_) {
+	public void drawScreen(int x, int y, float f) {
 		btnStart.enabled = te.getState() == TileEntityPortalControllerEntity.State.READY;
 		btnStop.enabled = te.getState() == TileEntityPortalControllerEntity.State.CONNECTING || te.getState() == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL;
-		super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
+		super.drawScreen(x, y, f);
+		drawTooltips(x, y);
 	}
 
 	@Override
@@ -68,6 +73,11 @@ public class GuiEntityPortalController extends GuiContainer {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		mc.getTextureManager().bindTexture(Textures.GUI_ENTITY_PORTAL_CONTROLLER);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+		drawTexturedModalRect(guiLeft + 199, guiTop + 15 + 55 - getEnergyScaled(), 223, 36 + 55 - getEnergyScaled(), 16, getEnergyScaled());
+	}
+
+	private int getEnergyScaled() {
+		return (int) (te.getEnergyStored() * 55 / te.getMaxEnergyStored());
 	}
 
 	@Override
@@ -77,6 +87,20 @@ public class GuiEntityPortalController extends GuiContainer {
 		drawString(this.fontRendererObj, "Destination: " + te.getDestination(), 58, 30, 4210752);
 		drawString(this.fontRendererObj, "State: " + te.getState(), 58, 40, 4210752);
 		drawString(this.fontRendererObj, "Last Error: " + te.getLastError().name, 58, 50, 4210752);
+	}
+
+	/**
+	 * Draws Tooltips
+	 *
+	 * @param x mouse position x
+	 * @param y mouse position y
+	 */
+	private void drawTooltips(int x, int y) {
+		if(x >= guiLeft + 199 && y >= guiTop + 15 && x < guiLeft + 199 + 16 && y < guiTop + 15 + 55) {
+			List<String> list = new ArrayList<String>();
+			list.add(EnumChatFormatting.GRAY + "" + (int) te.getEnergyStored() + " EU" + EnumChatFormatting.RESET);
+			drawHoveringText(list, x, y, fontRendererObj);
+		}
 	}
 
 

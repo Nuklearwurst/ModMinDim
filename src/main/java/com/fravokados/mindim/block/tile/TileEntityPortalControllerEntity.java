@@ -19,6 +19,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;
+import ic2.api.item.ElectricItem;
+import ic2.api.item.IElectricItem;
 import ic2.api.tile.IWrenchable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,7 +56,8 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public enum Error {
 		//TODO: translation
 		NO_ERROR("No Error"), INVALID_DESTINATION("Invalid Destination"),
-		INVALID_PORTAL_STRUCTURE("Portal Structure is not intact!"), CONNECTION_INTERRUPED("Connection Interrupted!");
+		INVALID_PORTAL_STRUCTURE("Portal Structure is not intact!"), CONNECTION_INTERRUPED("Connection Interrupted!"),
+		POWER_FAILURE("Power Failure"), DESTINATION_CHANGED("Destination Changed");
 
 		/** unlocalized name */
 		public final String name;
@@ -94,7 +97,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	/** EnergyType of this block */
 	private EnergyTypes energyType = EnergyTypes.IC2; //TODO proper initialization of this value and support of different energy mods
 	/** Energy Storage */
-	private EnergyStorage energy;
+	private EnergyStorage energy = new EnergyStorage(100000);
 
 
 
@@ -175,6 +178,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				lastError = Error.CONNECTION_INTERRUPED;
 				collapseWholePortal();
 			}
+		} else if(state != State.INCOMING_PORTAL) {
+			//invalid state, close portal and continue as usual
+			collapseWholePortal();
 		}
 	}
 
@@ -238,46 +244,100 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 		//Connect Portal
 		if(state == State.CONNECTING) {
-			if(tick >= Settings.PORTAL_CONNECTION_TIME) {
-				tick = 0;
-				portalDestination = getDestination();
-				if(portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
-					portalDestination = PortalManager.getInstance().createPortal(id, metrics);
-				}
-				//TODO: better portal connection
+			if(tick == 0) { //update destination portal
+				int portalDestination = getDestination();
 				if(portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
-					if(pos == null) {
+					if (pos == null) { //invalid portal
 						state = State.READY;
 						lastError = Error.INVALID_DESTINATION;
 					} else {
-						if(!openPortal()) {
+						MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+						WorldServer world = server.worldServerForDimension(pos.dimension);
+						TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+						if(te != null && te instanceof TileEntityPortalControllerEntity) {
+							//inform target of our connection
+							((TileEntityPortalControllerEntity) te).setState(State.INCOMING_CONNECTION);
+						} else { //invalid controller
 							state = State.READY;
-							lastError = Error.INVALID_PORTAL_STRUCTURE;
-						} else {
-							MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-							WorldServer world = server.worldServerForDimension(pos.dimension);
-							TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-							if(te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).openPortal()) {
-								((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
-								state = State.OUTGOING_PORTAL;
-								lastError = Error.NO_ERROR;
-							} else {
-								state = State.READY;
-								lastError = Error.CONNECTION_INTERRUPED;
-							}
+							lastError = Error.CONNECTION_INTERRUPED;
 						}
 					}
-				} else {
-					//connection failed
+				}
+			} else if(tick >= Settings.PORTAL_CONNECTION_TIME) { //Do connection
+				tick = 0;
+				int oldDestination = portalDestination;
+				portalDestination = getDestination();
+				//check destination
+				if(oldDestination != portalDestination) {
 					state = State.READY;
-					lastError = Error.INVALID_DESTINATION;
+					lastError = Error.DESTINATION_CHANGED;
+				} else {
+					//create portal if necessary
+					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
+						portalDestination = PortalManager.getInstance().createPortal(id, metrics);
+					}
+					if (portalDestination >= 0) { //if destination is valid
+						BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
+						if (pos == null) { //invalid destination (Not found)
+							state = State.READY;
+							lastError = Error.INVALID_DESTINATION;
+						} else {
+							//open portal
+							if (!openPortal()) { //invalid structure
+								state = State.READY;
+								lastError = Error.INVALID_PORTAL_STRUCTURE;
+							} else {
+								//update controllers
+								MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+								WorldServer world = server.worldServerForDimension(pos.dimension);
+								TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+								if (te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).openPortal()) {
+									if (energy.useEnergy(10000)) { //use energy
+										//update controller states
+										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
+										state = State.OUTGOING_PORTAL;
+										lastError = Error.NO_ERROR;
+									} else {
+										//reset destination if power fails
+										((TileEntityPortalControllerEntity) te).setState(State.READY);
+										state = State.READY;
+										lastError = Error.POWER_FAILURE;
+									}
+								} else { //invalid portal (Invalid TE or Destination has invalid structure [portal creation failed])
+									state = State.READY;
+									lastError = Error.CONNECTION_INTERRUPED;
+								}
+							}
+						}
+					} else {
+						//connection failed (invalid destination card or failed creating portal)
+						state = State.READY;
+						lastError = Error.INVALID_DESTINATION;
+					}
 				}
 			} else {
+				//update progress
 				tick++;
 			}
 		}
 		//Use Energy
+		if(state == State.CONNECTING || state == State.OUTGOING_PORTAL) {
+			if(!energy.useEnergy(1000)) {
+				//TODO: proper energy usage
+				state = State.READY;
+				lastError = Error.POWER_FAILURE;
+				collapseWholePortal();
+			}
+		}
+		//recharge energy
+		if(inventory[1] != null) {
+			if(energyType == EnergyTypes.IC2) {
+				if(inventory[1].getItem() instanceof IElectricItem) {
+					energy.receiveEnergy(ElectricItem.manager.discharge(inventory[1], getDemandedEnergy(), getSinkTier(), false, true, false), false);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -449,6 +509,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public void initializeConnection() {
 		//update state and tick
 		state = State.CONNECTING;
+		lastError = Error.NO_ERROR;
 		tick = 0;
 		//register portal and log warning
 		if (id == PortalManager.PORTAL_NOT_CONNECTED) {
@@ -548,7 +609,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public double getDemandedEnergy() {
-		return Math.max(0, energy.getEnergyStored() - energy.getMaxEnergyStored());
+		return Math.max(0, energy.getMaxEnergyStored() - energy.getEnergyStored());
 	}
 
 	@Override
@@ -564,5 +625,17 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction) {
 		return energyType == EnergyTypes.IC2;
+	}
+
+	public double getEnergyStored() {
+		return energy.getEnergyStored();
+	}
+
+	public int getMaxEnergyStored() {
+		return energy.getMaxEnergyStored();
+	}
+
+	public EnergyStorage getEnergyStorage() {
+		return energy;
 	}
 }

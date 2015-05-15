@@ -22,6 +22,9 @@ public class ContainerEntityPortalController extends Container implements IEleme
 	private TileEntityPortalControllerEntity.Error lastError = TileEntityPortalControllerEntity.Error.NO_ERROR;
 	private TileEntityPortalControllerEntity.State lastState = TileEntityPortalControllerEntity.State.READY;
 
+	private int lastEnergyStored = 0;
+	private int lastMaxEnergyStored = 100000;
+
 
 	public ContainerEntityPortalController(InventoryPlayer player, TileEntityPortalControllerEntity te) {
 		super();
@@ -51,6 +54,8 @@ public class ContainerEntityPortalController extends Container implements IEleme
 		crafter.sendProgressBarUpdate(this, 0, te.getId());
 		crafter.sendProgressBarUpdate(this, 1, te.getState().ordinal());
 		crafter.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
+		crafter.sendProgressBarUpdate(this, 3, (int) te.getEnergyStored());
+		crafter.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
 	}
 
 	@Override
@@ -66,9 +71,17 @@ public class ContainerEntityPortalController extends Container implements IEleme
 			if(this.lastError != te.getLastError()){
 				icrafting.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
 			}
+			if(this.lastEnergyStored != (int) te.getEnergyStored()) {
+				icrafting.sendProgressBarUpdate(this, 3, (int) te.getEnergyStored());
+			}
+			if(this.lastMaxEnergyStored != te.getMaxEnergyStored()) {
+				icrafting.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
+			}
 		}
 		this.lastState = te.getState();
 		this.lastError = te.getLastError();
+		this.lastEnergyStored = (int) te.getEnergyStored();
+		this.lastMaxEnergyStored = te.getMaxEnergyStored();
 	}
 
 
@@ -85,6 +98,12 @@ public class ContainerEntityPortalController extends Container implements IEleme
 				break;
 			case 2:
 				this.te.setLastError(TileEntityPortalControllerEntity.Error.values()[value]);
+				break;
+			case 3:
+				this.te.getEnergyStorage().setEnergyStored(value);
+				break;
+			case 4:
+				this.te.getEnergyStorage().setCapacity(value);
 				break;
 		}
 	}

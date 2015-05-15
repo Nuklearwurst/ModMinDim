@@ -20,3 +20,6 @@ run
 *.iml
 *.ipr
 *.iws
+
+## Other
+*.db

@@ -90,4 +90,17 @@ public class EnergyStorage {
 	public int getMaxEnergyStored() {
 		return this.capacity;
 	}
+
+	public boolean canUse(double energy) {
+		return energy <= this.energy;
+	}
+
+	public boolean useEnergy(double energy) {
+		if(canUse(energy)) {
+			this.energy -= energy;
+			return true;
+		} else{
+			return false;
+		}
+	}
 }
