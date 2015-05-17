@@ -62,8 +62,8 @@ public class GuiEntityPortalController extends GuiContainer {
 
 	@Override
 	public void drawScreen(int x, int y, float f) {
-		btnStart.enabled = te.getState() == TileEntityPortalControllerEntity.State.READY;
-		btnStop.enabled = te.getState() == TileEntityPortalControllerEntity.State.CONNECTING || te.getState() == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL;
+		btnStart.enabled = te.getState() == TileEntityPortalControllerEntity.State.READY || te.getState() == TileEntityPortalControllerEntity.State.INCOMING_CONNECTION;
+		btnStop.enabled = te.getState() == TileEntityPortalControllerEntity.State.CONNECTING || te.getState() == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL || te.getState() == TileEntityPortalControllerEntity.State.INCOMING_PORTAL;
 		super.drawScreen(x, y, f);
 		drawTooltips(x, y);
 	}

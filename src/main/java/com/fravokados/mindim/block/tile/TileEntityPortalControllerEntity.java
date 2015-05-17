@@ -106,7 +106,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
 		}
 		if (getDestination() == PortalManager.PORTAL_MINING_DIMENSION) {
-			int dest = ModMiningDimension.instance.portalManager.createPortal(id, null);
+			int dest = ModMiningDimension.instance.portalManager.createPortal(id, null, this);
 			if(dest >= 0)
 				setDest(dest);
 		}
@@ -174,15 +174,20 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * @param entity
 	 */
 	public void teleportEntity(Entity entity) {
-		if(state == State.OUTGOING_PORTAL && metrics != null && metrics.isEntityInsidePortal(entity, 0)) {
-			if(!ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics)) {
-				state = State.READY;
-				lastError = Error.CONNECTION_INTERRUPED;
-				collapseWholePortal();
+		if(state == State.OUTGOING_PORTAL && metrics != null) {
+			if(metrics.isEntityInsidePortal(entity, 1)) {
+				if (!ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics)) {
+					state = State.READY;
+					lastError = Error.CONNECTION_INTERRUPED;
+					collapseWholePortal();
+				}
 			}
 		} else if(state != State.INCOMING_PORTAL) {
 			//invalid state, close portal and continue as usual
 			collapseWholePortal();
+			state = State.READY;
+			lastError = Error.CONNECTION_INTERRUPED;
+			LogHelper.warn("Invalid portal found, destroying... (" + id + ", dest.:" + portalDestination + ")");
 		}
 	}
 
@@ -201,6 +206,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * FIXME: remove, portal should not spawn with connection card
 	 * @param dest
 	 */
+	@Deprecated
 	public void setDest(int dest) {
 		ItemStack card = new ItemStack(ModMiningDimension.instance.itemDestinationCard);
 		NBTTagCompound nbt = ItemUtils.getNBTTagCompound(card);
@@ -230,7 +236,10 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		//Do first tick initialization
 		if(!init) {
 			init = true;
-			energy = new EnergyStorage(100000); //TODO: proper values and conversion
+			if(state != State.INCOMING_PORTAL && state != State.OUTGOING_PORTAL) {
+				collapseWholePortal();//reset portals
+			}
+			energy.setCapacity(100000); //TODO: proper values and conversion
 			if(energyType == EnergyTypes.IC2) {
 				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
 			}
@@ -250,7 +259,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				portalDestination = getDestination();
 				if(portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
-					if (pos == null) { //invalid portal
+					if (pos == null || portalDestination == id) { //invalid portal
 						state = State.READY;
 						lastError = Error.INVALID_DESTINATION;
 					} else {
@@ -261,6 +270,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 							//inform target of our connection
 							((TileEntityPortalControllerEntity) te).setState(State.INCOMING_CONNECTION);
 						} else { //invalid controller
+							LogHelper.warn("Could not find registered controller with id: " + portalDestination);
 							state = State.READY;
 							lastError = Error.CONNECTION_INTERRUPED;
 						}
@@ -278,7 +288,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				} else {
 					//create portal if necessary
 					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
-						portalDestination = PortalManager.getInstance().createPortal(id, metrics);
+						portalDestination = PortalManager.getInstance().createPortal(id, metrics, this);
 						if(portalDestination >= 0) {
 							//create destination card
 							inventory[0] = ItemDestinationCard.fromDestination(portalDestination);
@@ -312,6 +322,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 										lastError = Error.POWER_FAILURE;
 									}
 								} else { //invalid portal (Invalid TE or Destination has invalid structure [portal creation failed])
+									LogHelper.warn("Error opening portal to: " + portalDestination + " with controller: " + te);
 									state = State.READY;
 									lastError = Error.CONNECTION_INTERRUPED;
 								}
@@ -480,6 +491,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		if(nbt.hasKey("metrics")) {
 			metrics = PortalMetrics.getMetricsFromNBT(nbt.getCompoundTag("metrics"));
 		}
+		energy.readFromNBT(nbt);
 		//TODO: save energy stored to disk
 	}
 
@@ -508,6 +520,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			metrics.writeToNBT(metricsTag);
 			nbt.setTag("metrics", metricsTag);
 		}
+		energy.writeToNBT(nbt);
 	}
 
 	/**
@@ -536,7 +549,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	public void handleStopButton(ContainerEntityPortalController containerEntityPortalController) {
 		switch (state) {
-			case OUTGOING_PORTAL:
+			case OUTGOING_PORTAL:case INCOMING_PORTAL: //For now you can disconnect manually TODO: maximum connection time
 				BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 				if(pos != null) {
 					MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();

@@ -21,10 +21,6 @@ public class EnergyStorage {
 
 	public EnergyStorage readFromNBT(NBTTagCompound nbt) {
 		this.energy = nbt.getDouble("Energy");
-		if(this.energy > this.capacity) {
-			this.energy = this.capacity;
-		}
-
 		return this;
 	}
 
