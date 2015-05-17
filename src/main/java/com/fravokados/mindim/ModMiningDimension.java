@@ -17,6 +17,7 @@ import com.fravokados.mindim.lib.Reference;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.network.NetworkManager;
 import com.fravokados.mindim.portal.PortalManager;
+import com.fravokados.mindim.recipes.RecipeManager;
 import com.fravokados.mindim.util.LogHelper;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -81,6 +82,8 @@ public class ModMiningDimension {
         DimensionManager.registerDimension(dimensionId, dimensionId);
 
 	    NetworkManager.init();
+
+        RecipeManager.initRecipes();
     }
 
     @Mod.EventHandler
