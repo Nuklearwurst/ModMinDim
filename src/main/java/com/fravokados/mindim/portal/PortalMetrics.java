@@ -295,7 +295,7 @@ public class PortalMetrics {
 	 * @return returns how many blocks are needed to form the frame of this portal
 	 */
 	public int getFrameBlockCount() {
-		return (maxX - minX) * 2 + (maxY - minY) * 2 + (maxZ - minZ) *2 - 4;
+		return (maxX - minX) * 2 + (maxY - minY) * 2 + (maxZ - minZ) *2;
 	}
 
 	/**

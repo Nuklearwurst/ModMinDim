@@ -147,6 +147,10 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		this.id = id;
 	}
 
+	public EnergyTypes getEnergyType() {
+		return energyType;
+	}
+
 	/**
 	 * reads the destination card
 	 * @return
@@ -288,10 +292,13 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				} else {
 					//create portal if necessary
 					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
-						portalDestination = PortalManager.getInstance().createPortal(id, metrics, this);
-						if(portalDestination >= 0) {
-							//create destination card
-							inventory[0] = ItemDestinationCard.fromDestination(portalDestination);
+						int count = ItemUtils.getNBTTagCompound(inventory[0]).getInteger("frame_blocks");
+						if(count >= metrics.getFrameBlockCount()) {
+							portalDestination = PortalManager.getInstance().createPortal(id, metrics, this);
+							if (portalDestination >= 0) {
+								//create destination card
+								inventory[0] = ItemDestinationCard.fromDestination(portalDestination);
+							}
 						}
 					}
 					if (portalDestination >= 0) { //if destination is valid

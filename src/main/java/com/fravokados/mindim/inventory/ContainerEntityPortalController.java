@@ -1,6 +1,9 @@
 package com.fravokados.mindim.inventory;
 
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.inventory.slot.SlotControllerDestinationCard;
+import com.fravokados.mindim.inventory.slot.SlotEnergyFuel;
+import com.fravokados.mindim.inventory.slot.SlotOutput;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.network.IElementButtonHandler;
 import ic2.api.item.IElectricItem;
@@ -32,10 +35,10 @@ public class ContainerEntityPortalController extends Container implements IEleme
 		super();
 		this.te = te;
 
-		this.addSlotToContainer(new Slot(te, 0, 55, 80)); //destination card
-		this.addSlotToContainer(new Slot(te, 1, 199, 80)); //battery
-		this.addSlotToContainer(new Slot(te, 2, 14, 10)); //input destination card
-		this.addSlotToContainer(new Slot(te, 3, 14, 68)); //output destination card
+		this.addSlotToContainer(new SlotControllerDestinationCard(te, 0, 55, 80)); //destination card
+		this.addSlotToContainer(new SlotEnergyFuel(te, 1, 199, 80, te.getEnergyType())); //battery
+		this.addSlotToContainer(new SlotControllerDestinationCard(te, 2, 14, 10)); //input destination card
+		this.addSlotToContainer(new SlotOutput(te, 3, 14, 68)); //output destination card
 
 		//Player inventory
 		int i;
@@ -88,7 +91,6 @@ public class ContainerEntityPortalController extends Container implements IEleme
 
 	@Override
 	public void updateProgressBar(int index, int value) {
-		//TODO update energy
 		super.updateProgressBar(index, value);
 		switch (index) {
 			case 0:
@@ -129,7 +131,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 					return null;
 				}
 			} else {
-				if (stackSlot.getItem() instanceof IElectricItem) { //TODO generalize to support other energy sources/mods
+				if (stackSlot.getItem() instanceof IElectricItem && ((IElectricItem) stackSlot.getItem()).canProvideEnergy(stackSlot)) { //TODO generalize to support other energy sources/mods
 					if (!this.mergeItemStack(stackSlot, 1, 2, false)) {
 						return null;
 					}

@@ -1,9 +1,12 @@
 package com.fravokados.mindim.common;
 
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.client.gui.GuiDestinationCardMinDim;
 import com.fravokados.mindim.client.gui.GuiEntityPortalController;
+import com.fravokados.mindim.inventory.ContainerDestinationCardMinDim;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.lib.GUIIDs;
+import com.fravokados.mindim.util.ItemUtils;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -21,6 +24,10 @@ public class GuiHandler implements IGuiHandler {
 				TileEntityPortalControllerEntity te = (TileEntityPortalControllerEntity) world.getTileEntity(x, y, z);
 				return new ContainerEntityPortalController(player.inventory, te);
 			}
+			case GUIIDs.DESTINATION_CARD_MIN_DIM:
+			{
+				return new ContainerDestinationCardMinDim(player.inventory, player.getCurrentEquippedItem());
+			}
 		}
 		return null;
 	}
@@ -32,6 +39,11 @@ public class GuiHandler implements IGuiHandler {
 			{
 				TileEntityPortalControllerEntity te = (TileEntityPortalControllerEntity) world.getTileEntity(x, y, z);
 				return new GuiEntityPortalController(player.inventory, te);
+			}
+			case GUIIDs.DESTINATION_CARD_MIN_DIM:
+			{
+				ItemUtils.getNBTTagCompound(player.getCurrentEquippedItem()).setString("TEST", "hkjhkbjkjb");
+				return new GuiDestinationCardMinDim(player.inventory, player.getCurrentEquippedItem());
 			}
 		}
 		return null;

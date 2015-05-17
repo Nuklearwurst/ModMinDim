@@ -83,10 +83,10 @@ public class GuiEntityPortalController extends GuiContainer {
 	@Override
 	protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_) {
 		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
-		drawString(this.fontRendererObj, "ID: " + te.getId(), 58, 18, 4210752);
-		drawString(this.fontRendererObj, "Destination: " + te.getDestination(), 58, 30, 4210752);
-		drawString(this.fontRendererObj, "State: " + te.getState(), 58, 40, 4210752);
-		drawString(this.fontRendererObj, "Last Error: " + te.getLastError().name, 58, 50, 4210752);
+		drawString(this.fontRendererObj, "ID: " + te.getId(), 58, 18, 0xa2cc42);
+		drawString(this.fontRendererObj, "Destination: " + te.getDestination(), 58, 30, 0xa2cc42);
+		drawString(this.fontRendererObj, "State: " + te.getState(), 58, 40, 0xa2cc42);
+		drawString(this.fontRendererObj, "Last Error: " + te.getLastError().name, 58, 50, 0xa2cc42);
 	}
 
 	/**

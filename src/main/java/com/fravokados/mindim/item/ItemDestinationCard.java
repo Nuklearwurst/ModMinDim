@@ -1,6 +1,7 @@
 package com.fravokados.mindim.item;
 
 import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.lib.GUIIDs;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -53,7 +55,26 @@ public class ItemDestinationCard extends ItemMDMultiType {
 					info.add("Portal Destination: " + dest);
 				}
 			}
+		} else {
+			if (stack.stackTagCompound != null) {
+				if (stack.stackTagCompound.hasKey("TEST")) {
+					info.add("Hi, DASFLHL");
+				}
+			}
 		}
+	}
+
+	@Override
+	public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer player) {
+		if(!world.isRemote && itemStack.getItemDamage() == META_MIN_DIM && player.isSneaking()) {
+			player.openGui(ModMiningDimension.instance, GUIIDs.DESTINATION_CARD_MIN_DIM, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+		}
+		return itemStack;
+	}
+
+	@Override
+	public boolean getShareTag() {
+		return true;
 	}
 
 	public static ItemStack fromDestination(int id) {
