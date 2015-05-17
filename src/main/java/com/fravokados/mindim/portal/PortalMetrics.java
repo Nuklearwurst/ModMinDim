@@ -1,9 +1,11 @@
 package com.fravokados.mindim.portal;
 
+import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.BlockPortalMinDim;
 import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
-import com.fravokados.mindim.util.RotationUtils;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -68,6 +70,10 @@ public class PortalMetrics {
 
 	public boolean isBlockInside(int x, int y, int z) {
 		return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
+	}
+
+	public boolean isHorizontal() {
+		return minY == maxY;
 	}
 
 	public void addCoord(int x, int y, int z) {
@@ -155,12 +161,12 @@ public class PortalMetrics {
 
 	public void calculateOrigin(List<IEntityPortalMandatoryComponent> list) {
 		if(maxY - minY == 0) {
-			originY = minY + 1.5;
+			originY = minY + 0.5; //center in horizontal portals
 		} else {
-			originY = minY + 0.5;
+			originY = minY + 1; //ground om vertical portals
 		}
-		originX = minX + (maxX - minX) / 2 + 0.5;
-		originZ = minZ + (maxZ - minZ) / 2 + 0.5;
+		originX = minX + ((maxX - minX) / 2 + 0.5);
+		originZ = minZ + ((maxZ - minZ) / 2 + 0.5);
 		//Orientation
 		int[] orientation = {0, 0, 0, 0, 0, 0};
 		for(IEntityPortalMandatoryComponent frame : list) {
@@ -181,10 +187,10 @@ public class PortalMetrics {
 				front = ForgeDirection.EAST;
 			}
 		} else if(maxY - minY == 0) {
-			top = ForgeDirection.EAST;
 			if(front != ForgeDirection.DOWN && front != ForgeDirection.UP) {
 				front = ForgeDirection.UP;
 			}
+			top = front == ForgeDirection.UP ? ForgeDirection.EAST : ForgeDirection.WEST;
 		} else if(maxZ - minZ == 0) {
 			top = ForgeDirection.UP;
 			if(front != ForgeDirection.NORTH && front != ForgeDirection.SOUTH) {
@@ -283,29 +289,45 @@ public class PortalMetrics {
 	}
 
 	/**
-	 * not working?
-	 * @param target
-	 * @return
+	 *
+	 * @return returns how many blocks are needed to form the frame of this portal
 	 */
-	@Deprecated
-	public PortalMetrics getRotatedMetrics(PortalMetrics target) {
-		PortalMetrics metrics = new PortalMetrics();
-		metrics.minX = (int) RotationUtils.getOffsetXForRotation(minX, top, target.top, front, target.front);
-		metrics.minY = (int) RotationUtils.getOffsetYForRotation(minY, top, target.top, front, target.front);
-		metrics.minZ = (int) RotationUtils.getOffsetZForRotation(minZ, top, target.top, front, target.front);
+	public int getFrameBlockCount() {
+		return (maxX - minX) * 2 + (maxY - minY) * 2 + (maxZ - minZ) *2 - 4;
+	}
 
-		metrics.maxX = (int) RotationUtils.getOffsetXForRotation(maxX, top, target.top, front, target.front);
-		metrics.maxY = (int) RotationUtils.getOffsetYForRotation(maxY, top, target.top, front, target.front);
-		metrics.maxZ = (int) RotationUtils.getOffsetZForRotation(maxZ, top, target.top, front, target.front);
-
-		metrics.originX = RotationUtils.getOffsetXForRotation(originX, top, target.top, front, target.front);
-		metrics.originY = RotationUtils.getOffsetYForRotation(originY, top, target.top, front, target.front);
-		metrics.originZ = RotationUtils.getOffsetZForRotation(originZ, top, target.top, front, target.front);
-
-		metrics.init = true;
-		metrics.top = target.top;
-		metrics.front = target.front;
-		return metrics;
+	/**
+	 * creates a portal with x, y, z as its origin
+	 * @param world
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public boolean placePortalFrame(World world, int x, int y, int z, boolean clearInside) {
+		int minX = this.minX - (int) (originX);
+		int minY = this.minY - (int) (originY);
+		int minZ = this.minZ - (int) (originZ);
+		int maxX = this.maxX - (int) (originX);
+		int maxY = this.maxY - (int) (originY);
+		int maxZ = this.maxZ - (int) (originZ);
+		boolean flagX = false;
+		boolean flagY = false;
+		boolean flagZ = false;
+		for(int i = minX; i <= maxX; i++) {
+			flagX = i == minX || i == maxX;
+			for(int j = minY; j <= maxY; j++) {
+				flagY = j == minY || j == maxY;
+				for(int k = minZ; k <= maxZ; k++) {
+					flagZ = k == minZ || k == maxZ;
+					if(flagX==flagY ? flagX : flagZ) {
+						world.setBlock(x + i, y + j, z + k, ModMiningDimension.instance.portalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
+					} else {
+						world.setBlock(x + i, y + j, z + k, Blocks.air, 0, 0);
+					}
+				}
+			}
+		}
+		return true;
 	}
 }
 

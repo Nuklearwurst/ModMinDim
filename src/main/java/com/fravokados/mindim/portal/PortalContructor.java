@@ -1,6 +1,9 @@
 package com.fravokados.mindim.portal;
 
-import com.fravokados.mindim.block.tile.*;
+import com.fravokados.mindim.block.tile.IEntityPortalComponent;
+import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
+import com.fravokados.mindim.block.tile.IEntityPortalOptionalComponent;
+import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.mindim.util.SimpleObjectReference;
@@ -150,8 +153,7 @@ public class PortalContructor {
 		return Result.ERROR_NO_PORTAL_BLOCK;
 	}
 
-	public static boolean createPortalFromMetrics() {
-		//TODO implement portal placer
-		return false;
+	public static boolean createPortalFromMetrics(World w, PortalMetrics m, boolean clearInside) {
+		return m.placePortalFrame(w, (int) m.originX, (int) m.originY, (int) m.originZ, clearInside);
 	}
 }

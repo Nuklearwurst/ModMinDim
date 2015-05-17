@@ -77,4 +77,24 @@ public class RotationUtils {
 		};
 		return matrix[a1][a2];
 	}
+
+	public static float get2DRotation(ForgeDirection from, ForgeDirection to) {
+		if(from == to) {
+			return 0;
+		} else if(from.getOpposite() == to) {
+			return 180;
+		} else {
+			switch (from) {
+				case SOUTH:
+					return to == ForgeDirection.WEST ? 90 : -90;
+				case WEST:
+					return to == ForgeDirection.NORTH ? 90 : -90;
+				case NORTH:
+					return to == ForgeDirection.EAST ? 90 : -90;
+				case EAST:
+					return to == ForgeDirection.SOUTH ? 90 : -90;
+			}
+		}
+		return 0;
+	}
 }
