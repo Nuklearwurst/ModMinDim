@@ -1,7 +1,9 @@
 package com.fravokados.mindim.inventory;
 
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.network.IElementButtonHandler;
+import ic2.api.item.IElectricItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -62,19 +64,18 @@ public class ContainerEntityPortalController extends Container implements IEleme
 	public void detectAndSendChanges() {
 		//TODO update energy
 		super.detectAndSendChanges();
-		for (int i = 0; i < this.crafters.size(); ++i)
-		{
-			ICrafting icrafting = (ICrafting)this.crafters.get(i);
-			if(this.lastState != te.getState()) {
+		for (int i = 0; i < this.crafters.size(); ++i) {
+			ICrafting icrafting = (ICrafting) this.crafters.get(i);
+			if (this.lastState != te.getState()) {
 				icrafting.sendProgressBarUpdate(this, 1, te.getState().ordinal());
 			}
-			if(this.lastError != te.getLastError()){
+			if (this.lastError != te.getLastError()) {
 				icrafting.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
 			}
-			if(this.lastEnergyStored != (int) te.getEnergyStored()) {
+			if (this.lastEnergyStored != (int) te.getEnergyStored()) {
 				icrafting.sendProgressBarUpdate(this, 3, (int) te.getEnergyStored());
 			}
-			if(this.lastMaxEnergyStored != te.getMaxEnergyStored()) {
+			if (this.lastMaxEnergyStored != te.getMaxEnergyStored()) {
 				icrafting.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
 			}
 		}
@@ -109,11 +110,56 @@ public class ContainerEntityPortalController extends Container implements IEleme
 	}
 
 
-
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-		//TODO mnanage shift clicking
-		return null;
+	public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
+		ItemStack stackCopy = null;
+		Slot slot = (Slot) this.inventorySlots.get(slotId);
+
+		if (slot != null && slot.getHasStack()) {
+			ItemStack stackSlot = slot.getStack();
+			stackCopy = stackSlot.copy();
+
+			if (slotId == 3) { //Destination Card Output
+				if (!this.mergeItemStack(stackSlot, 4, this.inventorySlots.size(), true)) { //(inverted merge direction)
+					return null;
+				}
+				slot.onSlotChange(stackSlot, stackCopy);
+			} else if (slotId < 4) {
+				if (!this.mergeItemStack(stackSlot, 4, this.inventorySlots.size(), false)) {
+					return null;
+				}
+			} else {
+				if (stackSlot.getItem() instanceof IElectricItem) { //TODO generalize to support other energy sources/mods
+					if (!this.mergeItemStack(stackSlot, 1, 2, false)) {
+						return null;
+					}
+				} else if (stackSlot.getItem() instanceof ItemDestinationCard) {
+					if (!this.mergeItemStack(stackSlot, 0, 1, false)) {
+						return null;
+					}
+				} else if (slotId >= 4 && slotId < 31) {
+					if (!this.mergeItemStack(stackSlot, 31, 40, false)) {
+						return null;
+					}
+				} else if (slotId >= 31 && slotId < 40 && !this.mergeItemStack(stackSlot, 4, 31, false)) {
+					return null;
+				}
+			}
+
+			if (stackSlot.stackSize == 0) {
+				slot.putStack((ItemStack) null);
+			} else {
+				slot.onSlotChanged();
+			}
+
+			if (stackSlot.stackSize == stackCopy.stackSize) {
+				return null;
+			}
+
+			slot.onPickupFromSlot(player, stackSlot);
+		}
+
+		return stackCopy;
 	}
 
 	@Override
@@ -126,7 +172,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 		if (elementName != null) {
 			if (elementName.equals(NETWORK_ID_START)) {
 				te.handleStartButton(this);
-			} else if(elementName.equals(NETWORK_ID_STOP)) {
+			} else if (elementName.equals(NETWORK_ID_STOP)) {
 				te.handleStopButton(this);
 			}
 
