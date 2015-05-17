@@ -147,7 +147,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 			}
 
 			if (stackSlot.stackSize == 0) {
-				slot.putStack((ItemStack) null);
+				slot.putStack(null);
 			} else {
 				slot.onSlotChanged();
 			}

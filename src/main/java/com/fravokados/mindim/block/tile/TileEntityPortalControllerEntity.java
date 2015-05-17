@@ -47,7 +47,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * possible states of the controller
 	 */
 	public enum State {
-		NO_MULTIBLOCK, READY, CONNECTING, OUTGOING_PORTAL, INCOMING_CONNECTION, INCOMING_PORTAL;
+		NO_MULTIBLOCK, READY, CONNECTING, OUTGOING_PORTAL, INCOMING_CONNECTION, INCOMING_PORTAL
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		/** unlocalized name */
 		public final String name;
 
-		private Error(String s) {
+		Error(String s) {
 			this.name = s;
 		}
 	}

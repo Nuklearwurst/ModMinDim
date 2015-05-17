@@ -62,7 +62,7 @@ public class EnergyStorage {
 	}
 
 	public double receiveEnergy(double maxReceive, boolean simulate) {
-		double energyReceived = Math.min(this.capacity - this.energy, (double) maxReceive);
+		double energyReceived = Math.min(this.capacity - this.energy, maxReceive);
 		if(!simulate) {
 			this.energy += energyReceived;
 		}
