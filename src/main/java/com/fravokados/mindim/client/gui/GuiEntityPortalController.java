@@ -22,7 +22,7 @@ public class GuiEntityPortalController extends GuiContainer {
 	private static final int BUTTON_ID_START = 0;
 	private static final int BUTTON_ID_STOP = 1;
 
-	private TileEntityPortalControllerEntity te;
+	private final TileEntityPortalControllerEntity te;
 
 	private GuiButton btnStop;
 	private GuiButton btnStart;

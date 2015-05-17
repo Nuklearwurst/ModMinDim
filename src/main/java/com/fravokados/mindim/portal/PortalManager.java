@@ -32,7 +32,7 @@ public class PortalManager extends WorldSavedData {
 	public static final int PORTAL_WRONG_TYPE = -4;
 
 
-	private Map<Integer, BlockPositionDim> entityPortals = new HashMap<Integer, BlockPositionDim>();
+	private final Map<Integer, BlockPositionDim> entityPortals = new HashMap<Integer, BlockPositionDim>();
 	private int entityPortalCounter = 0;
 
 	public PortalManager(String s) {

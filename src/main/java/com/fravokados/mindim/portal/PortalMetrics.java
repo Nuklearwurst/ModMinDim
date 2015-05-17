@@ -21,7 +21,7 @@ public class PortalMetrics {
 	public enum Type {
 		ENTITY_PORTAL("portal.entity");
 
-		public String name;
+		public final String name;
 
 		Type(String name) {
 			this.name = name;
@@ -112,6 +112,7 @@ public class PortalMetrics {
 		return 0;
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	public boolean placePortalsInsideFrame(World world, int x, int y, int z) {
 		for(int j = minX; j <= maxX; j++) { //X
 			for(int k = minY; k <= maxY; k++) { //Y
@@ -132,6 +133,7 @@ public class PortalMetrics {
 		return true;
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	public void removePortalsInsideFrame(World world) {
 		for(int j = minX; j <= maxX; j++) { //X
 			for(int k = minY; k <= maxY; k++) { //Y
@@ -303,6 +305,7 @@ public class PortalMetrics {
 	 * @param y
 	 * @param z
 	 */
+	@SuppressWarnings("ConstantConditions")
 	public boolean placePortalFrame(World world, int x, int y, int z, boolean clearInside) {
 		int minX = this.minX - (int) (originX);
 		int minY = this.minY - (int) (originY);
@@ -310,16 +313,16 @@ public class PortalMetrics {
 		int maxX = this.maxX - (int) (originX);
 		int maxY = this.maxY - (int) (originY);
 		int maxZ = this.maxZ - (int) (originZ);
-		boolean flagX = false;
-		boolean flagY = false;
-		boolean flagZ = false;
+		boolean flagX;
+		boolean flagY;
+		boolean flagZ;
 		for(int i = minX; i <= maxX; i++) {
 			flagX = i == minX || i == maxX;
 			for(int j = minY; j <= maxY; j++) {
 				flagY = j == minY || j == maxY;
 				for(int k = minZ; k <= maxZ; k++) {
 					flagZ = k == minZ || k == maxZ;
-					if(flagX==flagY ? flagX : flagZ) {
+					if(flagX == flagY ? flagX : flagZ) {
 						world.setBlock(x + i, y + j, z + k, ModMiningDimension.instance.portalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
 					} else {
 						world.setBlock(x + i, y + j, z + k, Blocks.air, 0, 0);

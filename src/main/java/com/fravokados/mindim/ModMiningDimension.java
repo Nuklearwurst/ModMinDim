@@ -17,6 +17,7 @@ import com.fravokados.mindim.lib.Reference;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.network.NetworkManager;
 import com.fravokados.mindim.portal.PortalManager;
+import com.fravokados.mindim.util.LogHelper;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -84,7 +85,7 @@ public class ModMiningDimension {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent evt) {
-
+        LogHelper.info("Mod " + Reference.MOD_NAME + " version: " + Reference.MOD_VERSION + " has successfully loaded.");
     }
 
     @Mod.EventHandler

@@ -141,9 +141,8 @@ public class PortalContructor {
 				if (controller.isNull()) {
 					controller.set((TileEntityPortalControllerEntity) te);
 				} else {
-					if (controller.get() == te) {
+					if (controller.get() != te) {
 						//go on to confirm
-					} else {
 						return Result.ERROR_MULTIPLE_CONTROLLERS;
 					}
 				}

@@ -19,6 +19,7 @@ apply plugin: 'forge'
 
 version = "1.0"
 group= "com.fravokados.mindim" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+//noinspection GroovyUnusedAssignment
 archivesBaseName = "MiningDimension"
 
 minecraft {

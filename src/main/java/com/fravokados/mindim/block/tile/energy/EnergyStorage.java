@@ -19,9 +19,8 @@ public class EnergyStorage {
 	}
 
 
-	public EnergyStorage readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(NBTTagCompound nbt) {
 		this.energy = nbt.getDouble("Energy");
-		return this;
 	}
 
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {

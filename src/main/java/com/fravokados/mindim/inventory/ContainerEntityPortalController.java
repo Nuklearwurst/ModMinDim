@@ -19,7 +19,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 	public static final String NETWORK_ID_START = "epc_bstart";
 	public static final String NETWORK_ID_STOP = "epc_bstop";
 
-	private TileEntityPortalControllerEntity te;
+	private final TileEntityPortalControllerEntity te;
 
 	private TileEntityPortalControllerEntity.Error lastError = TileEntityPortalControllerEntity.Error.NO_ERROR;
 	private TileEntityPortalControllerEntity.State lastState = TileEntityPortalControllerEntity.State.READY;
@@ -64,8 +64,8 @@ public class ContainerEntityPortalController extends Container implements IEleme
 	public void detectAndSendChanges() {
 		//TODO update energy
 		super.detectAndSendChanges();
-		for (int i = 0; i < this.crafters.size(); ++i) {
-			ICrafting icrafting = (ICrafting) this.crafters.get(i);
+		for (Object crafter : this.crafters) {
+			ICrafting icrafting = (ICrafting) crafter;
 			if (this.lastState != te.getState()) {
 				icrafting.sendProgressBarUpdate(this, 1, te.getState().ordinal());
 			}
