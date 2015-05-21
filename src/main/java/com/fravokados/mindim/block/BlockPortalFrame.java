@@ -100,7 +100,7 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 			case META_FRAME_ENTITY:
 				return iconFrame;
 			case META_CONTROLLER_ENTITY:
-				return iconController;
+				return side == 3 ? iconController : iconFrame;
 		}
 		return iconFrame;
 	}
