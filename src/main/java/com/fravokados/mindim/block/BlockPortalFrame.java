@@ -17,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -125,5 +126,10 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 		if(te != null && te instanceof IFacingSix) {
 			RotationUtils.updateFacing((IFacingSix) te, entityLivingBase, x, y, z);
 		}
+	}
+
+	@Override
+	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
+		return new ItemStack(this, 1, world.getBlockMetadata(x, y, z));
 	}
 }
