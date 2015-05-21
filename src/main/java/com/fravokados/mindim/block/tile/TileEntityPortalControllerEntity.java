@@ -74,6 +74,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 	}
 
+	/** flag indicating that the controller is able to disconnect from incoming portals */
+	public static final int FLAG_CAN_DISCONNECT_INCOMING = 1;
+	/** flag indicating that the controller can reverse the portal direction */
+	public static final int FLAG_CAN_REVERSE_PORTAL = 2;
+
 	/**
 	 * Portal id
 	 */
@@ -134,6 +139,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	private InventoryUpgrade upgrades = new InventoryUpgrade(9);
 
+	/**
+	 * used to determine wich upgrades are installed
+	 */
+	private int upgradeTrackerFlags = 0;
+
 
 	public void createPortal() {
 		if (id == PortalManager.PORTAL_NOT_CONNECTED) {
@@ -147,10 +157,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	public boolean openPortal() {
-		if (metrics != null) {
-			return metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
-		}
-		return false;
+		return metrics != null && metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 	}
 
 
@@ -163,6 +170,21 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public void updateUpgradeInformation() {
 		UpgradeStatCollection col = UpgradeStatCollection.getUpgradeStatsFromDefinitions(upgrades.getUpgrades());
 		energy.setCapacity(100000 + col.getInt(UpgradeTypes.ENERGY_STORAGE.id, 0));
+		upgradeTrackerFlags = 0;
+		if(col.hasKey(UpgradeTypes.DISCONNECT_INCOMING)) {
+			upgradeTrackerFlags += FLAG_CAN_DISCONNECT_INCOMING;
+		}
+		if(col.hasKey(UpgradeTypes.REVERSE_DIRECTION)) {
+			upgradeTrackerFlags += FLAG_CAN_REVERSE_PORTAL;
+		}
+	}
+
+	public int getUpgradeTrackerFlags() {
+		return upgradeTrackerFlags;
+	}
+
+	public void setUpgradeTrackerFlags(int upgradeTrackerFlags) {
+		this.upgradeTrackerFlags = upgradeTrackerFlags;
 	}
 
 	public PortalMetrics getMetrics() {
@@ -365,7 +387,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 								WorldServer world = server.worldServerForDimension(pos.dimension);
 								TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
 								if (te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).openPortal()) {
-									if (energy.useEnergy(10000)) { //use energy
+									if (energy.useEnergy(10000)) { //use initial energy
 										//update controller states
 										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
 										state = State.OUTGOING_PORTAL;
@@ -393,14 +415,19 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				//update progress
 				tick++;
 			}
+		} else if(state == State.OUTGOING_PORTAL) {
+			if(tick >= Settings.MAX_PORTAL_CONNECTION_LENGTH) {
+				closePortal();
+				tick = 0;
+			} else {
+				tick++;
+			}
 		}
 		//Use Energy
 		if (state == State.CONNECTING || state == State.OUTGOING_PORTAL) {
-			if (!energy.useEnergy(1000)) {
-				//TODO: proper energy usage
-				state = State.READY;
+			if (!energy.useEnergy(Settings.ENERGY_USAGE)) {
+				closePortal();
 				lastError = Error.POWER_FAILURE;
-				collapseWholePortal();
 			}
 		}
 		//recharge energy
@@ -609,24 +636,39 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public void handleStopButton(ContainerEntityPortalController containerEntityPortalController) {
 		switch (state) {
 			case OUTGOING_PORTAL:
-			case INCOMING_PORTAL: //For now you can disconnect manually TODO: maximum connection time
-				BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
-				if (pos != null) {
-					MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-					WorldServer world = server.worldServerForDimension(pos.dimension);
-					TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-					if (te != null && te instanceof TileEntityPortalControllerEntity) {
-						((TileEntityPortalControllerEntity) te).setState(State.READY);
-						((TileEntityPortalControllerEntity) te).collapseWholePortal();
-					}
-				}
-				state = State.READY;
-				collapseWholePortal();
+			case INCOMING_PORTAL: //For now you can disconnect manually TODO: require an upgrade in order to disconnect from incoming portal
+				closePortal();
 				break;
 			case CONNECTING:
 				state = State.READY;
 				break;
 
+		}
+	}
+
+	/**
+	 * closes the portal
+	 * TODO: better system
+	 */
+	public void closePortal() {
+		//close remote portal if needed
+		if(state == State.OUTGOING_PORTAL) {
+			BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
+			if (pos != null) {
+				MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+				WorldServer world = server.worldServerForDimension(pos.dimension);
+				TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+				if (te != null && te instanceof TileEntityPortalControllerEntity) {
+					((TileEntityPortalControllerEntity) te).setState(State.READY);
+					((TileEntityPortalControllerEntity) te).collapseWholePortal();
+				}
+			}
+		}
+		//reset state
+		state = State.READY;
+		//remove portal
+		if (metrics != null) {
+			metrics.removePortalsInsideFrame(worldObj);
 		}
 	}
 

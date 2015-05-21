@@ -29,6 +29,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 
 	private int lastEnergyStored = 0;
 	private int lastMaxEnergyStored = 100000;
+	private int lastFlags = 0;
 
 
 	public ContainerEntityPortalController(InventoryPlayer player, TileEntityPortalControllerEntity te) {
@@ -61,6 +62,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 		crafter.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
 		crafter.sendProgressBarUpdate(this, 3, (int) te.getEnergyStored());
 		crafter.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
+		crafter.sendProgressBarUpdate(this, 5, te.getUpgradeTrackerFlags());
 	}
 
 	@Override
@@ -81,11 +83,15 @@ public class ContainerEntityPortalController extends Container implements IEleme
 			if (this.lastMaxEnergyStored != te.getMaxEnergyStored()) {
 				icrafting.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
 			}
+			if(this.lastFlags != te.getUpgradeTrackerFlags()) {
+				icrafting.sendProgressBarUpdate(this, 5, te.getUpgradeTrackerFlags());
+			}
 		}
 		this.lastState = te.getState();
 		this.lastError = te.getLastError();
 		this.lastEnergyStored = (int) te.getEnergyStored();
 		this.lastMaxEnergyStored = te.getMaxEnergyStored();
+		this.lastFlags = te.getUpgradeTrackerFlags();
 	}
 
 
@@ -108,6 +114,9 @@ public class ContainerEntityPortalController extends Container implements IEleme
 			case 4:
 				this.te.getEnergyStorage().setCapacity(value);
 				break;
+			case 5:
+				this.te.setUpgradeTrackerFlags(value);
+				break;
 		}
 	}
 
@@ -126,24 +135,28 @@ public class ContainerEntityPortalController extends Container implements IEleme
 					return null;
 				}
 				slot.onSlotChange(stackSlot, stackCopy);
-			} else if (slotId < 4) {
+			} else if (slotId < 4) { //all other machine inventory slots
 				if (!this.mergeItemStack(stackSlot, 4, this.inventorySlots.size(), false)) {
 					return null;
 				}
-			} else {
+			} else { //from player:
 				if (stackSlot.getItem() instanceof IElectricItem && ((IElectricItem) stackSlot.getItem()).canProvideEnergy(stackSlot)) { //TODO generalize to support other energy sources/mods
+					//Electric Item
 					if (!this.mergeItemStack(stackSlot, 1, 2, false)) {
 						return null;
 					}
 				} else if (stackSlot.getItem() instanceof ItemDestinationCard) {
+					//Destination Card
 					if (!this.mergeItemStack(stackSlot, 0, 1, false)) {
 						return null;
 					}
 				} else if (slotId >= 4 && slotId < 31) {
+					//To Hotbar
 					if (!this.mergeItemStack(stackSlot, 31, 40, false)) {
 						return null;
 					}
 				} else if (slotId >= 31 && slotId < 40 && !this.mergeItemStack(stackSlot, 4, 31, false)) {
+					//From hotbar to player main inventory
 					return null;
 				}
 			}

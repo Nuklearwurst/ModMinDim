@@ -62,8 +62,12 @@ public class GuiEntityPortalController extends GuiContainer {
 
 	@Override
 	public void drawScreen(int x, int y, float f) {
-		btnStart.enabled = te.getState() == TileEntityPortalControllerEntity.State.READY || te.getState() == TileEntityPortalControllerEntity.State.INCOMING_CONNECTION;
-		btnStop.enabled = te.getState() == TileEntityPortalControllerEntity.State.CONNECTING || te.getState() == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL || te.getState() == TileEntityPortalControllerEntity.State.INCOMING_PORTAL;
+		btnStart.enabled = te.getState() == TileEntityPortalControllerEntity.State.READY
+				|| te.getState() == TileEntityPortalControllerEntity.State.INCOMING_CONNECTION
+				|| (te.getState() == TileEntityPortalControllerEntity.State.INCOMING_PORTAL && (te.getUpgradeTrackerFlags() & TileEntityPortalControllerEntity.FLAG_CAN_REVERSE_PORTAL) == TileEntityPortalControllerEntity.FLAG_CAN_REVERSE_PORTAL);
+		btnStop.enabled = te.getState() == TileEntityPortalControllerEntity.State.CONNECTING
+				|| te.getState() == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL
+				|| (te.getState() == TileEntityPortalControllerEntity.State.INCOMING_PORTAL && (te.getUpgradeTrackerFlags() & TileEntityPortalControllerEntity.FLAG_CAN_DISCONNECT_INCOMING) == TileEntityPortalControllerEntity.FLAG_CAN_DISCONNECT_INCOMING);
 		super.drawScreen(x, y, f);
 		drawTooltips(x, y);
 	}

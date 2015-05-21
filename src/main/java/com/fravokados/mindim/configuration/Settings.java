@@ -4,13 +4,23 @@ import net.minecraft.world.World;
 
 public class Settings {
 
+	/** simple test to determine wether we are in a dev environment */
 	public static final boolean IS_OBFUSCATED = !World.class.getSimpleName().equals("World");
 
+	/** general testing features */
 	public static boolean DEBUG_TESTING = false;
+	/** dev env only testing features */
 	public static boolean DEBUG = false;
 
-	public static int MAX_PORTAL_SIZE = 20;
-	public static int MIN_PORTAL_SIZE = 2; //FIXME: portal size seems to be not working properly, this value will allow sizes of 4 or more!
+	/** maximum size of the portal frame in any direction */
+	public static int MAX_PORTAL_SIZE = 20; //untested
+	/** minimum size inside the frame */
+	public static int MIN_PORTAL_SIZE = 2;
 
-	public static int PORTAL_CONNECTION_TIME = 100; //in ticks
+	/** time in ticks the portal takes to open a connection */
+	public static int PORTAL_CONNECTION_TIME = 100;
+	/** maximum time in ticks a portal can be held open */
+	public static int MAX_PORTAL_CONNECTION_LENGTH = 20 * 20;
+
+	public static int ENERGY_USAGE = 1000;
 }
