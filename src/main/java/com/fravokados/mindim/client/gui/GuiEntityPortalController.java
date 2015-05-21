@@ -98,7 +98,7 @@ public class GuiEntityPortalController extends GuiContainer {
 	private void drawTooltips(int x, int y) {
 		if(x >= guiLeft + 199 && y >= guiTop + 15 && x < guiLeft + 199 + 16 && y < guiTop + 15 + 55) {
 			List<String> list = new ArrayList<String>();
-			list.add(EnumChatFormatting.GRAY + "" + (int) te.getEnergyStored() + " EU" + EnumChatFormatting.RESET);
+			list.add(EnumChatFormatting.GRAY + "" + (int) te.getEnergyStored() + " EU / " + te.getMaxEnergyStored() + " EU" + EnumChatFormatting.RESET);
 			drawHoveringText(list, x, y, fontRendererObj);
 		}
 	}

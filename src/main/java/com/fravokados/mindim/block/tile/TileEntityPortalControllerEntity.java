@@ -15,6 +15,11 @@ import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
+import com.fravokados.techmobs.inventory.InventoryUpgrade;
+import com.fravokados.techmobs.upgrade.IUpgradable;
+import com.fravokados.techmobs.upgrade.IUpgradeInventory;
+import com.fravokados.techmobs.upgrade.UpgradeStatCollection;
+import com.fravokados.techmobs.upgrade.UpgradeTypes;
 import cpw.mods.fml.common.FMLCommonHandler;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
@@ -41,7 +46,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 /**
  * @author Nuklearwurst
  */
-public class TileEntityPortalControllerEntity extends TileEntity implements IInventory, IBlockPlacedListener, IEntityPortalOptionalComponent, IFacingSix, IEnergySink, IWrenchable {
+public class TileEntityPortalControllerEntity extends TileEntity implements IInventory, IBlockPlacedListener, IEntityPortalOptionalComponent, IFacingSix, IEnergySink, IWrenchable, IUpgradable {
 
 	/**
 	 * possible states of the controller
@@ -59,7 +64,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		INVALID_PORTAL_STRUCTURE("Portal Structure is not intact!"), CONNECTION_INTERRUPED("Connection Interrupted!"),
 		POWER_FAILURE("Power Failure"), DESTINATION_CHANGED("Destination Changed");
 
-		/** unlocalized name */
+		/**
+		 * unlocalized name
+		 */
 		public final String name;
 
 		Error(String s) {
@@ -67,38 +74,65 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 	}
 
-	/** Portal id */
+	/**
+	 * Portal id
+	 */
 	private int id = PortalManager.PORTAL_NOT_CONNECTED;
 
-	/** Controller name */
+	/**
+	 * Controller name
+	 */
 	private String name = null; //TODO: Controller naming
 
-	/** Controller main inventory */
+	/**
+	 * Controller main inventory
+	 */
 	private ItemStack[] inventory = new ItemStack[getSizeInventory()];
 
-	/** last portal metrics */
+	/**
+	 * last portal metrics
+	 */
 	private PortalMetrics metrics;
-	/** current destination (if open portal) */
+	/**
+	 * current destination (if open portal)
+	 */
 	private int portalDestination = PortalManager.PORTAL_NOT_CONNECTED;
 
-	/** block facing */
+	/**
+	 * block facing
+	 */
 	private short facing = 0;
 
-	/** controller state */
+	/**
+	 * controller state
+	 */
 	private State state = State.READY;
 	private Error lastError = Error.NO_ERROR;
 
-	/** current progress */
+	/**
+	 * current progress
+	 */
 	private int tick = 0;
 
-	/** gets set to true on first world tick, used for energy initialization */
+	/**
+	 * gets set to true on first world tick, used for energy initialization
+	 */
 	private boolean init = false;
 
-	/** EnergyType of this block */
+	/**
+	 * EnergyType of this block
+	 */
 	private EnergyTypes energyType = EnergyTypes.IC2; //TODO proper initialization of this value and support of different energy mods
-	/** Energy Storage */
+	/**
+	 * Energy Storage
+	 */
 	private EnergyStorage energy = new EnergyStorage(100000);
 
+	/**
+	 * Upgrades
+	 * TODO: support different upgrade inventory sizes
+	 */
+	private InventoryUpgrade upgrades = new InventoryUpgrade(9);
 
 
 	public void createPortal() {
@@ -107,16 +141,28 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 		if (getDestination() == PortalManager.PORTAL_MINING_DIMENSION) {
 			int dest = ModMiningDimension.instance.portalManager.createPortal(id, null, this);
-			if(dest >= 0)
+			if (dest >= 0)
 				setDest(dest);
 		}
 	}
 
 	public boolean openPortal() {
-		if(metrics != null) {
+		if (metrics != null) {
 			return metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 		}
 		return false;
+	}
+
+
+	@Override
+	public IUpgradeInventory getUpgradeInventory() {
+		return upgrades;
+	}
+
+	@Override
+	public void updateUpgradeInformation() {
+		UpgradeStatCollection col = UpgradeStatCollection.getUpgradeStatsFromDefinitions(upgrades.getUpgrades());
+		energy.setCapacity(100000 + col.getInt(UpgradeTypes.ENERGY_STORAGE.id, 0));
 	}
 
 	public PortalMetrics getMetrics() {
@@ -153,17 +199,18 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	/**
 	 * reads the destination card
+	 *
 	 * @return
 	 */
 	public int getDestination() {
-		if(inventory[0] == null) {
+		if (inventory[0] == null) {
 			return PortalManager.PORTAL_NOT_CONNECTED;
 		}
-		if(inventory[0].getItem() instanceof ItemDestinationCard) {
-			if(inventory[0].getItemDamage() == ItemDestinationCard.META_MIN_DIM) {
+		if (inventory[0].getItem() instanceof ItemDestinationCard) {
+			if (inventory[0].getItemDamage() == ItemDestinationCard.META_MIN_DIM) {
 				return PortalManager.PORTAL_MINING_DIMENSION;
-			} else if(inventory[0].stackTagCompound != null && inventory[0].stackTagCompound.hasKey("destinationPortalType") && inventory[0].stackTagCompound.hasKey("destinationPortal")) {
-				if(inventory[0].stackTagCompound.getInteger("destinationPortalType") == PortalMetrics.Type.ENTITY_PORTAL.ordinal()) {
+			} else if (inventory[0].stackTagCompound != null && inventory[0].stackTagCompound.hasKey("destinationPortalType") && inventory[0].stackTagCompound.hasKey("destinationPortal")) {
+				if (inventory[0].stackTagCompound.getInteger("destinationPortalType") == PortalMetrics.Type.ENTITY_PORTAL.ordinal()) {
 					return inventory[0].stackTagCompound.getInteger("destinationPortal");
 				} else {
 					return PortalManager.PORTAL_WRONG_TYPE;
@@ -175,18 +222,19 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	/**
 	 * teleports an entity to the current destination
+	 *
 	 * @param entity
 	 */
 	public void teleportEntity(Entity entity) {
-		if(state == State.OUTGOING_PORTAL && metrics != null) {
-			if(metrics.isEntityInsidePortal(entity, 1)) {
+		if (state == State.OUTGOING_PORTAL && metrics != null) {
+			if (metrics.isEntityInsidePortal(entity, 1)) {
 				if (!ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics)) {
 					state = State.READY;
 					lastError = Error.CONNECTION_INTERRUPED;
 					collapseWholePortal();
 				}
 			}
-		} else if(state != State.INCOMING_PORTAL) {
+		} else if (state != State.INCOMING_PORTAL) {
 			//invalid state, close portal and continue as usual
 			collapseWholePortal();
 			state = State.READY;
@@ -208,6 +256,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	/**
 	 * creates a destination card!
 	 * FIXME: remove, portal should not spawn with connection card
+	 *
 	 * @param dest
 	 */
 	@Deprecated
@@ -234,23 +283,22 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
-		if(worldObj.isRemote) {
+		if (worldObj.isRemote) {
 			return;
 		}
 		//Do first tick initialization
-		if(!init) {
+		if (!init) {
 			init = true;
-			if(state != State.INCOMING_PORTAL && state != State.OUTGOING_PORTAL) {
+			if (state != State.INCOMING_PORTAL && state != State.OUTGOING_PORTAL) {
 				collapseWholePortal();//reset portals
 			}
-			energy.setCapacity(100000); //TODO: proper values and conversion
-			if(energyType == EnergyTypes.IC2) {
+			if (energyType == EnergyTypes.IC2) {
 				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
 			}
 		}
 		//Write Destination Cards (Side GUI)
-		if(id > -1 && inventory[2] != null && inventory[3] == null) {
-			if(inventory[2].getItem() instanceof ItemDestinationCard && inventory[2].getItemDamage() != ItemDestinationCard.META_MIN_DIM) {
+		if (id > -1 && inventory[2] != null && inventory[3] == null) {
+			if (inventory[2].getItem() instanceof ItemDestinationCard && inventory[2].getItemDamage() != ItemDestinationCard.META_MIN_DIM) {
 				inventory[3] = inventory[2];
 				inventory[2] = null;
 				ItemDestinationCard.writeDestination(inventory[3], id);
@@ -258,10 +306,10 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		}
 		//Connect Portal
-		if(state == State.CONNECTING) {
-			if(tick == 0) { //update destination portal
+		if (state == State.CONNECTING) {
+			if (tick == 0) { //update destination portal
 				portalDestination = getDestination();
-				if(portalDestination >= 0) {
+				if (portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 					if (pos == null || portalDestination == id) { //invalid portal
 						state = State.READY;
@@ -270,7 +318,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 						MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 						WorldServer world = server.worldServerForDimension(pos.dimension);
 						TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-						if(te != null && te instanceof TileEntityPortalControllerEntity) {
+						if (te != null && te instanceof TileEntityPortalControllerEntity) {
 							//inform target of our connection
 							((TileEntityPortalControllerEntity) te).setState(State.INCOMING_CONNECTION);
 						} else { //invalid controller
@@ -281,19 +329,19 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 					}
 				}
 				tick++;
-			} else if(tick >= Settings.PORTAL_CONNECTION_TIME) { //Do connection
+			} else if (tick >= Settings.PORTAL_CONNECTION_TIME) { //Do connection
 				tick = 0;
 				int oldDestination = portalDestination;
 				portalDestination = getDestination();
 				//check destination
-				if(oldDestination != portalDestination) {
+				if (oldDestination != portalDestination) {
 					state = State.READY;
 					lastError = Error.DESTINATION_CHANGED;
 				} else {
 					//create portal if necessary
 					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
 						int count = ItemUtils.getNBTTagCompound(inventory[0]).getInteger("frame_blocks");
-						if(count >= metrics.getFrameBlockCount()) {
+						if (count >= metrics.getFrameBlockCount()) {
 							portalDestination = PortalManager.getInstance().createPortal(id, metrics, this);
 							if (portalDestination >= 0) {
 								//create destination card
@@ -347,8 +395,8 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		}
 		//Use Energy
-		if(state == State.CONNECTING || state == State.OUTGOING_PORTAL) {
-			if(!energy.useEnergy(1000)) {
+		if (state == State.CONNECTING || state == State.OUTGOING_PORTAL) {
+			if (!energy.useEnergy(1000)) {
 				//TODO: proper energy usage
 				state = State.READY;
 				lastError = Error.POWER_FAILURE;
@@ -356,9 +404,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		}
 		//recharge energy
-		if(inventory[1] != null) {
-			if(energyType == EnergyTypes.IC2) {
-				if(inventory[1].getItem() instanceof IElectricItem) {
+		if (inventory[1] != null) {
+			if (energyType == EnergyTypes.IC2) {
+				if (inventory[1].getItem() instanceof IElectricItem) {
 					energy.receiveEnergy(ElectricItem.manager.discharge(inventory[1], getDemandedEnergy(), getSinkTier(), false, true, false), false);
 				}
 			}
@@ -383,7 +431,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	public boolean canConnectTo(TileEntityPortalControllerEntity e) {
-		return  true;
+		return true;
 	}
 
 	@Override
@@ -471,7 +519,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int slot, ItemStack p_94041_2_) {
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		//TODO improve slot validation
 		return slot != 3;
 	}
@@ -490,16 +538,18 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				this.inventory[slot] = ItemStack.loadItemStackFromNBT(tag);
 			}
 		}
-		if(nbt.hasKey("name")) {
+		if (nbt.hasKey("name")) {
 			name = nbt.getString("name");
 		}
 		id = nbt.getInteger("PortalID");
 		facing = nbt.getShort("facing");
-		if(nbt.hasKey("metrics")) {
+		if (nbt.hasKey("metrics")) {
 			metrics = PortalMetrics.getMetricsFromNBT(nbt.getCompoundTag("metrics"));
 		}
+		upgrades.readFromNBT(nbt.getCompoundTag("Upgrades"));
+		energyType = EnergyTypes.readFromNBT(nbt);
 		energy.readFromNBT(nbt);
-		//TODO: save energy stored to disk
+		updateUpgradeInformation();
 	}
 
 	@Override
@@ -517,16 +567,18 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		}
 		nbt.setTag("Items", nbttaglist);
-		if(hasCustomInventoryName()) {
+		if (hasCustomInventoryName()) {
 			nbt.setString("name", name);
 		}
 		nbt.setInteger("PortalID", id);
 		nbt.setShort("facing", facing);
-		if(metrics != null) {
+		if (metrics != null) {
 			NBTTagCompound metricsTag = new NBTTagCompound();
 			metrics.writeToNBT(metricsTag);
 			nbt.setTag("metrics", metricsTag);
 		}
+		nbt.setTag("Upgrades", upgrades.writeToNBT(new NBTTagCompound()));
+		energyType.writeToNBT(nbt);
 		energy.writeToNBT(nbt);
 	}
 
@@ -556,13 +608,14 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	public void handleStopButton(ContainerEntityPortalController containerEntityPortalController) {
 		switch (state) {
-			case OUTGOING_PORTAL:case INCOMING_PORTAL: //For now you can disconnect manually TODO: maximum connection time
+			case OUTGOING_PORTAL:
+			case INCOMING_PORTAL: //For now you can disconnect manually TODO: maximum connection time
 				BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
-				if(pos != null) {
+				if (pos != null) {
 					MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 					WorldServer world = server.worldServerForDimension(pos.dimension);
 					TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-					if(te != null && te instanceof TileEntityPortalControllerEntity) {
+					if (te != null && te instanceof TileEntityPortalControllerEntity) {
 						((TileEntityPortalControllerEntity) te).setState(State.READY);
 						((TileEntityPortalControllerEntity) te).collapseWholePortal();
 					}
@@ -578,7 +631,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	public void collapseWholePortal() {
-		if(metrics != null) {
+		if (metrics != null) {
 			metrics.removePortalsInsideFrame(worldObj);
 		}
 	}
@@ -624,10 +677,10 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		NBTTagCompound nbt = pkt.func_148857_g();
-		if(nbt != null && nbt.hasKey("facing")) {
+		if (nbt != null && nbt.hasKey("facing")) {
 			int old = facing;
 			facing = nbt.getShort("facing");
-			if(old != facing) {
+			if (old != facing) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 		}
