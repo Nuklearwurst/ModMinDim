@@ -425,7 +425,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		} else if(state == State.OUTGOING_PORTAL) {
 			if(tick >= Settings.MAX_PORTAL_CONNECTION_LENGTH) {
-				closePortal();
+				closePortal(true);
 				tick = 0;
 			} else {
 				tick++;
@@ -434,7 +434,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		//Use Energy
 		if (state == State.CONNECTING || state == State.OUTGOING_PORTAL) {
 			if (!energy.useEnergy(Settings.ENERGY_USAGE)) {
-				closePortal();
+				closePortal(true);
 				lastError = Error.POWER_FAILURE;
 			}
 		}
@@ -645,7 +645,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		switch (state) {
 			case OUTGOING_PORTAL:
 			case INCOMING_PORTAL: //For now you can disconnect manually TODO: require an upgrade in order to disconnect from incoming portal
-				closePortal();
+				closePortal(true);
 				break;
 			case CONNECTING:
 				state = State.READY;
@@ -658,17 +658,16 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * closes the portal
 	 * TODO: better system
 	 */
-	public void closePortal() {
+	public void closePortal(boolean closeRemote) {
 		//close remote portal if needed
-		if(state == State.OUTGOING_PORTAL) {
+		if(closeRemote) {
 			BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 			if (pos != null) {
 				MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 				WorldServer world = server.worldServerForDimension(pos.dimension);
 				TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
 				if (te != null && te instanceof TileEntityPortalControllerEntity) {
-					((TileEntityPortalControllerEntity) te).setState(State.READY);
-					((TileEntityPortalControllerEntity) te).collapseWholePortal();
+					((TileEntityPortalControllerEntity) te).closePortal(false);
 				}
 			}
 		}

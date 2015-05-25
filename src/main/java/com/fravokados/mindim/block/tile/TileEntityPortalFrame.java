@@ -84,7 +84,7 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 			if(te != null && te instanceof TileEntityPortalControllerEntity) {
 				if(((TileEntityPortalControllerEntity) te).isActive()) {
 					worldObj.createExplosion(null, xCoord, yCoord, zCoord, 2.0F, false);
-					((TileEntityPortalControllerEntity) te).closePortal();
+					((TileEntityPortalControllerEntity) te).closePortal(true);
 				}
 //				((TileEntityPortalControllerEntity) te).updateMetrics();
 			}
