@@ -47,6 +47,7 @@ public class ModMiningDimension {
 
     public static int dimensionId = 20;
 
+    /** FIXME this cannot be allowed to be used for more than one session, it has to be removed on world unload */
     public PortalManager portalManager;
 
 	public static ConfigHandler config;

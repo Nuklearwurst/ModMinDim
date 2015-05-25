@@ -15,38 +15,43 @@ import net.minecraftforge.event.world.WorldEvent;
  */
 public class ModEventHandler {
 
-    @SubscribeEvent
-    public void onBlockPlaced(BlockEvent.PlaceEvent evt) {
-        if(evt.player.dimension != ModMiningDimension.dimensionId) {
+	@SubscribeEvent
+	public void onBlockPlaced(BlockEvent.PlaceEvent evt) {
+		if (evt.player.dimension != ModMiningDimension.dimensionId) {
 //	        evt.block.getUnlocalizedName()
-	        GameRegistry.UniqueIdentifier block = GameRegistry.findUniqueIdentifierFor(evt.block);
-	        if(block != null && block.modId.contains("BuildCraft")) {
-		        if(block.name.equals("machineBlock") || block.name.equals("miningWellBlock")) {
-			        evt.player.addChatComponentMessage(new ChatComponentText("Mmh, that didn't work..."));
-			        evt.setCanceled(true);
-		        }
-	        }
-        }
-    }
+			GameRegistry.UniqueIdentifier block = GameRegistry.findUniqueIdentifierFor(evt.block);
+			if (block != null && block.modId.contains("BuildCraft")) {
+				if (block.name.equals("machineBlock") || block.name.equals("miningWellBlock")) {
+					evt.player.addChatComponentMessage(new ChatComponentText("Mmh, that didn't work..."));
+					evt.setCanceled(true);
+				}
+			}
+		}
+	}
 
-    @SubscribeEvent
-    public void loadWorld(WorldEvent.Load evt) {
-        if(!evt.world.isRemote && evt.world.provider.dimensionId == 0)
-        {
-            WorldServer world = (WorldServer)evt.world;
-            PortalManager saveData = (PortalManager)world.perWorldStorage.loadData(PortalManager.class, "PortalManager");
+	@SubscribeEvent
+	public void loadWorld(WorldEvent.Load evt) {
+		if (!evt.world.isRemote && evt.world.provider.dimensionId == 0) {
+			WorldServer world = (WorldServer) evt.world;
+			PortalManager saveData = (PortalManager) world.perWorldStorage.loadData(PortalManager.class, "PortalManager");
 
-            if(saveData == null)
-            {
-                saveData = new PortalManager("PortalManager");
-                world.perWorldStorage.setData("PortalManager", saveData);
-            }
+			if (saveData == null) {
+				saveData = new PortalManager("PortalManager");
+				world.perWorldStorage.setData("PortalManager", saveData);
+			}
 
-            if(ModMiningDimension.instance.portalManager != null) {
-                LogHelper.error("PortalManager already loaded! Using live version... (This is a programming Error)");
-                return;
-            }
-            ModMiningDimension.instance.portalManager = saveData;
-        }
-    }
+			if (ModMiningDimension.instance.portalManager != null) {
+				throw new IllegalStateException("PortalManager already loaded! (This is a programming Error)");
+			}
+			ModMiningDimension.instance.portalManager = saveData;
+		}
+	}
+
+	@SubscribeEvent
+	public void unloadWorld(WorldEvent.Unload evt) {
+		if (!evt.world.isRemote && evt.world.provider.dimensionId == 0) {
+			LogHelper.info("Unloading PortalManager...");
+			ModMiningDimension.instance.portalManager = null;
+		}
+	}
 }

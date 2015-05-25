@@ -398,6 +398,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 									if (energy.useEnergy(10000)) { //use initial energy
 										//update controller states
 										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
+										((TileEntityPortalControllerEntity) te).portalDestination = id;
 										state = State.OUTGOING_PORTAL;
 										lastError = Error.NO_ERROR;
 									} else {
@@ -638,19 +639,34 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		switch (state) {
 			case READY:
 				initializeConnection();
+				break;
+			case INCOMING_PORTAL: {
+				BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
+				if(pos != null) {
+					MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+					WorldServer world = server.worldServerForDimension(pos.dimension);
+					TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
+					if (te != null && te instanceof TileEntityPortalControllerEntity) {
+						((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
+						this.setState(State.OUTGOING_PORTAL);
+					} else {
+						closePortal(true);
+					}
+				} else {
+					closePortal(true);
+				}
+				break;
+			}
 		}
 	}
 
 	public void handleStopButton(ContainerEntityPortalController containerEntityPortalController) {
 		switch (state) {
+			case CONNECTING:
 			case OUTGOING_PORTAL:
-			case INCOMING_PORTAL: //For now you can disconnect manually TODO: require an upgrade in order to disconnect from incoming portal
+			case INCOMING_PORTAL: //For now you can disconnect manually TODO: check if upgrade is available (don't trust client)
 				closePortal(true);
 				break;
-			case CONNECTING:
-				state = State.READY;
-				break;
-
 		}
 	}
 
