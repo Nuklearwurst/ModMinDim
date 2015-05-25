@@ -4,12 +4,17 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.tile.TileEntityPortal;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.util.LogHelper;
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.Random;
 
 /**
  * Portal Block
@@ -34,6 +39,21 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 	}
 
 	@Override
+	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side) {
+		TileEntity te = world.getTileEntity(x, y, z);
+		if(te != null && te instanceof TileEntityPortal) {
+			short facing = ((TileEntityPortal) te).getFacing();
+			if(side == facing || ForgeDirection.getOrientation(side) == ForgeDirection.getOrientation(facing).getOpposite()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+
+	@Override
 	public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity) {
 		super.onEntityCollidedWithBlock(world, x, y, z, entity);
 		if(!world.isRemote) {
@@ -42,7 +62,17 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 				((TileEntityPortal) te).onEntityEnterPortal(entity);
 			} else {
 				LogHelper.error("Invalid Portal!");
-				world.setBlockToAir(x, y, z);
+				removePortalAndSurroundingPortals(world, x, y, z);
+			}
+		}
+	}
+
+	public void removePortalAndSurroundingPortals(World world, int x, int y, int z) {
+		world.setBlockToAir(x, y, z);
+		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			Block b = world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+			if(b != null && b instanceof BlockPortalMinDim) {
+				((BlockPortalMinDim) b).removePortalAndSurroundingPortals(world, x, y, z);
 			}
 		}
 	}
@@ -55,8 +85,18 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 	}
 
 	public static void placePortalInWorld(World world, int x, int y, int z, int cx, int cy, int cz) {
-		world.setBlock(x, y, z, ModMiningDimension.instance.portalBlock, 0, 3);
+		world.setBlock(x, y, z, ModMiningDimension.instance.blockPortalBlock, 0, 3);
 		TileEntityPortal te = (TileEntityPortal) world.getTileEntity(x, y, z);
 		te.setPortalController(cx, cy, cz);
+	}
+
+	@Override
+	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+		super.breakBlock(world, x, y, z, block, meta);
+	}
+
+	@Override
+	public int quantityDropped(Random r) {
+		return 0;
 	}
 }

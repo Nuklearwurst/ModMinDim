@@ -19,4 +19,9 @@ public class SlotDestinationCardMinDim extends Slot {
 	public boolean isItemValid(ItemStack stack) {
 		return stack.getItem() instanceof ItemBlockPortalFrame && stack.getItemDamage() == BlockPortalFrame.META_FRAME_ENTITY;
 	}
+
+	@Override
+	public int getSlotStackLimit() {
+		return 1;
+	}
 }

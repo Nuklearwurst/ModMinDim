@@ -52,9 +52,17 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	public void onBlockPreDestroy(World world, int x, int y, int z, int meta) {
 		super.onBlockPreDestroy(world, x, y, z, meta);
 		TileEntity te = world.getTileEntity(x, y, z);
-		if (te != null && te instanceof TileEntityPortalControllerEntity) {
-			PortalManager.getInstance().removeEntityPortal(((TileEntityPortalControllerEntity) te).getId());
+
+		if(meta == META_CONTROLLER_ENTITY) {
+			if (te != null && te instanceof TileEntityPortalControllerEntity) {
+				PortalManager.getInstance().removeEntityPortal(((TileEntityPortalControllerEntity) te).getId());
+			}
+		} else if(meta == META_FRAME_ENTITY) {
+			if(te != null && te instanceof TileEntityPortalFrame) {
+				((TileEntityPortalFrame) te).onDestroy();
+			}
 		}
+
 	}
 
 	@Override

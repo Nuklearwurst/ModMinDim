@@ -1,5 +1,7 @@
 package com.fravokados.mindim.block.tile;
 
+import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.block.BlockPortalMinDim;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.util.LogHelper;
 import net.minecraft.entity.Entity;
@@ -44,19 +46,11 @@ public class TileEntityPortal extends TileEntity implements IFacingSix {
 		}
 	}
 
-	//TODO: remove obsolete code
-//	public void collapseWholePortal() {
-//		TileEntityPortalControllerEntity controller = getController();
-//		if(controller != null) {
-//			controller.collapseWholePortal();
-//		}
-//	}
-
 	public TileEntityPortalControllerEntity getController() {
 		TileEntity controller = this.worldObj.getTileEntity(coreX, coreY, coreZ);
 		if(controller == null || !(controller instanceof TileEntityPortalControllerEntity)) {
 			LogHelper.warn("Invalid Controller Found! portal: [" + xCoord + "; " + yCoord + "; " + zCoord + "], controller: [" + coreX + "; " + coreY + "; " + coreZ + "]");
-			this.worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+			((BlockPortalMinDim)blockType).removePortalAndSurroundingPortals(worldObj, xCoord, yCoord, zCoord);
 			return null;
 		}
 		return (TileEntityPortalControllerEntity) controller;

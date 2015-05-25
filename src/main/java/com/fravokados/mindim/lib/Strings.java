@@ -17,6 +17,10 @@ public class Strings {
 
 	public static final class Item {
 		public static final String destinationCard = "destinationCard";
+		public static final String upgrade = "upgrade";
+
+		public static final String upgradeReverse = "upgrade_reverse";
+		public static final String upgradeDisconnect = "upgrade_disconnect";
 	}
 
 	public static final class TileEntity {

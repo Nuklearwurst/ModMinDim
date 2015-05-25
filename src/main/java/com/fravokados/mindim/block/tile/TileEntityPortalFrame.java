@@ -2,6 +2,7 @@ package com.fravokados.mindim.block.tile;
 
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.portal.PortalContructor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -73,6 +74,19 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 			facing = nbt.getShort("facing");
 			if(old != facing) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+			}
+		}
+	}
+
+	public void onDestroy() {
+		if(validPortal) {
+			TileEntity te = worldObj.getTileEntity(coreX, coreY, coreZ);
+			if(te != null && te instanceof TileEntityPortalControllerEntity) {
+				if(((TileEntityPortalControllerEntity) te).isActive()) {
+					worldObj.createExplosion(null, xCoord, yCoord, zCoord, 2.0F, false);
+					((TileEntityPortalControllerEntity) te).closePortal();
+				}
+//				((TileEntityPortalControllerEntity) te).updateMetrics();
 			}
 		}
 	}

@@ -5,6 +5,7 @@ public class Reference {
     public static final String MOD_ID = "MiningDimension";
     public static final String MOD_NAME = "Mining Dimension";
     public static final String MOD_VERSION = "@VERSION@";
+    public static final String MOD_DEPENDENCIES = "required-after:techmobs";
 
 
     public static final String PROXY_CLIENT = "com.fravokados.mindim.client.ClientProxy";

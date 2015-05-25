@@ -53,7 +53,7 @@ public class PortalContructor {
 		}
 		metrics.calculateOrigin(frames);
 		//update controller
-		controller.get().updateMetrics(metrics);
+		controller.get().setMetrics(metrics);
 
 		LogHelper.info("Successfully formed multiblock");
 		return Result.SUCCESS;

@@ -1,5 +1,6 @@
 package com.fravokados.mindim;
 
+import com.fravokados.mindim.block.BlockMD;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.BlockPortalMinDim;
 import com.fravokados.mindim.block.tile.TileEntityPortal;
@@ -13,6 +14,8 @@ import com.fravokados.mindim.dimension.WorldProviderMiningDimension;
 import com.fravokados.mindim.event.ModEventHandler;
 import com.fravokados.mindim.item.ItemBlockPortalFrame;
 import com.fravokados.mindim.item.ItemDestinationCard;
+import com.fravokados.mindim.item.ItemMD;
+import com.fravokados.mindim.item.ItemMindDimUpgrade;
 import com.fravokados.mindim.lib.Reference;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.network.NetworkManager;
@@ -33,13 +36,14 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, guiFactory = Reference.GUI_FACTORY, canBeDeactivated=false)
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = Reference.MOD_DEPENDENCIES, canBeDeactivated=false)
 public class ModMiningDimension {
 
-    public Block portalFrame;
-    public Block portalBlock;
+    public BlockMD blockPortalFrame;
+    public BlockMD blockPortalBlock;
 
-	public Item itemDestinationCard;
+	public ItemMD itemDestinationCard;
+    public ItemMD itemUpgrade;
 
     public static int dimensionId = 20;
 
@@ -59,13 +63,15 @@ public class ModMiningDimension {
 	    config = new ConfigHandler(evt.getSuggestedConfigurationFile());
 	    config.load(true);
 
-        portalFrame = new BlockPortalFrame();
-        GameRegistry.registerBlock(portalFrame, ItemBlockPortalFrame.class, Strings.Block.portalMachineBase);
-        portalBlock = new BlockPortalMinDim();
-	    GameRegistry.registerBlock(portalBlock, Strings.Block.portal);
+        blockPortalFrame = new BlockPortalFrame();
+        GameRegistry.registerBlock(blockPortalFrame, ItemBlockPortalFrame.class, Strings.Block.portalMachineBase);
+        blockPortalBlock = new BlockPortalMinDim();
+	    GameRegistry.registerBlock(blockPortalBlock, Strings.Block.portal);
 
 	    itemDestinationCard = new ItemDestinationCard();
-	    GameRegistry.registerItem(itemDestinationCard, "destinationCard");
+	    GameRegistry.registerItem(itemDestinationCard, Strings.Item.destinationCard);
+        itemUpgrade = new ItemMindDimUpgrade();
+        GameRegistry.registerItem(itemUpgrade, Strings.Item.upgrade);
 
         GameRegistry.registerTileEntity(TileEntityPortalControllerEntity.class, Strings.TileEntity.TILE_ENTITY_PORTAL_CONTROLLER_ENTITY);
 	    GameRegistry.registerTileEntity(TileEntityPortal.class, Strings.TileEntity.TILE_ENTITY_PORTAL);

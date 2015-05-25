@@ -231,7 +231,7 @@ public class PortalManager extends WorldSavedData {
 		//create the portal frame
 		PortalContructor.createPortalFromMetrics(worldServer, metrics, true);
 		//create the controller
-		worldServer.setBlock(parentTile.xCoord, parentTile.yCoord, parentTile.zCoord, ModMiningDimension.instance.portalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
+		worldServer.setBlock(parentTile.xCoord, parentTile.yCoord, parentTile.zCoord, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
 		TileEntity te = worldServer.getTileEntity(pos.x, pos.y, pos.z);
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
 			((TileEntityPortalControllerEntity) te).setDest(parent);

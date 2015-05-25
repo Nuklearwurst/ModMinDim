@@ -152,12 +152,20 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		if (getDestination() == PortalManager.PORTAL_MINING_DIMENSION) {
 			int dest = ModMiningDimension.instance.portalManager.createPortal(id, null, this);
 			if (dest >= 0)
-				setDest(dest);
+				inventory[0] = ItemDestinationCard.fromDestination(dest);
 		}
 	}
 
 	public boolean openPortal() {
+		updateMetrics();
 		return metrics != null && metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
+	}
+
+	/**
+	 * Used to update portal strucutre metrics
+	 */
+	public boolean updateMetrics() {
+		return PortalContructor.createPortalMultiBlock(worldObj, xCoord, yCoord, zCoord) == PortalContructor.Result.SUCCESS;
 	}
 
 
@@ -298,7 +306,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		return state == State.INCOMING_PORTAL || state == State.OUTGOING_PORTAL;
 	}
 
-	public void updateMetrics(PortalMetrics metrics) {
+	public void setMetrics(PortalMetrics metrics) {
 		this.metrics = metrics;
 	}
 
@@ -706,7 +714,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
-		return new ItemStack(ModMiningDimension.instance.portalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
+		return new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
 	}
 
 	@Override

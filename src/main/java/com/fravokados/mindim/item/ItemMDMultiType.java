@@ -1,6 +1,7 @@
 package com.fravokados.mindim.item;
 
 import com.fravokados.mindim.lib.Textures;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -31,4 +32,7 @@ public abstract class ItemMDMultiType extends ItemMD {
 	}
 
 	protected abstract String getUnlocalizedNameForItem(ItemStack stack);
+
+	@Override
+	public abstract void registerIcons(IIconRegister reg);
 }

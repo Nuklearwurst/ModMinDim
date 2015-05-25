@@ -323,7 +323,7 @@ public class PortalMetrics {
 				for(int k = minZ; k <= maxZ; k++) {
 					flagZ = k == minZ || k == maxZ;
 					if(flagX == flagY ? flagX : flagZ) {
-						world.setBlock(x + i, y + j, z + k, ModMiningDimension.instance.portalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
+						world.setBlock(x + i, y + j, z + k, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
 					} else {
 						world.setBlock(x + i, y + j, z + k, Blocks.air, 0, 0);
 					}

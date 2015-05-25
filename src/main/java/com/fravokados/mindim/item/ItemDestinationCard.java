@@ -3,8 +3,10 @@ package com.fravokados.mindim.item;
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.lib.GUIIDs;
 import com.fravokados.mindim.lib.Strings;
+import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -77,6 +79,11 @@ public class ItemDestinationCard extends ItemMDMultiType {
 		return true;
 	}
 
+	@Override
+	public int getItemStackLimit(ItemStack stack) {
+		return stack.getItemDamage() == META_MIN_DIM ? 1 : 64;
+	}
+
 	public static ItemStack fromDestination(int id) {
 		return writeDestination(new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, 0), id);
 	}
@@ -86,5 +93,10 @@ public class ItemDestinationCard extends ItemMDMultiType {
 		nbt.setInteger("destinationPortalType", PortalMetrics.Type.ENTITY_PORTAL.ordinal());
 		nbt.setInteger("destinationPortal", id);
 		return stack;
+	}
+
+	@Override
+	public void registerIcons(IIconRegister reg) {
+		itemIcon = reg.registerIcon(Textures.ITEM_DESTINATION_CARD);
 	}
 }

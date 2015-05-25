@@ -30,7 +30,7 @@ public class RecipeManager {
 				Character.valueOf('p'), Items.paper
 		);
 
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.portalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
 				"oeo",
 				"eme",
 				"oeo",
@@ -39,11 +39,11 @@ public class RecipeManager {
 				Character.valueOf('e'), Items.ender_pearl
 		);
 
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.portalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
+		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
 				"ded",
 				"ama",
 				"sfs",
-				Character.valueOf('f'), new ItemStack(ModMiningDimension.instance.portalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+				Character.valueOf('f'), new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
 				Character.valueOf('m'), mfe,
 				Character.valueOf('a'), advancedCircuit,
 				Character.valueOf('d'), Items.diamond,
@@ -55,7 +55,7 @@ public class RecipeManager {
 				"ede",
 				"gcg",
 				"ege",
-				Character.valueOf('c'), new ItemStack(ModMiningDimension.instance.portalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
+				Character.valueOf('c'), new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
 				Character.valueOf('d'), new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
 				Character.valueOf('e'), Items.ender_eye,
 				Character.valueOf('g'), Items.diamond
