@@ -32,7 +32,7 @@ public class ConfigHandler {
 		// DEBUG //
 		///////////
 
-		if(Settings.IS_OBFUSCATED) {
+		if(!Settings.IS_OBFUSCATED) {
 			Settings.DEBUG = config.getBoolean(Keys.Debug.DEBUG, Configuration.CATEGORY_GENERAL, DefaultSettings.Debug.DEBUG, "Enables dev debug features");
 		}
 		Settings.DEBUG_TESTING = config.getBoolean(Keys.Debug.DEBUG_TESTING, Configuration.CATEGORY_GENERAL, DefaultSettings.Debug.DEBUG_TESTING, "Enables debug testing features");
