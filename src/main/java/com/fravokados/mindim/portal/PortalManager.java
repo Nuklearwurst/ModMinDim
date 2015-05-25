@@ -3,6 +3,7 @@ package com.fravokados.mindim.portal;
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.mindim.util.RotationUtils;
 import com.fravokados.mindim.util.TeleportUtils;
@@ -159,6 +160,7 @@ public class PortalManager extends WorldSavedData {
 				////////////////
 				//  momentum  //
 				////////////////
+
 				//relative coordinate system
 				double speed_rel_x = entity.motionX * originMetrics.front.offsetX + entity.motionY * originMetrics.front.offsetY + entity.motionZ * originMetrics.front.offsetZ;
 				double speed_rel_y = entity.motionX * originMetrics.top.offsetX + entity.motionY * originMetrics.top.offsetY + entity.motionZ * originMetrics.top.offsetZ;
@@ -168,6 +170,17 @@ public class PortalManager extends WorldSavedData {
 				double speed_x = targetMetrics.front.offsetX * (-1) * speed_rel_x + targetMetrics.top.offsetX * speed_rel_y + sideAxisTarget.offsetX * speed_rel_z;
 				double speed_y = targetMetrics.front.offsetY * (-1) * speed_rel_x + targetMetrics.top.offsetY * speed_rel_y + sideAxisTarget.offsetY * speed_rel_z;
 				double speed_z = targetMetrics.front.offsetZ * (-1) * speed_rel_x + targetMetrics.top.offsetZ * speed_rel_y + sideAxisTarget.offsetZ * speed_rel_z;
+
+				if(Settings.DEBUG) {
+					LogHelper.info("Teleporting entity | Momentum | Total");
+					LogHelper.info("Old square velocity: " + (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ));
+					LogHelper.info("Relative square velocity: " + (speed_rel_x * speed_rel_x + speed_rel_y * speed_rel_y + speed_rel_z * speed_rel_z));
+					LogHelper.info("New square velocity: " + (speed_x * speed_x + speed_y * speed_y + speed_z * speed_z));
+					LogHelper.info("Teleporting entity | Momentum | Components");
+					LogHelper.info("Old velocity: " + entity.motionX + "; " + entity.motionY + "; " + entity.motionZ);
+					LogHelper.info("Relative velocity: " + speed_rel_x + "; " + speed_rel_y + "; " + speed_rel_z);
+					LogHelper.info("New velocity: " + speed_x + "; " + speed_y + "; " + speed_z);
+				}
 
 				//update entity
 				entity.setVelocity(speed_x, speed_y, speed_z);
