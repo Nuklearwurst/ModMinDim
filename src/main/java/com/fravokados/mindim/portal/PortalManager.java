@@ -115,8 +115,6 @@ public class PortalManager extends WorldSavedData {
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
 			PortalMetrics targetMetrics = ((TileEntityPortalControllerEntity) te).getMetrics();
 			if(targetMetrics != null) {
-				//TODO: update player rotation
-				//TODO: update portal boundaries
 				ForgeDirection sideAxisOrigin = originMetrics.top.getRotation(originMetrics.front);
 				ForgeDirection sideAxisTarget = targetMetrics.top.getRotation(targetMetrics.front);
 

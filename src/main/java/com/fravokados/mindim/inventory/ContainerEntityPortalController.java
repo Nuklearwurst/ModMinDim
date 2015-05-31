@@ -55,7 +55,6 @@ public class ContainerEntityPortalController extends Container implements IEleme
 
 	@Override
 	public void addCraftingToCrafters(ICrafting crafter) {
-		//TODO update energy
 		super.addCraftingToCrafters(crafter);
 		crafter.sendProgressBarUpdate(this, 0, te.getId());
 		crafter.sendProgressBarUpdate(this, 1, te.getState().ordinal());
@@ -67,7 +66,6 @@ public class ContainerEntityPortalController extends Container implements IEleme
 
 	@Override
 	public void detectAndSendChanges() {
-		//TODO update energy
 		super.detectAndSendChanges();
 		for (Object crafter : this.crafters) {
 			ICrafting icrafting = (ICrafting) crafter;
