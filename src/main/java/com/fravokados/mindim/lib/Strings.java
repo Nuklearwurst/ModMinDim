@@ -30,13 +30,16 @@ public class Strings {
 		public static final String TILE_ENTITY_PORTAL_FRAME = "TileEntityPortalFrame";
 	}
 
+	/**
+	 * Configuration keys
+	 */
 	public static final class Keys {
-
-		public static final String KEY_GENERAL_SETTINGS = "General Settings";
-
 		public static final class Debug {
 			public static final String DEBUG = "debug_deobf";
 			public static final String DEBUG_TESTING = "debug_testing";
+		}
+		public static final class General {
+			public static final String PORTAL_SPAWN_WITH_CARD = "portal_spawns_with_card";
 		}
 	}
 }

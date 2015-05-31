@@ -23,4 +23,7 @@ public class Settings {
 	public static int MAX_PORTAL_CONNECTION_LENGTH = 20 * 20;
 
 	public static int ENERGY_USAGE = 1000;
+
+	/** should a mindim portal spawn with a card leading back */
+	public static boolean PORTAL_SPAWN_WITH_CARD = false;
 }

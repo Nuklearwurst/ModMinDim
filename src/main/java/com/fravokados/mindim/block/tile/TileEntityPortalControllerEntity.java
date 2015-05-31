@@ -8,6 +8,7 @@ import com.fravokados.mindim.block.tile.energy.EnergyStorage;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
+import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.plugin.EnergyTypes;
 import com.fravokados.mindim.portal.BlockPositionDim;
 import com.fravokados.mindim.portal.PortalContructor;
@@ -281,22 +282,6 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public void onBlockPostPlaced(World world, int x, int y, int z, int meta) {
 		id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
 		PortalContructor.createPortalMultiBlock(world, x, y, z);
-	}
-
-	/**
-	 * creates a destination card!
-	 * FIXME: remove, portal should not spawn with connection card
-	 *
-	 * @param dest
-	 */
-	@Deprecated
-	public void setDest(int dest) {
-		ItemStack card = new ItemStack(ModMiningDimension.instance.itemDestinationCard);
-		NBTTagCompound nbt = ItemUtils.getNBTTagCompound(card);
-		nbt.setInteger("destinationPortalType", PortalMetrics.Type.ENTITY_PORTAL.ordinal());
-		nbt.setInteger("destinationPortal", dest);
-		inventory[0] = card;
-		markDirty();
 	}
 
 	/**

@@ -8,6 +8,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
+import java.util.Set;
 
 public class ConfigHandler {
 
@@ -27,6 +28,12 @@ public class ConfigHandler {
 			}
 		}
 		//read config
+
+		/////////////
+		// GENERAL //
+		/////////////
+
+		Settings.PORTAL_SPAWN_WITH_CARD = config.getBoolean(Keys.General.PORTAL_SPAWN_WITH_CARD, Configuration.CATEGORY_GENERAL, DefaultSettings.General.PORTAL_SPAWN_WITH_CARD, "Should a portal to the Mining Dimension also spawn a Destination Card leading to the Origin-Portal?");
 
 		////////////
 		// DEBUG //

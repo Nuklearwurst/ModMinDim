@@ -4,6 +4,7 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.configuration.Settings;
+import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.mindim.util.RotationUtils;
 import com.fravokados.mindim.util.TeleportUtils;
@@ -31,6 +32,7 @@ public class PortalManager extends WorldSavedData {
 	public static final int PORTAL_MINING_DIMENSION = -2;
 	public static final int PORTAL_INVALID_ITEM = -3;
 	public static final int PORTAL_WRONG_TYPE = -4;
+	public static final int PORTAL_INVALID_DIMENSION = -5;
 
 
 	private final Map<Integer, BlockPositionDim> entityPortals = new HashMap<Integer, BlockPositionDim>();
@@ -171,6 +173,7 @@ public class PortalManager extends WorldSavedData {
 				double speed_y = targetMetrics.front.offsetY * (-1) * speed_rel_x + targetMetrics.top.offsetY * speed_rel_y + sideAxisTarget.offsetY * speed_rel_z;
 				double speed_z = targetMetrics.front.offsetZ * (-1) * speed_rel_x + targetMetrics.top.offsetZ * speed_rel_y + sideAxisTarget.offsetZ * speed_rel_z;
 
+				//FIXME: working so far, can be removed in the future
 				if(Settings.DEBUG) {
 					LogHelper.info("Teleporting entity | Momentum | Total");
 					LogHelper.info("Old square velocity: " + (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ));
@@ -234,8 +237,10 @@ public class PortalManager extends WorldSavedData {
 		if (pos == null) {
 			return PORTAL_NOT_CONNECTED;
 		}
-		//FIXME: For now it is possible creating portals both ways
-		int dim = pos.dimension == ModMiningDimension.dimensionId ? 0 : ModMiningDimension.dimensionId;
+		if(pos.dimension == ModMiningDimension.dimensionId) {
+			return PORTAL_INVALID_DIMENSION;
+		}
+		int dim = ModMiningDimension.dimensionId;
 
 		//get the destination world server
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -247,7 +252,9 @@ public class PortalManager extends WorldSavedData {
 		worldServer.setBlock(parentTile.xCoord, parentTile.yCoord, parentTile.zCoord, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
 		TileEntity te = worldServer.getTileEntity(pos.x, pos.y, pos.z);
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
-			((TileEntityPortalControllerEntity) te).setDest(parent);
+			if(Settings.PORTAL_SPAWN_WITH_CARD) {
+				((TileEntityPortalControllerEntity) te).setInventorySlotContents(0, ItemDestinationCard.fromDestination(parent));
+			}
 			((TileEntityPortalControllerEntity) te).onBlockPostPlaced(te.getWorldObj(), pos.x, pos.y, pos.z, worldServer.getBlockMetadata(pos.x, pos.y, pos.z));
 			return ((TileEntityPortalControllerEntity) te).getId();
 		}
