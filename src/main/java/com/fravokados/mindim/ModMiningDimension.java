@@ -18,7 +18,7 @@ import com.fravokados.mindim.item.ItemMD;
 import com.fravokados.mindim.item.ItemMindDimUpgrade;
 import com.fravokados.mindim.lib.Reference;
 import com.fravokados.mindim.lib.Strings;
-import com.fravokados.mindim.network.NetworkManager;
+import com.fravokados.mindim.network.ModNetworkManager;
 import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.recipes.RecipeManager;
 import com.fravokados.mindim.util.LogHelper;
@@ -30,8 +30,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -87,7 +85,7 @@ public class ModMiningDimension {
         DimensionManager.registerProviderType(dimensionId, WorldProviderMiningDimension.class, false);
         DimensionManager.registerDimension(dimensionId, dimensionId);
 
-	    NetworkManager.init();
+	    ModNetworkManager.init();
 
         RecipeManager.initRecipes();
     }

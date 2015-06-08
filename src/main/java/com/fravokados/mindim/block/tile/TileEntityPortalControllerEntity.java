@@ -8,7 +8,6 @@ import com.fravokados.mindim.block.tile.energy.EnergyStorage;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
-import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.plugin.EnergyTypes;
 import com.fravokados.mindim.portal.BlockPositionDim;
 import com.fravokados.mindim.portal.PortalContructor;
@@ -210,6 +209,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	public void setState(State state) {
 		this.state = state;
+		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 
 	public void setLastError(Error lastError) {
@@ -260,7 +260,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		if (state == State.OUTGOING_PORTAL && metrics != null) {
 			if (metrics.isEntityInsidePortal(entity, 1)) {
 				if (!ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics)) {
-					state = State.READY;
+					setState(State.READY);
 					lastError = Error.CONNECTION_INTERRUPED;
 					collapseWholePortal();
 				}
@@ -268,7 +268,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		} else if (state != State.INCOMING_PORTAL) {
 			//invalid state, close portal and continue as usual
 			collapseWholePortal();
-			state = State.READY;
+			setState(State.READY);
 			lastError = Error.CONNECTION_INTERRUPED;
 			LogHelper.warn("Invalid portal found, destroying... (" + id + ", dest.:" + portalDestination + ")");
 		}
@@ -327,7 +327,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				if (portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 					if (pos == null || portalDestination == id) { //invalid portal
-						state = State.READY;
+						setState(State.READY);
 						lastError = Error.INVALID_DESTINATION;
 					} else {
 						MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -338,7 +338,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 							((TileEntityPortalControllerEntity) te).setState(State.INCOMING_CONNECTION);
 						} else { //invalid controller
 							LogHelper.warn("Could not find registered controller with id: " + portalDestination);
-							state = State.READY;
+							setState(State.READY);
 							lastError = Error.CONNECTION_INTERRUPED;
 						}
 					}
@@ -350,7 +350,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				portalDestination = getDestination();
 				//check destination
 				if (oldDestination != portalDestination) {
-					state = State.READY;
+					setState(State.READY);
 					lastError = Error.DESTINATION_CHANGED;
 				} else {
 					//create portal if necessary
@@ -367,12 +367,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 					if (portalDestination >= 0) { //if destination is valid
 						BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 						if (pos == null) { //invalid destination (Not found)
-							state = State.READY;
+							setState(State.READY);
 							lastError = Error.INVALID_DESTINATION;
 						} else {
 							//open portal
 							if (!openPortal()) { //invalid structure
-								state = State.READY;
+								setState(State.READY);
 								lastError = Error.INVALID_PORTAL_STRUCTURE;
 							} else {
 								//update controllers
@@ -384,24 +384,24 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 										//update controller states
 										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
 										((TileEntityPortalControllerEntity) te).portalDestination = id;
-										state = State.OUTGOING_PORTAL;
+										setState(State.OUTGOING_PORTAL);
 										lastError = Error.NO_ERROR;
 									} else {
 										//reset destination if power fails
 										((TileEntityPortalControllerEntity) te).setState(State.READY);
-										state = State.READY;
+										setState(State.READY);
 										lastError = Error.POWER_FAILURE;
 									}
 								} else { //invalid portal (Invalid TE or Destination has invalid structure [portal creation failed])
 									LogHelper.warn("Error opening portal to: " + portalDestination + " with controller: " + te);
-									state = State.READY;
+									setState(State.READY);
 									lastError = Error.CONNECTION_INTERRUPED;
 								}
 							}
 						}
 					} else {
 						//connection failed (invalid destination card or failed creating portal)
-						state = State.READY;
+						setState(State.READY);
 						lastError = Error.INVALID_DESTINATION;
 					}
 				}
@@ -608,7 +608,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	public void initializeConnection() {
 		//update state and tick
-		state = State.CONNECTING;
+		setState(State.CONNECTING);
 		lastError = Error.NO_ERROR;
 		tick = 0;
 		//register portal and log warning
@@ -673,7 +673,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		}
 		//reset state
-		state = State.READY;
+		setState(State.READY);
 		//remove portal
 		if (metrics != null) {
 			metrics.removePortalsInsideFrame(worldObj);
@@ -689,6 +689,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void setFacing(short b) {
 		facing = b;
+		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 
 	@Override
@@ -721,6 +722,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setShort("facing", facing);
+		nbt.setInteger("state", state.ordinal());
 		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
 	}
 
@@ -728,9 +730,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		NBTTagCompound nbt = pkt.func_148857_g();
 		if (nbt != null && nbt.hasKey("facing")) {
-			int old = facing;
+			int oldFacing = facing;
 			facing = nbt.getShort("facing");
-			if (old != facing) {
+			State oldState = state;
+			state = State.values()[nbt.getInteger("state")];
+			if (oldFacing != facing || oldState != state) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 		}

@@ -15,12 +15,19 @@ public class Textures {
 	public static final String TEXTURE_PREFIX = Reference.ASSET_DIR + ":";
 
 	public static final String BLOCK_PORTAL_FRAME = TEXTURE_PREFIX + Strings.Block.portalMachineFrame;
-	public static final String BLOCK_PORTAL_CONTROLLER = TEXTURE_PREFIX + Strings.Block.portalMachineController;
+	public static final String BLOCK_PORTAL_CONTROLLER_ONLINE = TEXTURE_PREFIX + Strings.Block.portalMachineController + "_online";
+	public static final String BLOCK_PORTAL_CONTROLLER_OFFLINE = TEXTURE_PREFIX + Strings.Block.portalMachineController + "_offline";
+	public static final String BLOCK_PORTAL_CONTROLLER_DISABLED = TEXTURE_PREFIX + Strings.Block.portalMachineController + "_disabled";
+	public static final String BLOCK_PORTAL_CONTROLLER_ONLINE_FRONT = TEXTURE_PREFIX + Strings.Block.portalMachineController + "_front_online";
+	public static final String BLOCK_PORTAL_CONTROLLER_OFFLINE_FRONT = TEXTURE_PREFIX + Strings.Block.portalMachineController + "_front_offline";
+	public static final String BLOCK_PORTAL_CONTROLLER_DISABLED_FRONT = TEXTURE_PREFIX + Strings.Block.portalMachineController + "_front_disabled";
 
 	public static final String ITEM_DESTINATION_CARD = TEXTURE_PREFIX + Strings.Item.destinationCard;
+	public static final String ITEM_DESTINATION_CARD_MINDIM = TEXTURE_PREFIX + Strings.Item.destinationCardMinDim;
 
 	public static final String ITEM_UPGRADE_REVERSE_DIRECTION = TEXTURE_PREFIX + Strings.Item.upgradeReverse;
 	public static final String ITEM_UPGRADE_DISCONNECT = TEXTURE_PREFIX + Strings.Item.upgradeDisconnect;
+	public static final String ITEM_UPGRADE_DUMMY = TEXTURE_PREFIX + Strings.Item.upgrade;
 
 
 	public static ResourceLocation getResourceLocation(String path) {

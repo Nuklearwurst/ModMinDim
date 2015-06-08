@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -23,6 +24,8 @@ public class ItemDestinationCard extends ItemMDMultiType {
 
 	public static final int META_NORMAL = 0;
 	public static final int META_MIN_DIM = 1; //this might get moved to another item
+
+	private IIcon iconMinDim;
 
 	public ItemDestinationCard() {
 		super(Strings.Item.destinationCard);
@@ -55,12 +58,6 @@ public class ItemDestinationCard extends ItemMDMultiType {
 					//TODO translation
 					info.add("Portal Type: " + PortalMetrics.Type.getType(type));
 					info.add("Portal Destination: " + dest);
-				}
-			}
-		} else {
-			if (stack.stackTagCompound != null) {
-				if (stack.stackTagCompound.hasKey("TEST")) {
-					info.add("Hi, DASFLHL");
 				}
 			}
 		}
@@ -98,5 +95,11 @@ public class ItemDestinationCard extends ItemMDMultiType {
 	@Override
 	public void registerIcons(IIconRegister reg) {
 		itemIcon = reg.registerIcon(Textures.ITEM_DESTINATION_CARD);
+		iconMinDim = reg.registerIcon(Textures.ITEM_DESTINATION_CARD_MINDIM);
+	}
+
+	@Override
+	public IIcon getIconFromDamage(int damage) {
+		return damage == META_MIN_DIM ? iconMinDim : itemIcon;
 	}
 }

@@ -61,6 +61,7 @@ public class ItemMindDimUpgrade extends ItemMDMultiType implements IUpgrade {
 
     @Override
     public void registerIcons(IIconRegister reg) {
+        itemIcon = reg.registerIcon(Textures.ITEM_UPGRADE_DUMMY);
         iconDisconnect = reg.registerIcon(Textures.ITEM_UPGRADE_DISCONNECT);
         iconReverse = reg.registerIcon(Textures.ITEM_UPGRADE_REVERSE_DIRECTION);
     }

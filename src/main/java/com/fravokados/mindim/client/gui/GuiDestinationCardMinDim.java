@@ -2,7 +2,7 @@ package com.fravokados.mindim.client.gui;
 
 import com.fravokados.mindim.inventory.ContainerDestinationCardMinDim;
 import com.fravokados.mindim.lib.Textures;
-import com.fravokados.mindim.network.NetworkManager;
+import com.fravokados.mindim.network.ModNetworkManager;
 import com.fravokados.mindim.network.network.MessageGuiElementClicked;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -52,7 +52,7 @@ public class GuiDestinationCardMinDim extends GuiContainer {
 	protected void actionPerformed(GuiButton btn) {
 		switch (btn.id) {
 			case BUTTON_ID_ADD:
-				NetworkManager.INSTANCE.sendToServer(new MessageGuiElementClicked(ContainerDestinationCardMinDim.NETWORK_ID_ADD, 0));
+				ModNetworkManager.INSTANCE.sendToServer(new MessageGuiElementClicked(ContainerDestinationCardMinDim.NETWORK_ID_ADD, 0));
 				return;
 		}
 		super.actionPerformed(btn);

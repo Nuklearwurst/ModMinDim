@@ -3,7 +3,7 @@ package com.fravokados.mindim.client.gui;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.lib.Textures;
-import com.fravokados.mindim.network.NetworkManager;
+import com.fravokados.mindim.network.ModNetworkManager;
 import com.fravokados.mindim.network.network.MessageGuiElementClicked;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -51,10 +51,10 @@ public class GuiEntityPortalController extends GuiContainer {
 	protected void actionPerformed(GuiButton btn) {
 		switch (btn.id) {
 			case BUTTON_ID_START:
-				NetworkManager.INSTANCE.sendToServer(new MessageGuiElementClicked(ContainerEntityPortalController.NETWORK_ID_START, 0));
+				ModNetworkManager.INSTANCE.sendToServer(new MessageGuiElementClicked(ContainerEntityPortalController.NETWORK_ID_START, 0));
 				return;
 			case BUTTON_ID_STOP:
-				NetworkManager.INSTANCE.sendToServer(new MessageGuiElementClicked(ContainerEntityPortalController.NETWORK_ID_STOP, 0));
+				ModNetworkManager.INSTANCE.sendToServer(new MessageGuiElementClicked(ContainerEntityPortalController.NETWORK_ID_STOP, 0));
 				return;
 		}
 		super.actionPerformed(btn);

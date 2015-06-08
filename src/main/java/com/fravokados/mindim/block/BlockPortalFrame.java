@@ -5,6 +5,7 @@ import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
 import com.fravokados.mindim.lib.GUIIDs;
 import com.fravokados.mindim.lib.Textures;
+import com.fravokados.mindim.plugin.PluginIC2;
 import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.util.RotationUtils;
 import net.minecraft.block.ITileEntityProvider;
@@ -32,7 +33,12 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	public static final int META_CONTROLLER_ENTITY = 1;
 
 	private IIcon iconFrame;
-	private IIcon iconController;
+	private IIcon iconController_online;
+	private IIcon iconController_offline;
+	private IIcon iconController_disabled;
+	private IIcon iconController_front_online;
+	private IIcon iconController_front_offline;
+	private IIcon iconController_front_disabled;
 
 	public BlockPortalFrame() {
 		super(Material.rock);
@@ -40,6 +46,9 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float j, float k, float l) {
+		if(PluginIC2.isItemWrench(player.getCurrentEquippedItem())) {
+			return true;
+		}
 		switch (world.getBlockMetadata(x, y, z)) {
 			case META_CONTROLLER_ENTITY:
 				player.openGui(ModMiningDimension.instance, GUIIDs.ENTITY_PORTAL_CONTROLLER, world, x, y, z);
@@ -99,7 +108,12 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister) {
 		iconFrame = iconRegister.registerIcon(Textures.BLOCK_PORTAL_FRAME);
-		iconController = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER);
+		iconController_online = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_ONLINE);
+		iconController_offline = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_OFFLINE);
+		iconController_disabled = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_DISABLED);
+		iconController_front_online = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_ONLINE_FRONT);
+		iconController_front_offline = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_OFFLINE_FRONT);
+		iconController_front_disabled = iconRegister.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_DISABLED_FRONT);
 	}
 
 	@Override
@@ -108,7 +122,7 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 			case META_FRAME_ENTITY:
 				return iconFrame;
 			case META_CONTROLLER_ENTITY:
-				return side == 3 ? iconController : iconFrame;
+				return side == 3 ? iconController_front_online : iconController_online;
 		}
 		return iconFrame;
 	}
@@ -117,11 +131,24 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
 		TileEntity te = world.getTileEntity(x, y, z);
 		if(te != null && te instanceof TileEntityPortalControllerEntity) {
-			short facing = ((IFacingSix) te).getFacing();
+			short facing = ((TileEntityPortalControllerEntity) te).getFacing();
+			TileEntityPortalControllerEntity.State state = ((TileEntityPortalControllerEntity) te).getState();
 			if(side == facing) {
-				return iconController;
+				if(state == TileEntityPortalControllerEntity.State.NO_MULTIBLOCK || state == TileEntityPortalControllerEntity.State.READY) {
+					return iconController_front_disabled;
+				} else if(state == TileEntityPortalControllerEntity.State.INCOMING_PORTAL || state == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL) {
+					return iconController_front_online;
+				} else {
+					return iconController_front_offline;
+				}
 			} else {
-				return iconFrame;
+				if(state == TileEntityPortalControllerEntity.State.NO_MULTIBLOCK || state == TileEntityPortalControllerEntity.State.READY) {
+					return iconController_disabled;
+				} else if(state == TileEntityPortalControllerEntity.State.INCOMING_PORTAL || state == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL) {
+					return iconController_online;
+				} else {
+					return iconController_offline;
+				}
 			}
 		}
 		return super.getIcon(world, x, y, z, side);

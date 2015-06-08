@@ -2,7 +2,6 @@ package com.fravokados.mindim.block.tile;
 
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
-import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.portal.PortalContructor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -63,6 +62,9 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setShort("facing", facing);
+		nbt.setInteger("x_core", coreX);
+		nbt.setInteger("y_core", coreY);
+		nbt.setInteger("z_core", coreZ);
 		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
 	}
 
@@ -70,9 +72,15 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		NBTTagCompound nbt = pkt.func_148857_g();
 		if(nbt != null && nbt.hasKey("facing")) {
-			int old = facing;
+			int oldFacing = facing;
 			facing = nbt.getShort("facing");
-			if(old != facing) {
+			int oldCoreX = coreX;
+			int oldCoreY = coreY;
+			int oldCoreZ = coreZ;
+			coreX = nbt.getInteger("x_core");
+			coreY = nbt.getInteger("y_core");
+			coreZ = nbt.getInteger("z_core");
+			if(oldFacing != facing || oldCoreX != coreX || oldCoreY != coreY || oldCoreZ != coreZ) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
 		}
