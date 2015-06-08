@@ -62,7 +62,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		//TODO: translation
 		NO_ERROR("No Error"), INVALID_DESTINATION("Invalid Destination"),
 		INVALID_PORTAL_STRUCTURE("Portal Structure is not intact!"), CONNECTION_INTERRUPED("Connection Interrupted!"),
-		POWER_FAILURE("Power Failure"), DESTINATION_CHANGED("Destination Changed");
+		POWER_FAILURE("Power Failure"), DESTINATION_CHANGED("Destination Changed"), NOT_ENOUGH_MINERALS("Not Enough Minerals");
 
 		/**
 		 * unlocalized name
@@ -210,6 +210,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	public void setState(State state) {
 		this.state = state;
 		this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		if(metrics != null) {
+			metrics.updatePortalFrames(worldObj);
+		}
 	}
 
 	public void setLastError(Error lastError) {
@@ -361,7 +364,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 							if (portalDestination >= 0) {
 								//create destination card
 								inventory[0] = ItemDestinationCard.fromDestination(portalDestination);
+							} else {
+								lastError = Error.INVALID_DESTINATION;
 							}
+						} else {
+							lastError = Error.NOT_ENOUGH_MINERALS;
 						}
 					}
 					if (portalDestination >= 0) { //if destination is valid
@@ -402,7 +409,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 					} else {
 						//connection failed (invalid destination card or failed creating portal)
 						setState(State.READY);
-						lastError = Error.INVALID_DESTINATION;
+						if(portalDestination != PortalManager.PORTAL_MINING_DIMENSION) {
+							lastError = Error.INVALID_DESTINATION;
+						}
 					}
 				}
 			} else {

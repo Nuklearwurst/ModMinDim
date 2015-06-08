@@ -235,10 +235,11 @@ public class PortalManager extends WorldSavedData {
 		if (pos == null) {
 			return PORTAL_NOT_CONNECTED;
 		}
-		if(pos.dimension == ModMiningDimension.dimensionId) {
-			return PORTAL_INVALID_DIMENSION;
-		}
-		int dim = ModMiningDimension.dimensionId;
+//		if(pos.dimension == ModMiningDimension.dimensionId) {
+//			return PORTAL_INVALID_DIMENSION;
+//		}
+		//TODO: make this configurable
+		int dim = pos.dimension == ModMiningDimension.dimensionId ? 0 : ModMiningDimension.dimensionId;
 
 		//get the destination world server
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();

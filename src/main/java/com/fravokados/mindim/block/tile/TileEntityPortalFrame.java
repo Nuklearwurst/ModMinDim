@@ -22,12 +22,14 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 	private int coreZ;
 
 	private short facing = 1;
+	private TileEntityPortalControllerEntity.State controllerState;
 
 	public void setPortalController(int x, int y, int z) {
 		this.coreX = x;
 		this.coreY = y;
 		this.coreZ = z;
 		this.validPortal = true;
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 	}
 
 	@Override
@@ -80,6 +82,7 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 			coreX = nbt.getInteger("x_core");
 			coreY = nbt.getInteger("y_core");
 			coreZ = nbt.getInteger("z_core");
+			validPortal = true;
 			if(oldFacing != facing || oldCoreX != coreX || oldCoreY != coreY || oldCoreZ != coreZ) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 			}
@@ -105,5 +108,15 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 
 	public short getFacing() {
 		return facing;
+	}
+
+	public TileEntityPortalControllerEntity.State getControllerState() {
+		if(validPortal) {
+			TileEntity te = worldObj.getTileEntity(coreX, coreY, coreZ);
+			if(te != null && te instanceof TileEntityPortalControllerEntity) {
+				return ((TileEntityPortalControllerEntity) te).getState();
+			}
+		}
+		return TileEntityPortalControllerEntity.State.NO_MULTIBLOCK;
 	}
 }

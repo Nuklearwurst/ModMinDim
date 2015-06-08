@@ -332,5 +332,24 @@ public class PortalMetrics {
 		}
 		return true;
 	}
+
+	@SuppressWarnings("ConstantConditions")
+	public void updatePortalFrames(World worldObj) {
+		boolean flagX;
+		boolean flagY;
+		boolean flagZ;
+		for(int i = minX; i <= maxX; i++) {
+			flagX = i == minX || i == maxX;
+			for(int j = minY; j <= maxY; j++) {
+				flagY = j == minY || j == maxY;
+				for(int k = minZ; k <= maxZ; k++) {
+					flagZ = k == minZ || k == maxZ;
+					if(flagX == flagY ? flagX : flagZ) {
+						worldObj.markBlockForUpdate(i, j, k);
+					}
+				}
+			}
+		}
+	}
 }
 
