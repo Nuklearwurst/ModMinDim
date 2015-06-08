@@ -83,9 +83,9 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 			coreY = nbt.getInteger("y_core");
 			coreZ = nbt.getInteger("z_core");
 			validPortal = true;
-			if(oldFacing != facing || oldCoreX != coreX || oldCoreY != coreY || oldCoreZ != coreZ) {
+//			if(oldFacing != facing || oldCoreX != coreX || oldCoreY != coreY || oldCoreZ != coreZ) {
 				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-			}
+//			}
 		}
 	}
 
