@@ -9,6 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -24,6 +25,10 @@ public class BlockUtils {
 		}
 
 		IUpgradeInventory inventory = ((IUpgradable) tileEntity).getUpgradeInventory();
+
+		if(inventory == null) {
+			return;
+		}
 
 		for (int i = 0; i < inventory.getSizeInventory(); i++) {
 			ItemStack itemStack = inventory.getStackInSlot(i);
@@ -84,5 +89,30 @@ public class BlockUtils {
 				itemStack.stackSize = 0;
 			}
 		}
+	}
+
+	public static List<ItemStack> addInventoryToList(List<ItemStack> list, IInventory inv) {
+		if(inv != null) {
+			for (int i = 0; i < inv.getSizeInventory(); i++) {
+				ItemStack stack = inv.getStackInSlot(i);
+				if (stack != null) {
+					list.add(stack);
+				}
+			}
+		}
+		return list;
+	}
+
+	public static List<ItemStack> addInventoryToList(List<ItemStack> list, World world, int x, int y, int z) {
+		TileEntity te = world.getTileEntity(x, y, z);
+		if(te != null) {
+			if(te instanceof IInventory) {
+				addInventoryToList(list, (IInventory) te);
+			}
+			if(te instanceof IUpgradable) {
+				addInventoryToList(list, ((IUpgradable) te).getUpgradeInventory());
+			}
+		}
+		return list;
 	}
 }

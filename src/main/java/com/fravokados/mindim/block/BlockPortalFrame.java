@@ -81,7 +81,6 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 				((TileEntityPortalFrame) te).onDestroy();
 			}
 		}
-
 	}
 
 	@Override
@@ -232,5 +231,4 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 		BlockUtils.dropUpgrades(world, x, y, z);
 		super.breakBlock(world, x, y, z, block, meta);
 	}
-
 }
