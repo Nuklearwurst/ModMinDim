@@ -13,6 +13,7 @@ import com.fravokados.mindim.portal.BlockPositionDim;
 import com.fravokados.mindim.portal.PortalContructor;
 import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.portal.PortalMetrics;
+import com.fravokados.mindim.util.BlockUtils;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.techmobs.inventory.InventoryUpgrade;
@@ -724,7 +725,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
-		return new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
+		ItemStack out = new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
+//		ItemUtils.writeUpgradesToItemStack(getUpgradeInventory(), out);
+		//TODO: implementation of storing upgrades in item
+		BlockUtils.dropUpgrades(worldObj, xCoord, yCoord, zCoord);
+		return out;
 	}
 
 	@Override

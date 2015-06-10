@@ -7,7 +7,9 @@ import com.fravokados.mindim.lib.GUIIDs;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.plugin.PluginIC2;
 import com.fravokados.mindim.portal.PortalManager;
+import com.fravokados.mindim.util.BlockUtils;
 import com.fravokados.mindim.util.RotationUtils;
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -23,6 +25,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Nuklearwurst
@@ -46,7 +49,9 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	private IIcon iconController_front_disabled;
 
 	public BlockPortalFrame() {
-		super(Material.rock);
+		super(Material.iron);
+		setHardness(2.0F);
+		setResistance(4.0F);
 	}
 
 	@Override
@@ -210,4 +215,22 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {
 		return new ItemStack(this, 1, world.getBlockMetadata(x, y, z));
 	}
+
+	@Override
+	public int damageDropped(int meta) {
+		return meta;
+	}
+
+	@Override
+	public int quantityDropped(Random random) {
+		return 1;
+	}
+
+	@Override
+	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+		BlockUtils.dropInventory(world, x, y, z);
+		BlockUtils.dropUpgrades(world, x, y, z);
+		super.breakBlock(world, x, y, z, block, meta);
+	}
+
 }
