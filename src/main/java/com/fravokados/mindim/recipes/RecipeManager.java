@@ -18,9 +18,13 @@ public class RecipeManager {
 		ItemStack electronicCircuit = IC2Items.getItem("electronicCircuit");
 		ItemStack copperWire = IC2Items.getItem("copperCableItem");
 		ItemStack machineCase = IC2Items.getItem("machine");
-		ItemStack mfe = IC2Items.getItem("mfsUnit");
+		ItemStack mfe = IC2Items.getItem("mfeUnit");
 		ItemStack advancedCircuit = IC2Items.getItem("advancedCircuit");
+		ItemStack coil = IC2Items.getItem("coil");
 
+		/**
+		 * Destination Card (normal)
+		 */
 		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
 				" p ",
 				"wcw",
@@ -30,15 +34,33 @@ public class RecipeManager {
 				Character.valueOf('p'), Items.paper
 		);
 
+		/**
+		 * Portal Frame (+rotated)
+		 */
 		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
-				"oeo",
-				"eme",
-				"oeo",
+				"oco",
+				"wmw",
+				"oco",
 				Character.valueOf('m'), machineCase,
 				Character.valueOf('o'), Blocks.obsidian,
-				Character.valueOf('e'), Items.ender_pearl
+				Character.valueOf('e'), Items.ender_pearl,
+				Character.valueOf('w'), copperWire,
+				Character.valueOf('c'), coil
+		);
+		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+				"owo",
+				"cmc",
+				"owo",
+				Character.valueOf('m'), machineCase,
+				Character.valueOf('o'), Blocks.obsidian,
+				Character.valueOf('e'), Items.ender_pearl,
+				Character.valueOf('w'), copperWire,
+				Character.valueOf('c'), coil
 		);
 
+		/**
+		 * PortalController
+		 */
 		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
 				"ded",
 				"ama",
@@ -51,14 +73,18 @@ public class RecipeManager {
 				Character.valueOf('s'), Blocks.stone
 		);
 
+		/**
+		 * DestinationCard - Mining Dimension
+		 */
 		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_MIN_DIM),
 				"ede",
-				"gcg",
+				"oco",
 				"ege",
 				Character.valueOf('c'), new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
 				Character.valueOf('d'), new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
 				Character.valueOf('e'), Items.ender_eye,
-				Character.valueOf('g'), Items.diamond
+				Character.valueOf('o'), Blocks.obsidian,
+				Character.valueOf('g'), Items.diamond_pickaxe
 		);
 	}
 }
