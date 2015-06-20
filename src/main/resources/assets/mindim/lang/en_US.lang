@@ -9,5 +9,26 @@ tile.mindim:portalFrame.name=Portal Frame
 item.mindim:destinationCard.name=Destination Card
 item.mindim:destinationCardMindim.name=Destination Card Mining Dimension
 
+#Upgrades
+item.mindim:upgrade_reverse.name=Portal Direction Reversing Upgrade
+item.mindim:upgrade_disconnect.name=Portal Disconnection Upgrade
+
+### unused
+item.mindim:upgrade.name=Empty Upgrade
+
+#Chat
+chat.mindim.cancelBlockPlacing=Mmh, that didn't work...
+
+#Gui
+gui.mindim.destinationCard.portalBlocksStored=%d Portal Frame Blocks stored.
+gui.mindim.controller.id=ID: %d
+gui.mindim.controller.destination=Destination: %d
+gui.mindim.controller.state=State: %s
+gui.mindim.controller.error=Last Error: %s
+gui.add=Add
+gui.start=Start
+gui.stop=Stop
+
+
 #CreativeTab
 itemGroup.mindim=Mining Dimension
