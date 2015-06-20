@@ -355,7 +355,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				if (oldDestination != portalDestination) {
 					setState(State.READY);
 					lastError = Error.DESTINATION_CHANGED;
-				} else {
+				} else if(updateMetrics()) { //Check whether we created a successful multiblock
 					//create portal if necessary
 					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
 						int count = ItemUtils.getNBTTagCompound(inventory[0]).getInteger("frame_blocks");
@@ -387,7 +387,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 								WorldServer world = server.worldServerForDimension(pos.dimension);
 								TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
 								if (te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).openPortal()) {
-									if (energy.useEnergy(10000)) { //use initial energy
+									if (energy.useEnergy(Settings.EBERGY_USAGE_INIT)) { //use initial energy
 										//update controller states
 										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
 										((TileEntityPortalControllerEntity) te).portalDestination = id;
@@ -413,6 +413,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 							lastError = Error.INVALID_DESTINATION;
 						}
 					}
+				} else {
+					setState(State.READY);
+					lastError = Error.INVALID_PORTAL_STRUCTURE;
 				}
 			} else {
 				//update progress

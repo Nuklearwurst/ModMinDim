@@ -29,22 +29,22 @@ public class PortalContructor {
 	}
 
 	public static Result createPortalMultiBlock(World world, int x, int y, int z, List<IEntityPortalMandatoryComponent> frames) {
-		LogHelper.info("Searching for Portal MultiBlock");
+		LogHelper.trace("Searching for Portal MultiBlock");
 		//settings up
 		SimpleObjectReference<TileEntityPortalControllerEntity> controller = new SimpleObjectReference<TileEntityPortalControllerEntity>();
 		PortalMetrics metrics = new PortalMetrics();
 
 		Result result = createPortalMultiBlock(world, x, y, z, ForgeDirection.UNKNOWN, frames, controller, metrics, new ArrayList<ForgeDirection>());
 		if (result != Result.SUCCESS) {
-			LogHelper.info("MultiBlock forming failed: " + result);
+			LogHelper.trace("MultiBlock forming failed: " + result);
 			return result;
 		}
 		if (controller.isNull()) {
-			LogHelper.info("MultiBlock is missing a controller!");
+			LogHelper.trace("MultiBlock is missing a controller!");
 			return Result.ERROR_MISSING_CONTOLLER;
 		}
 		if (metrics.smallestDimension() <= Settings.MIN_PORTAL_SIZE) {
-			LogHelper.info("MultiBlock to small!");
+			LogHelper.trace("MultiBlock to small!");
 			return Result.ERROR_TO_SMALL;
 		}
 		//update controllers
@@ -55,7 +55,7 @@ public class PortalContructor {
 		//update controller
 		controller.get().setMetrics(metrics);
 
-		LogHelper.info("Successfully formed multiblock");
+		LogHelper.trace("Successfully formed multiblock");
 		return Result.SUCCESS;
 	}
 

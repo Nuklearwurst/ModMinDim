@@ -13,7 +13,7 @@ public class Settings {
 	public static boolean DEBUG = false;
 
 	/** maximum size of the portal frame in any direction */
-	public static int MAX_PORTAL_SIZE = 20; //untested
+	public static int MAX_PORTAL_SIZE = 20;
 	/** minimum size inside the frame */
 	public static int MIN_PORTAL_SIZE = 2;
 
@@ -22,7 +22,8 @@ public class Settings {
 	/** maximum time in ticks a portal can be held open */
 	public static int MAX_PORTAL_CONNECTION_LENGTH = 20 * 20;
 
-	public static int ENERGY_USAGE = 1000;
+	public static int EBERGY_USAGE_INIT = 10000;
+	public static int ENERGY_USAGE = 100;
 
 	/** should a mindim portal spawn with a card leading back */
 	public static boolean PORTAL_SPAWN_WITH_CARD = false;

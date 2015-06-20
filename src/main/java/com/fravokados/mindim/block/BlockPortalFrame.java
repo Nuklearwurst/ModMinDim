@@ -32,8 +32,13 @@ import java.util.Random;
  */
 public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 
-	public static final int META_FRAME_ENTITY = 0;
-	public static final int META_CONTROLLER_ENTITY = 1;
+	public static final int META_FRAME_ENTITY =         0;
+	public static final int META_CONTROLLER_ENTITY =    1;
+	public static final int META_ITEM_PORTAL =          2;
+	public static final int META_FLUID_PORTAL =         3;
+	public static final int META_ENERGY_PORTAL =        4;
+	public static final int META_CONTROLLER_MINECART =  5;
+	public static final int META_FRAME_MINECART =       6;
 
 
 	private IIcon[] iconFrameSide;
@@ -116,14 +121,14 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 
 	@Override
 	public void registerBlockIcons(IIconRegister reg) {
-//		iconFrame = reg.registerIcon(Textures.BLOCK_PORTAL_FRAME);
+		//Controller Entity
 		iconController_online = reg.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_ONLINE);
 		iconController_offline = reg.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_OFFLINE);
 		iconController_disabled = reg.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_DISABLED);
 		iconController_front_online = reg.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_ONLINE_FRONT);
 		iconController_front_offline = reg.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_OFFLINE_FRONT);
 		iconController_front_disabled = reg.registerIcon(Textures.BLOCK_PORTAL_CONTROLLER_DISABLED_FRONT);
-		//Frame
+		//Frame Entity
 		iconFrameBack = new IIcon[3];
 		iconFrameFront = new IIcon[3];
 		iconFrameSide = new IIcon[3];

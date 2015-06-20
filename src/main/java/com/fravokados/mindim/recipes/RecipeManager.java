@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 /**
  * @author Nuklearwurst
  */
+@SuppressWarnings("UnnecessaryBoxing")
 public class RecipeManager {
 
 	public static void initRecipes() {
@@ -43,7 +44,6 @@ public class RecipeManager {
 				"oco",
 				Character.valueOf('m'), machineCase,
 				Character.valueOf('o'), Blocks.obsidian,
-				Character.valueOf('e'), Items.ender_pearl,
 				Character.valueOf('w'), copperWire,
 				Character.valueOf('c'), coil
 		);
