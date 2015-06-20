@@ -15,6 +15,7 @@ public class EnergyStorage {
 	private int capacity;
 
 	public EnergyStorage(int capacity) {
+		this.energy = 0;
 		this.capacity = capacity;
 	}
 
