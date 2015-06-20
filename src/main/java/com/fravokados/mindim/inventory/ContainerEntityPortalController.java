@@ -5,9 +5,13 @@ import com.fravokados.mindim.inventory.slot.SlotControllerDestinationCard;
 import com.fravokados.mindim.inventory.slot.SlotEnergyFuel;
 import com.fravokados.mindim.inventory.slot.SlotOutput;
 import com.fravokados.mindim.item.ItemDestinationCard;
+import com.fravokados.mindim.network.IContainerIntegerListener;
 import com.fravokados.mindim.network.IElementButtonHandler;
+import com.fravokados.mindim.network.ModNetworkManager;
+import com.fravokados.mindim.network.network.MessageContainerIntegerUpdate;
 import ic2.api.item.IElectricItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
@@ -17,7 +21,7 @@ import net.minecraft.item.ItemStack;
 /**
  * @author Nuklearwurst
  */
-public class ContainerEntityPortalController extends Container implements IElementButtonHandler {
+public class ContainerEntityPortalController extends Container implements IElementButtonHandler, IContainerIntegerListener {
 
 	public static final String NETWORK_ID_START = "epc_bstart";
 	public static final String NETWORK_ID_STOP = "epc_bstop";
@@ -76,10 +80,15 @@ public class ContainerEntityPortalController extends Container implements IEleme
 				icrafting.sendProgressBarUpdate(this, 2, te.getLastError().ordinal());
 			}
 			if (this.lastEnergyStored != (int) te.getEnergyStored()) {
-				icrafting.sendProgressBarUpdate(this, 3, (int) te.getEnergyStored());
+				if(icrafting instanceof EntityPlayerMP) {
+					ModNetworkManager.INSTANCE.sendTo(new MessageContainerIntegerUpdate((byte) 0, (int) te.getEnergyStored()), (EntityPlayerMP) icrafting);
+				}
 			}
 			if (this.lastMaxEnergyStored != te.getMaxEnergyStored()) {
-				icrafting.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
+//				icrafting.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
+				if(icrafting instanceof EntityPlayerMP) {
+					ModNetworkManager.INSTANCE.sendTo(new MessageContainerIntegerUpdate((byte) 1, (int) te.getMaxEnergyStored()), (EntityPlayerMP) icrafting);
+				}
 			}
 			if(this.lastFlags != te.getUpgradeTrackerFlags()) {
 				icrafting.sendProgressBarUpdate(this, 5, te.getUpgradeTrackerFlags());
@@ -106,12 +115,12 @@ public class ContainerEntityPortalController extends Container implements IEleme
 			case 2:
 				this.te.setLastError(TileEntityPortalControllerEntity.Error.values()[value]);
 				break;
-			case 3:
-				this.te.getEnergyStorage().setEnergyStored(value);
-				break;
-			case 4:
-				this.te.getEnergyStorage().setCapacity(value);
-				break;
+//			case 3:
+//				this.te.getEnergyStorage().setEnergyStored(value);
+//				break;
+//			case 4:
+//				this.te.getEnergyStorage().setCapacity(value);
+//				break;
 			case 5:
 				this.te.setUpgradeTrackerFlags(value);
 				break;
@@ -189,6 +198,18 @@ public class ContainerEntityPortalController extends Container implements IEleme
 				te.handleStopButton(this);
 			}
 
+		}
+	}
+
+	@Override
+	public void onIntegerUpdate(byte index, int value) {
+		switch (index) {
+			case 0:
+				this.te.getEnergyStorage().setEnergyStored(value);
+				break;
+			case 1:
+				this.te.getEnergyStorage().setCapacity(value);
+				break;
 		}
 	}
 }
