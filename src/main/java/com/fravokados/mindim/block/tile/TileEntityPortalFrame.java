@@ -1,8 +1,13 @@
 package com.fravokados.mindim.block.tile;
 
+import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
-import com.fravokados.mindim.portal.PortalContructor;
+import com.fravokados.mindim.portal.PortalConstructor;
+import ic2.api.tile.IWrenchable;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -13,7 +18,7 @@ import net.minecraft.world.World;
 /**
  * @author Nuklearwurst
  */
-public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedListener, IEntityPortalMandatoryComponent, IFacingSix {
+public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedListener, IEntityPortalMandatoryComponent, IFacingSix, IWrenchable {
 
 	private boolean validPortal = false;
 
@@ -34,7 +39,7 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 
 	@Override
 	public void onBlockPostPlaced(World world, int x, int y, int z, int meta) {
-		PortalContructor.createPortalMultiBlock(world, x, y, z);
+		PortalConstructor.createPortalMultiBlock(world, x, y, z);
 	}
 
 	public boolean isActive() {
@@ -104,6 +109,26 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 
 	public void setFacing(short facing) {
 		this.facing = facing;
+	}
+
+	@Override
+	public boolean wrenchCanRemove(EntityPlayer entityPlayer) {
+		return true;
+	}
+
+	@Override
+	public float getWrenchDropRate() {
+		return 1;
+	}
+
+	@Override
+	public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
+		return new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY);
+	}
+
+	@Override
+	public boolean wrenchCanSetFacing(EntityPlayer entityPlayer, int side) {
+		return side != facing;
 	}
 
 	public short getFacing() {

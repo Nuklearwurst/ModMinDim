@@ -2,6 +2,7 @@ package com.fravokados.mindim.portal;
 
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
+import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.item.ItemDestinationCard;
@@ -33,6 +34,7 @@ public class PortalManager extends WorldSavedData {
 	public static final int PORTAL_INVALID_ITEM = -3;
 	public static final int PORTAL_WRONG_TYPE = -4;
 	public static final int PORTAL_INVALID_DIMENSION = -5;
+	public static final int PORTAL_NO_SPAWN_FOUND = -6;
 
 
 	private final Map<Integer, BlockPositionDim> entityPortals = new HashMap<Integer, BlockPositionDim>();
@@ -184,7 +186,9 @@ public class PortalManager extends WorldSavedData {
 				}
 
 				//update entity
-				entity.setVelocity(speed_x, speed_y, speed_z);
+				entity.motionX = speed_x;
+				entity.motionY = speed_y;
+				entity.motionZ = speed_z;
 				entity.velocityChanged = true;
 				////////////////
 				//  rotation  //
@@ -246,15 +250,26 @@ public class PortalManager extends WorldSavedData {
 		WorldServer worldServer = server.worldServerForDimension(dim);
 
 		//create the portal frame
-		PortalContructor.createPortalFromMetrics(worldServer, metrics, true);
+		int yOffset = 0;
+		while(!metrics.isPortalAreaClear(worldServer, yOffset, 1)) {
+			if(metrics.maxY + yOffset < worldServer.getHeight()) {
+				//Cancel if we are reaching height limit
+				return PORTAL_NO_SPAWN_FOUND;
+			}
+			yOffset++;
+		}
+		PortalConstructor.createPortalFromMetrics(worldServer, metrics, true, yOffset);
 		//create the controller
-		worldServer.setBlock(parentTile.xCoord, parentTile.yCoord, parentTile.zCoord, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
-		TileEntity te = worldServer.getTileEntity(pos.x, pos.y, pos.z);
+		worldServer.setBlock(pos.x, pos.y + yOffset, pos.z, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
+		TileEntity te = worldServer.getTileEntity(pos.x, pos.y + yOffset, pos.z);
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
 			if(Settings.PORTAL_SPAWN_WITH_CARD) {
 				((TileEntityPortalControllerEntity) te).setInventorySlotContents(0, ItemDestinationCard.fromDestination(parent));
 			}
-			((TileEntityPortalControllerEntity) te).onBlockPostPlaced(te.getWorldObj(), pos.x, pos.y, pos.z, worldServer.getBlockMetadata(pos.x, pos.y, pos.z));
+			((TileEntityPortalControllerEntity) te).onBlockPostPlaced(te.getWorldObj(), pos.x, pos.y + yOffset, pos.z, worldServer.getBlockMetadata(pos.x, pos.y + yOffset, pos.z));
+			if(parentTile instanceof IFacingSix) {
+				((TileEntityPortalControllerEntity) te).setFacing(((IFacingSix) parentTile).getFacing());
+			}
 			return ((TileEntityPortalControllerEntity) te).getId();
 		}
 		LogHelper.warn("Error creating Portal Controller!");

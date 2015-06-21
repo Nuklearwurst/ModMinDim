@@ -9,10 +9,7 @@ import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.plugin.EnergyTypes;
-import com.fravokados.mindim.portal.BlockPositionDim;
-import com.fravokados.mindim.portal.PortalContructor;
-import com.fravokados.mindim.portal.PortalManager;
-import com.fravokados.mindim.portal.PortalMetrics;
+import com.fravokados.mindim.portal.*;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.techmobs.inventory.InventoryUpgrade;
@@ -144,18 +141,6 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	private int upgradeTrackerFlags = 0;
 
-
-	public void createPortal() {
-		if (id == PortalManager.PORTAL_NOT_CONNECTED) {
-			id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
-		}
-		if (getDestination() == PortalManager.PORTAL_MINING_DIMENSION) {
-			int dest = ModMiningDimension.instance.portalManager.createPortal(id, null, this);
-			if (dest >= 0)
-				inventory[0] = ItemDestinationCard.fromDestination(dest);
-		}
-	}
-
 	public boolean openPortal() {
 		updateMetrics();
 		return metrics != null && metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
@@ -165,7 +150,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * Used to update portal strucutre metrics
 	 */
 	public boolean updateMetrics() {
-		return PortalContructor.createPortalMultiBlock(worldObj, xCoord, yCoord, zCoord) == PortalContructor.Result.SUCCESS;
+		return PortalConstructor.createPortalMultiBlock(worldObj, xCoord, yCoord, zCoord) == PortalConstructor.Result.SUCCESS;
 	}
 
 
@@ -284,7 +269,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void onBlockPostPlaced(World world, int x, int y, int z, int meta) {
 		id = ModMiningDimension.instance.portalManager.registerNewEntityPortal(new BlockPositionDim(this));
-		PortalContructor.createPortalMultiBlock(world, x, y, z);
+		PortalConstructor.createPortalMultiBlock(world, x, y, z);
 	}
 
 	/**
@@ -325,6 +310,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 		//Connect Portal
 		if (state == State.CONNECTING) {
+			if(tick % 40 == 0 && metrics != null) {
+				worldObj.playSoundEffect(metrics.originX, metrics.originY, metrics.originZ, "portal.portal", 0.5F, worldObj.rand.nextFloat() * 0.1F + 1.9F);
+			}
 			if (tick == 0) { //update destination portal
 				portalDestination = getDestination();
 				if (portalDestination >= 0) {
@@ -393,6 +381,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 										((TileEntityPortalControllerEntity) te).portalDestination = id;
 										setState(State.OUTGOING_PORTAL);
 										lastError = Error.NO_ERROR;
+										worldObj.playSoundEffect(metrics.originX, metrics.originY, metrics.originZ, "portal.travel", 0.5F, worldObj.rand.nextFloat() * 0.1F + 1.9F);
 									} else {
 										//reset destination if power fails
 										((TileEntityPortalControllerEntity) te).setState(State.READY);
@@ -461,6 +450,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
 			init = false;
 		}
+		closePortal(true);
 	}
 
 	public boolean canConnectTo(TileEntityPortalControllerEntity e) {
@@ -684,12 +674,15 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				}
 			}
 		}
-		//reset state
-		setState(State.READY);
 		//remove portal
 		if (metrics != null) {
 			metrics.removePortalsInsideFrame(worldObj);
+			if(state != State.READY) {
+				worldObj.playSoundEffect(metrics.originX, metrics.originY, metrics.originZ, "portal.trigger", 1.0F, worldObj.rand.nextFloat() * 0.1F + 2.9F);
+			}
 		}
+		//reset state
+		setState(State.READY);
 	}
 
 	public void collapseWholePortal() {

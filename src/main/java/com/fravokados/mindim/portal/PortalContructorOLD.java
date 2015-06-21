@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * @author Nuklearwurst
  */
-public class PortalContructor {
+public class PortalContructorOLD {
 
 	public enum Result {
 		SUCCESS, ERROR_INVALID_STRUCTURE, ERROR_MULTIPLE_CONTROLLERS, ERROR_MISSING_CONTOLLER, ERROR_TO_BIG, ERROR_TO_SMALL, ERROR_OPEN_PORTAL, ERROR_NO_PORTAL_BLOCK, ERROR_UNKNOWN
@@ -61,12 +61,12 @@ public class PortalContructor {
 
 	private static Result createPortalMultiBlock(World world, int x, int y, int z, ForgeDirection from, List<IEntityPortalMandatoryComponent> frames, SimpleObjectReference<TileEntityPortalControllerEntity> controller, PortalMetrics metrics, List<ForgeDirection> finishedAxis) {
 		boolean success = false;
-		//first entry
+		//first entry (gets called the first time)
 		if (from == ForgeDirection.UNKNOWN) {
 			TileEntity te = world.getTileEntity(x, y, z);
 			if (te != null && te instanceof IEntityPortalComponent) {
 				if (te instanceof IEntityPortalOptionalComponent) {
-					//search new starting position
+					//search new starting position as we can only start with mandatory components
 					for (int i = 0; i < 6; i++) {
 						ForgeDirection dir = ForgeDirection.getOrientation(i);
 						TileEntity st = world.getTileEntity(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
@@ -75,7 +75,8 @@ public class PortalContructor {
 						}
 					}
 					return Result.ERROR_NO_PORTAL_BLOCK;
-				} else if (te instanceof IEntityPortalMandatoryComponent) { //add self
+				} else if (te instanceof IEntityPortalMandatoryComponent) {
+					//add self as starting point
 					frames.add((IEntityPortalMandatoryComponent) te);
 					metrics.addCoord(x, y, z);
 				}
@@ -97,19 +98,21 @@ public class PortalContructor {
 
 		}
 		if (!from.equals(ForgeDirection.UNKNOWN) && !finishedAxis.contains(from)) {
-			//finish top
+			//finish current axis and start testing other directions
 			finishedAxis.add(from);
 		}
 		//start search
 		for (int i = 0; i < 6; i++) {
 			ForgeDirection dir = ForgeDirection.getOrientation(i);
 			if (dir == from || dir.getOpposite() == from) {
+				//skip already tested directions
 				continue;
 			}
+			//get portal blocks in that direction
 			Result result = findPortalBockAt(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, dir, frames, controller, metrics, finishedAxis, true);
 			if(result == Result.SUCCESS) {
 				success = true;
-				if(finishedAxis.contains(from)) {
+				if(!finishedAxis.contains(from)) {
 					finishedAxis.add(from);
 				}
 			} else if (result != Result.ERROR_NO_PORTAL_BLOCK) {

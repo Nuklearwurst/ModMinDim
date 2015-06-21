@@ -3,10 +3,14 @@ package com.fravokados.mindim.portal;
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.BlockPortalMinDim;
+import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.block.tile.IEntityPortalComponent;
 import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
+import com.fravokados.mindim.util.BlockUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -16,7 +20,6 @@ import java.util.List;
  * @author Nuklearwurst
  */
 public class PortalMetrics {
-
 
 	public enum Type {
 		ENTITY_PORTAL("portal.entity");
@@ -90,6 +93,10 @@ public class PortalMetrics {
 			minZ = maxZ = z;
 			init = true;
 		}
+	}
+
+	public void addCoord(TileEntity te) {
+		addCoord(te.xCoord, te.yCoord, te.zCoord);
 	}
 
 	public int biggestDimension() {
@@ -207,6 +214,90 @@ public class PortalMetrics {
 				&& e.posZ >= minZ - padding && e.posZ <= maxZ + padding + 1;
 	}
 
+	@SuppressWarnings("ConstantConditions")
+	public boolean isFrameEmpty(World world) {
+		boolean flagX;
+		boolean flagY;
+		boolean flagZ;
+		for(int x = minX; x <= maxX; x++) {
+			flagX = x == minX || x == maxX;
+			for(int y = minY; y <= maxY; y++) {
+				flagY = y == minY || y == maxY;
+				for(int z = minZ; z <= maxZ; z++) {
+					flagZ = z == minZ || z == maxZ;
+					if(!(flagX == flagY ? flagX : flagZ)) {
+						if(!world.isAirBlock(x, y, z)) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	@SuppressWarnings("ConstantConditions")
+	public boolean isFrameComplete(World world) {
+		//These flags are true if the coordinate is on the frame (two out of three)
+		boolean flagX;
+		boolean flagY;
+		boolean flagZ;
+		for(int x = minX; x <= maxX; x++) {
+			flagX = x == minX || x == maxX;
+			for(int y = minY; y <= maxY; y++) {
+				flagY = y == minY || y == maxY;
+				for(int z = minZ; z <= maxZ; z++) {
+					flagZ = z == minZ || z == maxZ;
+					if(flagX == flagY ? flagX : flagZ) {
+						TileEntity te = world.getTileEntity(x, y, z);
+						if(te == null || !(te instanceof IEntityPortalComponent)) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+
+	public boolean isPortalAreaClear(World world, int yOffset, int padding) {
+		//generate padding
+		int x = maxX - minX;
+		int y = maxY - minY;
+		int z = maxZ - minZ;
+		if(x == 0) {
+			x = padding;
+			y = 0;
+			z = 0;
+		} else if(y == 0) {
+			x = 0;
+			y = padding;
+			z = 0;
+		} else if(z == 0) {
+			x = 0;
+			y = 0;
+			z = padding;
+		}
+		//update coordinates
+		int minX = this.minX - x;
+		int minY = this.minY + yOffset - y;
+		int minZ = this.minZ - z;
+		int maxX = this.maxX + x;
+		int maxY = this.maxY + yOffset + y;
+		int maxZ = this.maxZ + z;
+		for(int i = minX; i <= maxX; i++) {
+			for(int j = minY; j <= maxY; j++) {
+				for(int k = minZ; k <= maxZ; k++) {
+					if(!BlockUtils.isBlockReplaceable(world, i, j, k)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	public void writeToNBT(NBTTagCompound nbt) {
 		nbt.setDouble("originX", originX);
 		nbt.setDouble("originY", originY);
@@ -300,10 +391,10 @@ public class PortalMetrics {
 
 	/**
 	 * creates a portal with x, y, z as its origin
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param world The World to create the Portal in
+	 * @param x originX
+	 * @param y originY
+	 * @param z originZ
 	 */
 	@SuppressWarnings("ConstantConditions")
 	public boolean placePortalFrame(World world, int x, int y, int z, boolean clearInside) {
@@ -324,6 +415,10 @@ public class PortalMetrics {
 					flagZ = k == minZ || k == maxZ;
 					if(flagX == flagY ? flagX : flagZ) {
 						world.setBlock(x + i, y + j, z + k, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
+						TileEntity te = world.getTileEntity(x + i, y + j, z + k);
+						if(te != null && te instanceof IFacingSix) {
+							((IFacingSix) te).setFacing((short) front.ordinal());
+						}
 					} else {
 						world.setBlock(x + i, y + j, z + k, Blocks.air, 0, 0);
 					}

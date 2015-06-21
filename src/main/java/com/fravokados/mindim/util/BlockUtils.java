@@ -2,7 +2,9 @@ package com.fravokados.mindim.util;
 
 import com.fravokados.techmobs.upgrade.IUpgradable;
 import com.fravokados.techmobs.upgrade.IUpgradeInventory;
+import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -114,5 +116,15 @@ public class BlockUtils {
 			}
 		}
 		return list;
+	}
+
+	public static boolean isAreaClear(World world, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+		return true;
+	}
+
+	public static boolean isBlockReplaceable(World world, int x, int y, int z) {
+		Block block = world.getBlock(x, y, z);
+		return block == null || world.isAirBlock(x, y, z) || block.isReplaceable(world, x, y, z) ||
+				block == Blocks.vine  || block == Blocks.tallgrass || block == Blocks.deadbush;
 	}
 }
