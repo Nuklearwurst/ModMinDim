@@ -76,6 +76,7 @@ public class PortalManager extends WorldSavedData {
 
 	/**
 	 * registers a new entity portal
+	 *
 	 * @param pos position of the controller
 	 * @return new id
 	 */
@@ -95,9 +96,9 @@ public class PortalManager extends WorldSavedData {
 
 
 	/**
-	 * @param entity   entity to teleport
-	 * @param portalId destination portal id
-	 * @param originMetrics  used to calculate Entity Position in the destination portal (originMetrics of the origin portal)
+	 * @param entity        entity to teleport
+	 * @param portalId      destination portal id
+	 * @param originMetrics used to calculate Entity Position in the destination portal (originMetrics of the origin portal)
 	 */
 	public boolean teleportEntityToEntityPortal(Entity entity, int portalId, int parent, PortalMetrics originMetrics) {
 		if (!entityPortalExists(portalId)) {
@@ -116,7 +117,7 @@ public class PortalManager extends WorldSavedData {
 		TileEntity te = worldServer.getTileEntity(pos.x, pos.y, pos.z);
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
 			PortalMetrics targetMetrics = ((TileEntityPortalControllerEntity) te).getMetrics();
-			if(targetMetrics != null) {
+			if (targetMetrics != null) {
 				ForgeDirection sideAxisOrigin = originMetrics.top.getRotation(originMetrics.front);
 				ForgeDirection sideAxisTarget = targetMetrics.top.getRotation(targetMetrics.front);
 
@@ -133,20 +134,31 @@ public class PortalManager extends WorldSavedData {
 //					posZ = 0;
 //				}
 
-				double maxUp = targetMetrics.getMaxUp() - 0.5;
-				double minUp = targetMetrics.getMinUp() + 0.5;
-				double maxSide = targetMetrics.getMaxSide() - 0.5;
-				double minSide = targetMetrics.getMinSide() + 0.5;
-
 				////////////////
 				//  position  //
 				////////////////
 				//relative coordinate system
 				double posTop = posX * originMetrics.top.offsetX + posY * originMetrics.top.offsetY + posZ * originMetrics.top.offsetZ;
-				double posSide = posX * sideAxisOrigin.offsetX + posY * sideAxisOrigin.offsetY + posZ * sideAxisOrigin.offsetZ;
+				//invert side in order to make player come out of the front of the portal
+				double posSide = (posX * sideAxisOrigin.offsetX + posY * sideAxisOrigin.offsetY + posZ * sideAxisOrigin.offsetZ) * -1;
 
 				//make sure player spawns inside portal
-				posTop = MathHelper.clamp_double(posTop, minUp, maxUp); //"Top" Axis
+				double maxUp = targetMetrics.getMaxUp();
+				double minUp = targetMetrics.getMinUp();
+				double maxSide = targetMetrics.getMaxSide() - 0.5;
+				double minSide = targetMetrics.getMinSide() + 1.5;
+
+
+				posTop = posTop / (originMetrics.getMaxUp() - originMetrics.getMinUp()) * (maxUp - minUp);
+				posSide = posSide / (originMetrics.getMaxSide() - originMetrics.getMinSide()) * (maxSide - minSide);
+
+				if (!targetMetrics.isHorizontal()) {
+					//prevent player spawning with head inside portal frame
+					posTop = MathHelper.clamp_double(posTop, minUp, maxUp - entity.height); //"Top" Axis
+				} else {
+					//compensate problems with max/minUp on horizontal portals
+					posTop = MathHelper.clamp_double(posTop, minUp + 1.5, maxUp - 0.5); //"Top" Axis
+				}
 				posSide = MathHelper.clamp_double(posSide, minSide, maxSide); //"Side" Axis
 
 				//target coordinate system
@@ -154,7 +166,7 @@ public class PortalManager extends WorldSavedData {
 				double y = targetMetrics.originY + targetMetrics.top.offsetY * posTop + sideAxisTarget.offsetY * posSide;
 				double z = targetMetrics.originZ + targetMetrics.top.offsetZ * posTop + sideAxisTarget.offsetZ * posSide;
 
-				if(targetMetrics.front == ForgeDirection.DOWN) {
+				if (targetMetrics.front == ForgeDirection.DOWN) {
 					//spawn slighly lower to compensate entity/player height on down facing portals
 					y -= entity.height;
 				}
@@ -174,7 +186,7 @@ public class PortalManager extends WorldSavedData {
 				double speed_z = targetMetrics.front.offsetZ * (-1) * speed_rel_x + targetMetrics.top.offsetZ * speed_rel_y + sideAxisTarget.offsetZ * speed_rel_z;
 
 				//FIXME: working so far, can be removed in the future
-				if(Settings.DEBUG) {
+				if (Settings.DEBUG) {
 					LogHelper.info("Teleporting entity | Momentum | Total");
 					LogHelper.info("Old square velocity: " + (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ));
 					LogHelper.info("Relative square velocity: " + (speed_rel_x * speed_rel_x + speed_rel_y * speed_rel_y + speed_rel_z * speed_rel_z));
@@ -190,22 +202,27 @@ public class PortalManager extends WorldSavedData {
 				entity.motionY = speed_y;
 				entity.motionZ = speed_z;
 				entity.velocityChanged = true;
+				//update player
+				//needed?
+//				if(entity instanceof EntityPlayerMP) {
+//					ModNetworkManager.INSTANCE.sendTo(new MessagePlayerMotionUpdate((EntityPlayerMP) entity), (EntityPlayerMP) entity);
+//				}
 				////////////////
 				//  rotation  //
 				////////////////
-				if(originMetrics.isHorizontal()) {
-					if(targetMetrics.isHorizontal()) {
+				if (originMetrics.isHorizontal()) {
+					if (targetMetrics.isHorizontal()) {
 						entity.rotationYaw = (entity.rotationYaw + RotationUtils.get2DRotation(originMetrics.top, targetMetrics.top)) % 360;
 					} else {
 						entity.rotationPitch = (entity.rotationPitch + originMetrics.front.offsetY * (-90)) % 180;
-						entity.rotationYaw = (entity.rotationYaw + RotationUtils.get2DRotation(originMetrics.top, targetMetrics.front)) % 360;
+						entity.rotationYaw = (entity.rotationYaw + RotationUtils.get2DRotation(originMetrics.top, targetMetrics.front.getOpposite())) % 360;
 					}
 				} else {
-					if(targetMetrics.isHorizontal()) {
-						entity.rotationPitch = (entity.rotationPitch + targetMetrics.front.offsetY * 90) % 180;
+					if (targetMetrics.isHorizontal()) {
+						entity.rotationPitch = (entity.rotationPitch + targetMetrics.front.getOpposite().offsetY * 90) % 180;
 						entity.rotationYaw = (entity.rotationYaw + RotationUtils.get2DRotation(originMetrics.front, targetMetrics.top)) % 360;
 					} else {
-						entity.rotationYaw = (entity.rotationYaw + RotationUtils.get2DRotation(originMetrics.front, targetMetrics.front)) % 360;
+						entity.rotationYaw = (entity.rotationYaw + RotationUtils.get2DRotation(originMetrics.front, targetMetrics.front.getOpposite())) % 360;
 					}
 				}
 
@@ -251,8 +268,8 @@ public class PortalManager extends WorldSavedData {
 
 		//create the portal frame
 		int yOffset = 0;
-		while(!metrics.isPortalAreaClear(worldServer, yOffset, 1)) {
-			if(metrics.maxY + yOffset < worldServer.getHeight()) {
+		while (!metrics.isPortalAreaClear(worldServer, yOffset, 1)) {
+			if (metrics.maxY + yOffset < worldServer.getHeight()) {
 				//Cancel if we are reaching height limit
 				return PORTAL_NO_SPAWN_FOUND;
 			}
@@ -263,11 +280,11 @@ public class PortalManager extends WorldSavedData {
 		worldServer.setBlock(pos.x, pos.y + yOffset, pos.z, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
 		TileEntity te = worldServer.getTileEntity(pos.x, pos.y + yOffset, pos.z);
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
-			if(Settings.PORTAL_SPAWN_WITH_CARD) {
+			if (Settings.PORTAL_SPAWN_WITH_CARD) {
 				((TileEntityPortalControllerEntity) te).setInventorySlotContents(0, ItemDestinationCard.fromDestination(parent));
 			}
 			((TileEntityPortalControllerEntity) te).onBlockPostPlaced(te.getWorldObj(), pos.x, pos.y + yOffset, pos.z, worldServer.getBlockMetadata(pos.x, pos.y + yOffset, pos.z));
-			if(parentTile instanceof IFacingSix) {
+			if (parentTile instanceof IFacingSix) {
 				((TileEntityPortalControllerEntity) te).setFacing(((IFacingSix) parentTile).getFacing());
 			}
 			return ((TileEntityPortalControllerEntity) te).getId();

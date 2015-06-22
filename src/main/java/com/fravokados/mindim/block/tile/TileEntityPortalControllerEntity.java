@@ -446,6 +446,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	@Override
 	public void onChunkUnload() {
+		if(worldObj != null && worldObj.isRemote) {
+			return;
+		}
 		if (init && energyType == EnergyTypes.IC2) {
 			MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(this));
 			init = false;

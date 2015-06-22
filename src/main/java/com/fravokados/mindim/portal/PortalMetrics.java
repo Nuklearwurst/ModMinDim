@@ -169,13 +169,13 @@ public class PortalMetrics {
 	}
 
 	public void calculateOrigin(List<IEntityPortalMandatoryComponent> list) {
-		if(maxY - minY == 0) {
+		if(isHorizontal()) {
 			originY = minY + 0.5; //center in horizontal portals
 		} else {
 			originY = minY + 1; //ground om vertical portals
 		}
-		originX = minX + ((maxX - minX) / 2 + 0.5);
-		originZ = minZ + ((maxZ - minZ) / 2 + 0.5);
+		originX = minX + (((double)(maxX - minX)) / 2 + 0.5);
+		originZ = minZ + (((double)(maxZ - minZ)) / 2 + 0.5);
 		//Orientation
 		int[] orientation = {0, 0, 0, 0, 0, 0};
 		for(IEntityPortalMandatoryComponent frame : list) {
