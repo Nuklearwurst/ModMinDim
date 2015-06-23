@@ -2,9 +2,11 @@ package com.fravokados.mindim.client.gui;
 
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
+import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.network.ModNetworkManager;
 import com.fravokados.mindim.network.network.MessageGuiElementClicked;
+import com.fravokados.mindim.util.GeneralUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -40,9 +42,9 @@ public class GuiEntityPortalController extends GuiContainer {
 		super.initGui();
 		this.guiLeft = (this.width - 176) / 2 - 47;
 
-		btnStart = new GuiButton(BUTTON_ID_START, guiLeft + 75, guiTop + 78, 56, 20, "Start");
+		btnStart = new GuiButton(BUTTON_ID_START, guiLeft + 75, guiTop + 78, 56, 20, Strings.translate(Strings.Gui.GUI_START));
 		this.buttonList.add(btnStart);
-		btnStop = new GuiButton(BUTTON_ID_STOP, guiLeft + 133, guiTop + 78, 56, 20, "Stop");
+		btnStop = new GuiButton(BUTTON_ID_STOP, guiLeft + 133, guiTop + 78, 56, 20, Strings.translate(Strings.Gui.GUI_STOP));
 		this.buttonList.add(btnStop);
 	}
 
@@ -87,10 +89,12 @@ public class GuiEntityPortalController extends GuiContainer {
 	@Override
 	protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_) {
 		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
-		drawString(this.fontRendererObj, "ID: " + te.getId(), 58, 18, 0xa2cc42);
-		drawString(this.fontRendererObj, "Destination: " + te.getDestination(), 58, 30, 0xa2cc42);
-		drawString(this.fontRendererObj, "State: " + te.getState(), 58, 40, 0xa2cc42);
-		drawString(this.fontRendererObj, "Last Error: " + te.getLastError().name, 58, 50, 0xa2cc42);
+		//TODO hide/prettify destination and portal id
+		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_ID, te.getId()), 58, 18, 0xa2cc42);
+		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_DESTINATION, te.getDestination()), 58, 30, 0xa2cc42);
+		//TODO translate State
+		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_STATE, te.getState()), 58, 40, 0xa2cc42);
+		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_ERROR, te.getLastError() == TileEntityPortalControllerEntity.Error.NO_ERROR ? te.getLastError().getTranslationShort() : (EnumChatFormatting.RED + te.getLastError().getTranslationShort() + EnumChatFormatting.RESET)), 58, 50, 0xa2cc42);
 	}
 
 	/**
@@ -100,9 +104,13 @@ public class GuiEntityPortalController extends GuiContainer {
 	 * @param y mouse position y
 	 */
 	private void drawTooltips(int x, int y) {
-		if(x >= guiLeft + 199 && y >= guiTop + 15 && x < guiLeft + 199 + 16 && y < guiTop + 15 + 55) {
+		if(GeneralUtils.are2DCoordinatesInsideArea(x, y, guiLeft + 199, guiLeft + 199 + 16, guiTop + 15, guiTop + 15 + 55)) {
 			List<String> list = new ArrayList<String>();
 			list.add(EnumChatFormatting.GRAY + "" + (int) te.getEnergyStored() + " EU / " + te.getMaxEnergyStored() + " EU" + EnumChatFormatting.RESET);
+			drawHoveringText(list, x, y, fontRendererObj);
+		} else if(GeneralUtils.are2DCoordinatesInsideArea(x, y, guiLeft + 55, guiLeft + 190, guiTop + 50, guiTop + 60)) {
+			List<String> list = new ArrayList<String>();
+			list.add((te.getLastError() == TileEntityPortalControllerEntity.Error.NO_ERROR ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + te.getLastError().getTranslationDetail() + EnumChatFormatting.RESET);
 			drawHoveringText(list, x, y, fontRendererObj);
 		}
 	}

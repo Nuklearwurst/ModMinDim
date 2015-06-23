@@ -55,9 +55,8 @@ public class ItemDestinationCard extends ItemMDMultiType {
 				if (stack.stackTagCompound.hasKey("destinationPortalType") && stack.stackTagCompound.hasKey("destinationPortal")) {
 					int type = stack.stackTagCompound.getInteger("destinationPortalType");
 					int dest = stack.stackTagCompound.getInteger("destinationPortal");
-					//TODO translation
-					info.add(PortalMetrics.Type.getType(type));
-					info.add("Portal Destination: " + dest);
+					info.add(Strings.translateWithFormat(Strings.Tooltip.ITEM_DESTINATION_CARD_TYPE, PortalMetrics.Type.getType(type)));
+					info.add(Strings.translateWithFormat(Strings.Tooltip.ITEM_DESTINATION_CARD_DESTINATION, dest));
 				}
 			}
 		}

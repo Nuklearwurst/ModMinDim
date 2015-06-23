@@ -9,6 +9,7 @@ import com.fravokados.mindim.block.tile.energy.EnergyStorage;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
+import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.plugin.EnergyTypes;
 import com.fravokados.mindim.portal.*;
 import com.fravokados.mindim.util.ItemUtils;
@@ -57,18 +58,16 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * posible errors when connecting to a portal
 	 */
 	public enum Error {
-		//TODO: translation
-		NO_ERROR("No Error"), INVALID_DESTINATION("Invalid Destination"),
-		INVALID_PORTAL_STRUCTURE("Portal Structure is not intact!"), CONNECTION_INTERRUPED("Connection Interrupted!"),
-		POWER_FAILURE("Power Failure"), DESTINATION_CHANGED("Destination Changed"), NOT_ENOUGH_MINERALS("Not Enough Minerals");
+		NO_ERROR, INVALID_DESTINATION,
+		INVALID_PORTAL_STRUCTURE, CONNECTION_INTERRUPTED,
+		POWER_FAILURE, DESTINATION_CHANGED, NOT_ENOUGH_MINERALS;
 
-		/**
-		 * unlocalized name
-		 */
-		public final String name;
+		public String getTranslationShort() {
+			return Strings.translate(Strings.Gui.CONTROLLER_ERROR_MSG_SHORT_BASE + Strings.Gui.CONTROLLER_ERROR_MSG[this.ordinal()]);
+		}
 
-		Error(String s) {
-			this.name = s;
+		public String getTranslationDetail() {
+			return Strings.translate(Strings.Gui.CONTROLLER_ERROR_MSG_DETAIL_BASE + Strings.Gui.CONTROLLER_ERROR_MSG[this.ordinal()]);
 		}
 	}
 
@@ -265,7 +264,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			if (metrics.isEntityInsidePortal(entity, 1)) {
 				if (!ModMiningDimension.instance.portalManager.teleportEntityToEntityPortal(entity, getDestination(), id, metrics)) {
 					setState(State.READY);
-					lastError = Error.CONNECTION_INTERRUPED;
+					lastError = Error.CONNECTION_INTERRUPTED;
 					collapseWholePortal();
 				}
 			}
@@ -273,7 +272,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			//invalid state, close portal and continue as usual
 			collapseWholePortal();
 			setState(State.READY);
-			lastError = Error.CONNECTION_INTERRUPED;
+			lastError = Error.CONNECTION_INTERRUPTED;
 			LogHelper.warn("Invalid portal found, destroying... (" + id + ", dest.:" + portalDestination + ")");
 		}
 	}
@@ -351,7 +350,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 						} else { //invalid controller
 							LogHelper.warn("Could not find registered controller with id: " + portalDestination);
 							setState(State.READY);
-							lastError = Error.CONNECTION_INTERRUPED;
+							lastError = Error.CONNECTION_INTERRUPTED;
 						}
 					}
 				}
@@ -415,7 +414,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 								} else { //invalid portal (Invalid TE or Destination has invalid structure [portal creation failed])
 									LogHelper.warn("Error opening portal to: " + portalDestination + " with controller: " + te);
 									setState(State.READY);
-									lastError = Error.CONNECTION_INTERRUPED;
+									lastError = Error.CONNECTION_INTERRUPTED;
 								}
 							}
 						}

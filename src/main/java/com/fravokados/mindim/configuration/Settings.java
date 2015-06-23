@@ -30,4 +30,10 @@ public class Settings {
 
 	/** should a mindim portal spawn with a card leading back */
 	public static boolean PORTAL_SPAWN_WITH_CARD = false;
+
+	/** whether it is possible to use mining dimension destination card to create a portal back to the overworld */
+	public static boolean CAN_CREATE_PORTAL_BACK_TO_OVERWORLD = true;
+
+	/** whether you should only be able to create a portal into the mining dimension from the overworld */
+	public static boolean CAN_ONLY_ENTER_MINING_DIMENSION_FROM_OVERWORLD = false;
 }

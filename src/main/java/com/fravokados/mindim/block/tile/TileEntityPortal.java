@@ -13,7 +13,6 @@ import net.minecraft.tileentity.TileEntity;
 /**
  * helper tileentity that stores data used to determine the portals destination
  * will not save or load from disk
- * TODO: find way to destroy portal when attempted to be saved
  *
  * @author Nuklearwurst
  */

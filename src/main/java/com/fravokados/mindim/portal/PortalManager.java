@@ -257,11 +257,17 @@ public class PortalManager extends WorldSavedData {
 		if (pos == null) {
 			return PORTAL_NOT_CONNECTED;
 		}
-//		if(pos.dimension == ModMiningDimension.dimensionId) {
-//			return PORTAL_INVALID_DIMENSION;
-//		}
-		//TODO: make this configurable
-		int dim = pos.dimension == Settings.dimensionId ? 0 : Settings.dimensionId;
+
+		int dim = Settings.dimensionId;
+		if(pos.dimension == Settings.dimensionId) {
+			if(Settings.CAN_CREATE_PORTAL_BACK_TO_OVERWORLD) {
+				dim = 0;
+			} else {
+				return PORTAL_INVALID_DIMENSION;
+			}
+		} else if(pos.dimension != 0 && Settings.CAN_ONLY_ENTER_MINING_DIMENSION_FROM_OVERWORLD) {
+			return PORTAL_INVALID_DIMENSION;
+		}
 
 		//get the destination world server
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();

@@ -11,7 +11,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
 @GameRegistry.ObjectHolder(Reference.MOD_ID)
 public class ModBlocks {
 
+	@GameRegistry.ObjectHolder(Strings.Block.portalMachineBase)
 	public static final BlockMD blockPortalFrame = new BlockPortalFrame();
+
+	@GameRegistry.ObjectHolder(Strings.Block.portal)
 	public static final BlockMD blockPortalBlock = new BlockPortalMinDim();
 
 	public static void registerBlocks() {

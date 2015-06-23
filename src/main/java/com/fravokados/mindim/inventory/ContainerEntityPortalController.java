@@ -9,7 +9,7 @@ import com.fravokados.mindim.network.IContainerIntegerListener;
 import com.fravokados.mindim.network.IElementButtonHandler;
 import com.fravokados.mindim.network.ModNetworkManager;
 import com.fravokados.mindim.network.network.MessageContainerIntegerUpdate;
-import ic2.api.item.IElectricItem;
+import com.fravokados.mindim.plugin.EnergyManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -147,7 +147,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 					return null;
 				}
 			} else { //from player:
-				if (stackSlot.getItem() instanceof IElectricItem && ((IElectricItem) stackSlot.getItem()).canProvideEnergy(stackSlot)) { //TODO generalize to support other energy sources/mods
+				if (EnergyManager.canItemProvideEnergy(stackSlot, te.getEnergyType())) {
 					//Electric Item
 					if (!this.mergeItemStack(stackSlot, 1, 2, false)) {
 						return null;
