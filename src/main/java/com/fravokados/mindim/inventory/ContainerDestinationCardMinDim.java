@@ -19,10 +19,10 @@ import net.minecraft.nbt.NBTTagCompound;
  */
 public class ContainerDestinationCardMinDim extends Container implements IElementButtonHandler {
 
-	private ItemStack heldInventory;
+	private final ItemStack heldInventory;
 
-	private InventoryPlayer playerInventory;
-	private InventoryDestinationCardMinDim inventory;
+	private final InventoryPlayer playerInventory;
+	private final InventoryDestinationCardMinDim inventory;
 
 	private int lastFrameCount = 0;
 

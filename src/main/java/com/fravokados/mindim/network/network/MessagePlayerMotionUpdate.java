@@ -24,9 +24,9 @@ public class MessagePlayerMotionUpdate implements IMessage, IMessageHandler<Mess
 	}
 
 	public MessagePlayerMotionUpdate(double motionX, double motionY, double motionZ) {
-		this.xMotion = xMotion;
-		this.yMotion = yMotion;
-		this.zMotion = zMotion;
+		this.xMotion = motionX;
+		this.yMotion = motionY;
+		this.zMotion = motionZ;
 	}
 
 	public MessagePlayerMotionUpdate(EntityPlayerMP player) {

@@ -118,10 +118,6 @@ public class BlockUtils {
 		return list;
 	}
 
-	public static boolean isAreaClear(World world, int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
-		return true;
-	}
-
 	public static boolean isBlockReplaceable(World world, int x, int y, int z) {
 		Block block = world.getBlock(x, y, z);
 		return block == null || world.isAirBlock(x, y, z) || block.isReplaceable(world, x, y, z) ||

@@ -2,7 +2,6 @@ package com.fravokados.mindim.configuration.gui;
 
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.lib.Reference;
-import com.fravokados.mindim.lib.Strings;
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.IConfigElement;
 import net.minecraft.client.gui.GuiScreen;

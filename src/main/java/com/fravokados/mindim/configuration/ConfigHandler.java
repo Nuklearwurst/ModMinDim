@@ -8,11 +8,10 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
-import java.util.Set;
 
 public class ConfigHandler {
 
-	public Configuration config; 
+	public final Configuration config;
 
 	public ConfigHandler(File configFile) {
 		config = new Configuration(configFile);

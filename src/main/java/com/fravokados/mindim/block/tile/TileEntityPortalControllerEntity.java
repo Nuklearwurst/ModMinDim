@@ -128,7 +128,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	/**
 	 * Energy Storage
 	 */
-	private EnergyStorage energy = new EnergyStorage(100000);
+	private final EnergyStorage energy = new EnergyStorage(100000);
 
 	/**
 	 * Upgrades
@@ -226,7 +226,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	/**
 	 * reads the destination card
 	 *
-	 * @return
+	 * @return the destination id of the current destination card
 	 */
 	public int getDestination() {
 		if (inventory[0] == null) {
@@ -249,7 +249,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	/**
 	 * teleports an entity to the current destination
 	 *
-	 * @param entity
+	 * @param entity the enity to teleport
 	 */
 	public void teleportEntity(Entity entity) {
 		if (state == State.OUTGOING_PORTAL && metrics != null) {
@@ -463,10 +463,6 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			init = false;
 		}
 		closePortal(true);
-	}
-
-	public boolean canConnectTo(TileEntityPortalControllerEntity e) {
-		return true;
 	}
 
 	@Override

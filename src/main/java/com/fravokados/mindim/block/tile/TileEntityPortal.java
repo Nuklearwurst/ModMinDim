@@ -1,6 +1,5 @@
 package com.fravokados.mindim.block.tile;
 
-import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalMinDim;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.util.LogHelper;

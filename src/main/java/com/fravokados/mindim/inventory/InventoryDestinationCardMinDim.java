@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 public class InventoryDestinationCardMinDim implements IInventory {
 
 	private ItemStack item;
-	private String name;
+	private final String name;
 
 	public InventoryDestinationCardMinDim(ItemStack item, String name) {
 		this.item = item;

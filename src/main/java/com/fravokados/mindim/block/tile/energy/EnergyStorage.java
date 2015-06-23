@@ -4,7 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 /**
  * Helper energy storage class
- * based on COFH-Restone Flux API @link{cofh.api.energy.EnergyStorage}
+ * based on COFH-Redstone Flux API @link{cofh.api.energy.EnergyStorage}
  * modified to use double as energy stored, to support ic2
  * @author Nuklearwurst
  */

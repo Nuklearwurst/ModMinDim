@@ -17,7 +17,7 @@ public class GuiDestinationCardMinDim extends GuiContainer {
 
 	public static final int BUTTON_ID_ADD = 0;
 
-	private ItemStack heldInventory;
+	private final ItemStack heldInventory;
 
 	public GuiDestinationCardMinDim(InventoryPlayer inv, ItemStack stack) {
 		super(new ContainerDestinationCardMinDim(inv, stack));

@@ -79,11 +79,11 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		NBTTagCompound nbt = pkt.func_148857_g();
 		if(nbt != null && nbt.hasKey("facing")) {
-			int oldFacing = facing;
+//			int oldFacing = facing;
 			facing = nbt.getShort("facing");
-			int oldCoreX = coreX;
-			int oldCoreY = coreY;
-			int oldCoreZ = coreZ;
+//			int oldCoreX = coreX;
+//			int oldCoreY = coreY;
+//			int oldCoreZ = coreZ;
 			coreX = nbt.getInteger("x_core");
 			coreY = nbt.getInteger("y_core");
 			coreZ = nbt.getInteger("z_core");

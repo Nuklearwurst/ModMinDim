@@ -43,7 +43,7 @@ public class ModMiningDimension {
 	public ItemMD itemDestinationCard;
     public ItemMD itemUpgrade;
 
-    public static int dimensionId = 20;
+    public static final int dimensionId = 20;
 
     public PortalManager portalManager;
 

@@ -43,11 +43,7 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 		TileEntity te = world.getTileEntity(x, y, z);
 		if(te != null && te instanceof TileEntityPortal) {
 			short facing = ((TileEntityPortal) te).getFacing();
-			if(side == facing || ForgeDirection.getOrientation(side) == ForgeDirection.getOrientation(facing).getOpposite()) {
-				return true;
-			} else {
-				return false;
-			}
+			return side == facing || ForgeDirection.getOrientation(side) == ForgeDirection.getOrientation(facing).getOpposite();
 		} else {
 			return true;
 		}
@@ -88,11 +84,6 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 		world.setBlock(x, y, z, ModMiningDimension.instance.blockPortalBlock, 0, 3);
 		TileEntityPortal te = (TileEntityPortal) world.getTileEntity(x, y, z);
 		te.setPortalController(cx, cy, cz);
-	}
-
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-		super.breakBlock(world, x, y, z, block, meta);
 	}
 
 	@Override

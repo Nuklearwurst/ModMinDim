@@ -87,7 +87,7 @@ public class ContainerEntityPortalController extends Container implements IEleme
 			if (this.lastMaxEnergyStored != te.getMaxEnergyStored()) {
 //				icrafting.sendProgressBarUpdate(this, 4, te.getMaxEnergyStored());
 				if(icrafting instanceof EntityPlayerMP) {
-					ModNetworkManager.INSTANCE.sendTo(new MessageContainerIntegerUpdate((byte) 1, (int) te.getMaxEnergyStored()), (EntityPlayerMP) icrafting);
+					ModNetworkManager.INSTANCE.sendTo(new MessageContainerIntegerUpdate((byte) 1, te.getMaxEnergyStored()), (EntityPlayerMP) icrafting);
 				}
 			}
 			if(this.lastFlags != te.getUpgradeTrackerFlags()) {

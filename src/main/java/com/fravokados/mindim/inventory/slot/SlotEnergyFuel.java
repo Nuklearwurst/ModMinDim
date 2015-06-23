@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
  */
 public class SlotEnergyFuel extends Slot {
 
-	private EnergyTypes type;
+	private final EnergyTypes type;
 
 	public SlotEnergyFuel(IInventory inv, int id, int x, int y, EnergyTypes type) {
 		super(inv, id, x, y);
