@@ -8,3 +8,7 @@ item.mindim:destinationCardMindim.name=Destination Card Mining Dimension
 
 #CreativeTab
 itemGroup.mindim=Mining Dimension
+
+#Tooltip
+tooltip.item.destinationCard.type=Portal Type: %s
+tooltip.item.destinationCard.destination=Portal Destination: %s

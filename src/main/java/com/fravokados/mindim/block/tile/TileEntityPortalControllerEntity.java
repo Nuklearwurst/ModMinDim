@@ -4,6 +4,7 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.block.ModBlocks;
 import com.fravokados.mindim.block.tile.energy.EnergyStorage;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
@@ -141,12 +142,20 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	private int upgradeTrackerFlags = 0;
 
+	/** Time the portal needs to open a connection */
+	private int connectionTime = Settings.PORTAL_CONNECTION_TIME;
+
+	/** base energy usage after applying upgrades */
+	private double baseEnergyUse = Settings.ENERGY_USAGE;
+
+	/** base energy usage (init) after applying upgrades */
+	private double baseEnergyUseInit = Settings.ENERGY_USAGE_INIT;
+
 	/**
 	 * opens a portal to the current destination
 	 * @return success
 	 */
 	public boolean openPortal() {
-//		updateMetrics();
 		return metrics != null && metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 	}
 
@@ -300,9 +309,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		if (!init) {
 			init = true;
 			if (state != State.INCOMING_PORTAL && state != State.OUTGOING_PORTAL) {
-				collapseWholePortal();//reset portals
+				//reset portals
+				collapseWholePortal();
 			}
 			if (energyType == EnergyTypes.IC2) {
+				//init ic2 energy net
 				MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(this));
 			}
 		}
@@ -318,13 +329,16 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		//Connect Portal
 		if (state == State.CONNECTING) {
 			if(tick % 40 == 0 && metrics != null) {
+				//play connecting sound effect
 				worldObj.playSoundEffect(metrics.originX, metrics.originY, metrics.originZ, "portal.portal", 0.5F, worldObj.rand.nextFloat() * 0.1F + 1.9F);
 			}
-			if (tick == 0) { //update destination portal
+			if (tick == 0) {
+				//update destination portal
 				portalDestination = getDestination();
 				if (portalDestination >= 0) {
 					BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
-					if (pos == null || portalDestination == id) { //invalid portal
+					if (pos == null || portalDestination == id) {
+						//invalid portal
 						setState(State.READY);
 						lastError = Error.INVALID_DESTINATION;
 					} else {
@@ -347,13 +361,15 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				tick = 0;
 				int oldDestination = portalDestination;
 				portalDestination = getDestination();
-				//check destination
 				if (oldDestination != portalDestination) {
+					//check destination
 					setState(State.READY);
 					lastError = Error.DESTINATION_CHANGED;
-				} else if(updateMetrics()) { //Check whether we created a successful multiblock
+				} else if(updateMetrics()) {
+					//Check whether we created a successful multiblock
 					//create portal if necessary
 					if (portalDestination == PortalManager.PORTAL_MINING_DIMENSION) {
+						//create mining dimension portal and update destination
 						int count = ItemUtils.getNBTTagCompound(inventory[0]).getInteger("frame_blocks");
 						if (count >= metrics.getFrameBlockCount()) {
 							portalDestination = PortalManager.getInstance().createPortal(id, metrics, this);
@@ -731,7 +747,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
-		ItemStack out = new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
+		ItemStack out = new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY);
 		ItemUtils.writeUpgradesToItemStack(getUpgradeInventory(), out);
 		upgrades = null; //Hack to prevent droping of upgrades when removing using a wrench
 //		BlockUtils.dropUpgrades(worldObj, xCoord, yCoord, zCoord);

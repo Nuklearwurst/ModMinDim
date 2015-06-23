@@ -1,8 +1,9 @@
 package com.fravokados.mindim.recipes;
 
-import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
+import com.fravokados.mindim.block.ModBlocks;
 import com.fravokados.mindim.item.ItemDestinationCard;
+import com.fravokados.mindim.item.ModItems;
 import cpw.mods.fml.common.registry.GameRegistry;
 import ic2.api.item.IC2Items;
 import net.minecraft.init.Blocks;
@@ -27,7 +28,7 @@ public class RecipeManager {
 		/**
 		 * Destination Card (normal)
 		 */
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
+		GameRegistry.addRecipe(new ItemStack(ModItems.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
 				" p ",
 				"wcw",
 				"ppp",
@@ -39,7 +40,7 @@ public class RecipeManager {
 		/**
 		 * Portal Frame (+rotated)
 		 */
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+		GameRegistry.addRecipe(new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
 				"oco",
 				"wmw",
 				"oco",
@@ -48,7 +49,7 @@ public class RecipeManager {
 				Character.valueOf('w'), copperWire,
 				Character.valueOf('c'), coil
 		);
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+		GameRegistry.addRecipe(new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
 				"owo",
 				"cmc",
 				"owo",
@@ -62,11 +63,11 @@ public class RecipeManager {
 		/**
 		 * PortalController
 		 */
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
+		GameRegistry.addRecipe(new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
 				"ded",
 				"ama",
 				"sfs",
-				Character.valueOf('f'), new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+				Character.valueOf('f'), new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
 				Character.valueOf('m'), mfe,
 				Character.valueOf('a'), advancedCircuit,
 				Character.valueOf('d'), Items.diamond,
@@ -77,12 +78,12 @@ public class RecipeManager {
 		/**
 		 * DestinationCard - Mining Dimension
 		 */
-		GameRegistry.addRecipe(new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_MIN_DIM),
+		GameRegistry.addRecipe(new ItemStack(ModItems.itemDestinationCard, 1, ItemDestinationCard.META_MIN_DIM),
 				"ede",
 				"oco",
 				"ege",
-				Character.valueOf('c'), new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
-				Character.valueOf('d'), new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
+				Character.valueOf('c'), new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
+				Character.valueOf('d'), new ItemStack(ModItems.itemDestinationCard, 1, ItemDestinationCard.META_NORMAL),
 				Character.valueOf('e'), Items.ender_eye,
 				Character.valueOf('o'), Blocks.obsidian,
 				Character.valueOf('g'), Items.diamond_pickaxe

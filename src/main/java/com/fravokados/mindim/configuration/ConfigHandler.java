@@ -17,9 +17,14 @@ public class ConfigHandler {
 		config = new Configuration(configFile);
 	}
 
-	public void load(boolean load) {
+	/**
+	 * loads the config and applies settings<br>
+	 * also saves changes to disk
+	 * @param loadFromDisk whether the config should be loaded from disk, false when modifing config ingame
+	 */
+	public void load(boolean loadFromDisk) {
 		//load config
-		if(load) {
+		if(loadFromDisk) {
 			try {
 				config.load();
 			} catch(Exception e) {

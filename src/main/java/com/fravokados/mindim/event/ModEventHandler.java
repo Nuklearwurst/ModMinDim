@@ -1,6 +1,7 @@
 package com.fravokados.mindim.event;
 
 import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.util.LogHelper;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -17,8 +18,7 @@ public class ModEventHandler {
 
 	@SubscribeEvent
 	public void onBlockPlaced(BlockEvent.PlaceEvent evt) {
-		if (evt.player.dimension != ModMiningDimension.dimensionId) {
-//	        evt.block.getUnlocalizedName()
+		if (evt.player.dimension != Settings.dimensionId) {
 			GameRegistry.UniqueIdentifier block = GameRegistry.findUniqueIdentifierFor(evt.block);
 			if (block != null && block.modId.contains("BuildCraft")) {
 				if (block.name.equals("machineBlock") || block.name.equals("miningWellBlock")) {
@@ -50,7 +50,7 @@ public class ModEventHandler {
 	@SubscribeEvent
 	public void unloadWorld(WorldEvent.Unload evt) {
 		if (!evt.world.isRemote && evt.world.provider.dimensionId == 0) {
-			LogHelper.info("Unloading PortalManager...");
+			LogHelper.trace("Unloading PortalManager...");
 			ModMiningDimension.instance.portalManager = null;
 		}
 	}

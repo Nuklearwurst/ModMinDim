@@ -1,6 +1,5 @@
 package com.fravokados.mindim.block;
 
-import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.tile.TileEntityPortal;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.util.LogHelper;
@@ -81,7 +80,7 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 	}
 
 	public static void placePortalInWorld(World world, int x, int y, int z, int cx, int cy, int cz) {
-		world.setBlock(x, y, z, ModMiningDimension.instance.blockPortalBlock, 0, 3);
+		world.setBlock(x, y, z, ModBlocks.blockPortalBlock, 0, 3);
 		TileEntityPortal te = (TileEntityPortal) world.getTileEntity(x, y, z);
 		te.setPortalController(cx, cy, cz);
 	}

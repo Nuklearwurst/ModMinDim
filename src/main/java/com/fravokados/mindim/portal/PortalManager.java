@@ -3,6 +3,7 @@ package com.fravokados.mindim.portal;
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.block.ModBlocks;
 import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.item.ItemDestinationCard;
@@ -260,7 +261,7 @@ public class PortalManager extends WorldSavedData {
 //			return PORTAL_INVALID_DIMENSION;
 //		}
 		//TODO: make this configurable
-		int dim = pos.dimension == ModMiningDimension.dimensionId ? 0 : ModMiningDimension.dimensionId;
+		int dim = pos.dimension == Settings.dimensionId ? 0 : Settings.dimensionId;
 
 		//get the destination world server
 		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -277,7 +278,7 @@ public class PortalManager extends WorldSavedData {
 		}
 		PortalConstructor.createPortalFromMetrics(worldServer, metrics, true, yOffset);
 		//create the controller
-		worldServer.setBlock(pos.x, pos.y + yOffset, pos.z, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
+		worldServer.setBlock(pos.x, pos.y + yOffset, pos.z, ModBlocks.blockPortalFrame, BlockPortalFrame.META_CONTROLLER_ENTITY, 3);
 		TileEntity te = worldServer.getTileEntity(pos.x, pos.y + yOffset, pos.z);
 		if (te != null && te instanceof TileEntityPortalControllerEntity) {
 			if (Settings.PORTAL_SPAWN_WITH_CARD) {

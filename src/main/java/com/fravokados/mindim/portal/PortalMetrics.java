@@ -1,9 +1,9 @@
 package com.fravokados.mindim.portal;
 
-import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.BlockPortalMinDim;
 import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.block.ModBlocks;
 import com.fravokados.mindim.block.tile.IEntityPortalComponent;
 import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
 import com.fravokados.mindim.util.BlockUtils;
@@ -414,7 +414,7 @@ public class PortalMetrics {
 				for(int k = minZ; k <= maxZ; k++) {
 					flagZ = k == minZ || k == maxZ;
 					if(flagX == flagY ? flagX : flagZ) {
-						world.setBlock(x + i, y + j, z + k, ModMiningDimension.instance.blockPortalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
+						world.setBlock(x + i, y + j, z + k, ModBlocks.blockPortalFrame, BlockPortalFrame.META_FRAME_ENTITY, 0);
 						TileEntity te = world.getTileEntity(x + i, y + j, z + k);
 						if(te != null && te instanceof IFacingSix) {
 							((IFacingSix) te).setFacing((short) front.ordinal());

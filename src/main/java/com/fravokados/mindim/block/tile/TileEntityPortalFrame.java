@@ -1,9 +1,9 @@
 package com.fravokados.mindim.block.tile;
 
-import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
+import com.fravokados.mindim.block.ModBlocks;
 import com.fravokados.mindim.portal.PortalConstructor;
 import ic2.api.tile.IWrenchable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -123,7 +123,7 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 
 	@Override
 	public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
-		return new ItemStack(ModMiningDimension.instance.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY);
+		return new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY);
 	}
 
 	@Override

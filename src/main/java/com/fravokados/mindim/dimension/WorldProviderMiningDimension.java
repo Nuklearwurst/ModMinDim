@@ -1,6 +1,6 @@
 package com.fravokados.mindim.dimension;
 
-import com.fravokados.mindim.ModMiningDimension;
+import com.fravokados.mindim.configuration.Settings;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManagerHell;
@@ -15,7 +15,7 @@ public class WorldProviderMiningDimension extends WorldProvider {
     public void registerWorldChunkManager()
     {
         this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.desertHills, 0.8F);
-        this.dimensionId = ModMiningDimension.dimensionId;
+        this.dimensionId = Settings.dimensionId;
 
     }
 

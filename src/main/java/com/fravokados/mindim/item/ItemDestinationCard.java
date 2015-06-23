@@ -56,7 +56,7 @@ public class ItemDestinationCard extends ItemMDMultiType {
 					int type = stack.stackTagCompound.getInteger("destinationPortalType");
 					int dest = stack.stackTagCompound.getInteger("destinationPortal");
 					//TODO translation
-					info.add("Portal Type: " + PortalMetrics.Type.getType(type));
+					info.add(PortalMetrics.Type.getType(type));
 					info.add("Portal Destination: " + dest);
 				}
 			}
@@ -82,7 +82,7 @@ public class ItemDestinationCard extends ItemMDMultiType {
 	}
 
 	public static ItemStack fromDestination(int id) {
-		return writeDestination(new ItemStack(ModMiningDimension.instance.itemDestinationCard, 1, 0), id);
+		return writeDestination(new ItemStack(ModItems.itemDestinationCard, 1, 0), id);
 	}
 
 	public static ItemStack writeDestination(ItemStack stack, int id) {
