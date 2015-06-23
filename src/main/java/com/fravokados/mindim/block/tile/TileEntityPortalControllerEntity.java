@@ -141,8 +141,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 */
 	private int upgradeTrackerFlags = 0;
 
+	/**
+	 * opens a portal to the current destination
+	 * @return success
+	 */
 	public boolean openPortal() {
-		updateMetrics();
+//		updateMetrics();
 		return metrics != null && metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 	}
 
@@ -159,6 +163,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		return upgrades;
 	}
 
+	/**
+	 * updates local information on upgrades
+	 */
 	@Override
 	public void updateUpgradeInformation() {
 		UpgradeStatCollection col = UpgradeStatCollection.getUpgradeStatsFromDefinitions(upgrades.getUpgrades());
@@ -335,7 +342,8 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 					}
 				}
 				tick++;
-			} else if (tick >= Settings.PORTAL_CONNECTION_TIME) { //Do connection
+			} else if (tick >= Settings.PORTAL_CONNECTION_TIME) {
+				//Do connection
 				tick = 0;
 				int oldDestination = portalDestination;
 				portalDestination = getDestination();
@@ -374,8 +382,8 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 								MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 								WorldServer world = server.worldServerForDimension(pos.dimension);
 								TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-								if (te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).openPortal()) {
-									if (energy.useEnergy(Settings.EBERGY_USAGE_INIT)) { //use initial energy
+								if (te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).updateMetrics() && ((TileEntityPortalControllerEntity) te).openPortal()) {
+									if (energy.useEnergy(Settings.ENERGY_USAGE_INIT)) { //use initial energy
 										//update controller states
 										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
 										((TileEntityPortalControllerEntity) te).portalDestination = id;
@@ -411,6 +419,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 				tick++;
 			}
 		} else if(state == State.OUTGOING_PORTAL) {
+			//Outgoing portal opened --> update max length
 			if(tick >= Settings.MAX_PORTAL_CONNECTION_LENGTH) {
 				closePortal(true);
 				tick = 0;
@@ -426,7 +435,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			}
 		}
 		//recharge energy
-		if (inventory[1] != null) {
+		if (!energy.isFull() && inventory[1] != null) {
 			if (energyType == EnergyTypes.IC2) {
 				if (inventory[1].getItem() instanceof IElectricItem) {
 					energy.receiveEnergy(ElectricItem.manager.discharge(inventory[1], getDemandedEnergy(), getSinkTier(), false, true, false), false);
@@ -442,7 +451,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	}
 
 	/**
-	 * Unloads the IC2 Energy Sink
+	 * Unloads the IC2 Energy Sink and closes any open connections
 	 */
 	@Override
 	public void onChunkUnload() {
@@ -662,7 +671,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	/**
 	 * closes the portal
-	 * TODO: better system
+	 * @param closeRemote should remote also be closed?
 	 */
 	public void closePortal(boolean closeRemote) {
 		//close remote portal if needed
@@ -688,6 +697,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		setState(State.READY);
 	}
 
+	/**
+	 * removes all portal-blocks if possible
+	 */
 	public void collapseWholePortal() {
 		if (metrics != null) {
 			metrics.removePortalsInsideFrame(worldObj);

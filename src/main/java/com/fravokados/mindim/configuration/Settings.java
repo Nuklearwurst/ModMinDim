@@ -22,7 +22,7 @@ public class Settings {
 	/** maximum time in ticks a portal can be held open */
 	public static int MAX_PORTAL_CONNECTION_LENGTH = 20 * 20;
 
-	public static int EBERGY_USAGE_INIT = 10000;
+	public static int ENERGY_USAGE_INIT = 10000;
 	public static int ENERGY_USAGE = 100;
 
 	/** should a mindim portal spawn with a card leading back */

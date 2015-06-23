@@ -10,6 +10,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 /**
+ * Recipes
  * @author Nuklearwurst
  */
 @SuppressWarnings("UnnecessaryBoxing")

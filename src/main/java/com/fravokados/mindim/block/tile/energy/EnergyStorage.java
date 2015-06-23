@@ -99,4 +99,8 @@ public class EnergyStorage {
 			return false;
 		}
 	}
+
+	public boolean isFull() {
+		return getEnergyStored() >= getMaxEnergyStored();
+	}
 }
