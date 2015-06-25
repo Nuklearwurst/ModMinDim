@@ -41,6 +41,8 @@ gui.error.short.destinationChanged=Destination
 gui.error.detail.destinationChanged=Destination changed while booting up!
 gui.error.short.missingResources=Resources
 gui.error.detail.missingResources=Not enough minerals! (You need more Portal Frames)
+gui.error.short.unknown=Unknown
+gui.error.detail.unknown=An unknown error has occurred!
 
 #CreativeTab
 itemGroup.mindim=Mining Dimension

@@ -140,6 +140,10 @@ public class PortalMetrics {
 		return true;
 	}
 
+	/**
+	 * removes Portal Blocks inside metrics
+	 * @param world the world
+	 */
 	@SuppressWarnings("ConstantConditions")
 	public void removePortalsInsideFrame(World world) {
 		for(int j = minX; j <= maxX; j++) { //X

@@ -1,7 +1,10 @@
 package com.fravokados.mindim.portal;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
 
 public class BlockPositionDim {
     public int dimension;
@@ -35,4 +38,9 @@ public class BlockPositionDim {
         nbt.setInteger("z", z);
         nbt.setInteger("dim", dimension);
     }
+
+	public WorldServer getWorldServer() {
+		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+		return server.worldServerForDimension(dimension);
+	}
 }

@@ -26,7 +26,10 @@ public class Settings {
 	public static int MAX_PORTAL_CONNECTION_LENGTH = 20 * 20;
 
 	public static int ENERGY_USAGE_INIT = 10000;
+	public static int ENERGY_USAGE_CREATE_PORTAL = ENERGY_USAGE_INIT;
 	public static int ENERGY_USAGE = 100;
+
+	public static float ENERGY_USAGE_MODIFIER_SAME_DIMENSION = 1.5F;
 
 	/** should a mindim portal spawn with a card leading back */
 	public static boolean PORTAL_SPAWN_WITH_CARD = false;
@@ -36,4 +39,7 @@ public class Settings {
 
 	/** whether you should only be able to create a portal into the mining dimension from the overworld */
 	public static boolean CAN_ONLY_ENTER_MINING_DIMENSION_FROM_OVERWORLD = false;
+
+	/** true if portal spawn location should start at sea level (mindim portal creation) */
+	public static boolean START_SPAWN_SEARCH_FROM_BOTTOM = true;
 }

@@ -275,8 +275,11 @@ public class PortalManager extends WorldSavedData {
 
 		//create the portal frame
 		int yOffset = 0;
+		if(Settings.START_SPAWN_SEARCH_FROM_BOTTOM) {
+			yOffset = 64 - metrics.minY;
+		}
 		while (!metrics.isPortalAreaClear(worldServer, yOffset, 1)) {
-			if (metrics.maxY + yOffset < worldServer.getHeight()) {
+			if (metrics.maxY + yOffset >= worldServer.getHeight()) {
 				//Cancel if we are reaching height limit
 				return PORTAL_NO_SPAWN_FOUND;
 			}

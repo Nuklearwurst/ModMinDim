@@ -51,12 +51,18 @@ public class Strings {
 
 		public static final String CONTROLLER_ERROR_MSG_SHORT_BASE = "gui.error.short.";
 		public static final String CONTROLLER_ERROR_MSG_DETAIL_BASE = "gui.error.detail.";
-		public static final String[] CONTROLLER_ERROR_MSG = new String[] {"noError", "invalidDestination", "invalidStructure", "connectionInterrupted", "powerFailure", "destinationChanged", "missingResources"};
+		public static final String[] CONTROLLER_ERROR_MSG = new String[] {"noError", "invalidDestination", "invalidStructure", "connectionInterrupted", "powerFailure", "destinationChanged", "missingResources", "unknown"};
 	}
 
 	public static final class Tooltip {
 		public static final String ITEM_DESTINATION_CARD_TYPE = "tooltip.item.destinationCard.type";
 		public static final String ITEM_DESTINATION_CARD_DESTINATION = "tooltip.item.destinationCard.destination";
+	}
+
+	public static final class Sounds {
+		public static final String PORTAL_OPEN = "portal.travel";
+		public static final String PORTAL_CONNECT = "portal.portal";
+		public static final String PORTAL_CLOSE = "portal.trigger";
 	}
 
 	/**
