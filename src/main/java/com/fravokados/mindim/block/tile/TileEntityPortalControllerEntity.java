@@ -11,6 +11,7 @@ import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.plugin.EnergyTypes;
+import com.fravokados.mindim.plugin.PluginIC2;
 import com.fravokados.mindim.portal.*;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
@@ -194,7 +195,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void updateUpgradeInformation() {
 		UpgradeStatCollection col = UpgradeStatCollection.getUpgradeStatsFromDefinitions(upgrades.getUpgrades());
-		energy.setCapacity(100000 + col.getInt(UpgradeTypes.ENERGY_STORAGE.id, 0));
+		energy.setCapacity(100000 + col.getInt(UpgradeTypes.ENERGY_STORAGE.id, 0) * PluginIC2.ENERGY_STORAGE_UPGRADE);
 		upgradeTrackerFlags = 0;
 		if (col.hasKey(UpgradeTypes.DISCONNECT_INCOMING)) {
 			upgradeTrackerFlags += FLAG_CAN_DISCONNECT_INCOMING;

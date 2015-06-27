@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
  */
 public class PluginIC2 {
 
+	public static final int ENERGY_STORAGE_UPGRADE = 10000;
+
 	public static final String MOD_ID = "IC2";
 
 	public static boolean isAvailable() {

@@ -29,7 +29,7 @@ public class Settings {
 	public static int ENERGY_USAGE_CREATE_PORTAL = ENERGY_USAGE_INIT;
 	public static int ENERGY_USAGE = 100;
 
-	public static float ENERGY_USAGE_MODIFIER_SAME_DIMENSION = 1.5F;
+	public static float ENERGY_USAGE_MODIFIER_SAME_DIMENSION = 2F;
 
 	/** should a mindim portal spawn with a card leading back */
 	public static boolean PORTAL_SPAWN_WITH_CARD = false;

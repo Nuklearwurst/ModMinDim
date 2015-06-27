@@ -22,6 +22,8 @@ public class RecipeManager {
 		ItemStack copperWire = IC2Items.getItem("copperCableItem");
 		ItemStack machineCase = IC2Items.getItem("machine");
 		ItemStack mfe = IC2Items.getItem("mfeUnit");
+		ItemStack cesu = IC2Items.getItem("cesuUnit");
+		ItemStack evTransformer = IC2Items.getItem("evTransformer");
 		ItemStack advancedCircuit = IC2Items.getItem("advancedCircuit");
 		ItemStack coil = IC2Items.getItem("coil");
 
@@ -65,15 +67,27 @@ public class RecipeManager {
 		 */
 		GameRegistry.addRecipe(new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
 				"ded",
-				"ama",
-				"sfs",
+				"afa",
+				"tct",
 				Character.valueOf('f'), new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
-				Character.valueOf('m'), mfe,
 				Character.valueOf('a'), advancedCircuit,
 				Character.valueOf('d'), Items.diamond,
 				Character.valueOf('e'), Items.ender_eye,
-				Character.valueOf('s'), Blocks.stone
+				Character.valueOf('t'), evTransformer,
+				Character.valueOf('c'), cesu
 		);
+		//OLD Recipe
+//		GameRegistry.addRecipe(new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_CONTROLLER_ENTITY),
+//				"ded",
+//				"ama",
+//				"sfs",
+//				Character.valueOf('f'), new ItemStack(ModBlocks.blockPortalFrame, 1, BlockPortalFrame.META_FRAME_ENTITY),
+//				Character.valueOf('m'), mfe,
+//				Character.valueOf('a'), advancedCircuit,
+//				Character.valueOf('d'), Items.diamond,
+//				Character.valueOf('e'), Items.ender_eye,
+//				Character.valueOf('s'), Blocks.stone
+//		);
 
 		/**
 		 * DestinationCard - Mining Dimension
