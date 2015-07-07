@@ -4,7 +4,7 @@ import com.fravokados.mindim.inventory.ContainerDestinationCardMinDim;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.network.ModNetworkManager;
-import com.fravokados.mindim.network.network.MessageGuiElementClicked;
+import com.fravokados.mindim.network.message.MessageGuiElementClicked;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;

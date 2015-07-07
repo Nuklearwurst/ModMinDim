@@ -1,8 +1,8 @@
 package com.fravokados.mindim.portal;
 
-import com.fravokados.mindim.block.tile.IEntityPortalComponent;
-import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
-import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tileentity.IEntityPortalComponent;
+import com.fravokados.mindim.block.tileentity.IEntityPortalMandatoryComponent;
+import com.fravokados.mindim.block.tileentity.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.mindim.util.SimpleObjectReference;

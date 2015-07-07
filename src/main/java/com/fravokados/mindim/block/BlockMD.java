@@ -4,7 +4,7 @@ package com.fravokados.mindim.block;
  * @author Nuklearwurst
  */
 
-import com.fravokados.mindim.creativetab.CreativeTabMinDim;
+import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.lib.Textures;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,7 +20,7 @@ public class BlockMD extends Block {
 
 	public BlockMD(Material material) {
 		super(material);
-		this.setCreativeTab(CreativeTabMinDim.TAB_MD);
+		this.setCreativeTab(ModMiningDimension.TAB_MD);
 	}
 
 	public BlockMD(String name) {

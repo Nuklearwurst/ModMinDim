@@ -1,6 +1,6 @@
 package com.fravokados.mindim.common;
 
-import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tileentity.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.client.gui.GuiDestinationCardMinDim;
 import com.fravokados.mindim.client.gui.GuiEntityPortalController;
 import com.fravokados.mindim.inventory.ContainerDestinationCardMinDim;

@@ -18,8 +18,12 @@ chat.mindim.cancelBlockPlacing=Mmh, that didn't work...
 
 #Gui
 gui.mindim.destinationCard.portalBlocksStored=%d Portal Frame Blocks stored.
-gui.mindim.controller.id=ID: %d
-gui.mindim.controller.destination=Destination: %d
+gui.mindim.controller.id=ID: %s
+gui.mindim.controller.destination=Destination: %s
+gui.mindim.controller.destination.unknown=Unknown
+gui.mindim.controller.destination.mindim=Mining Dimension
+gui.mindim.controller.destination.error=Errored!
+gui.mindim.controller.destination.none=None.
 gui.mindim.controller.state=State: %s
 gui.mindim.controller.error=Last Error: %s
 gui.add=Add
@@ -50,3 +54,9 @@ itemGroup.mindim=Mining Dimension
 #Tooltip
 tooltip.item.destinationCard.type=Portal Type: %s
 tooltip.item.destinationCard.destination=Portal Destination: %s
+tooltip.item.destinationCard.empty=<empty>
+tooltip.item.destinationCard.mindim=Contains %s Portal Frames
+tooltip.item.destinationCard.mindim.info_1=Sneak and Rightclick to open GUI!
+
+#Portal
+portal.entity=Entity Portal

@@ -4,8 +4,8 @@ import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.BlockPortalMinDim;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.block.ModBlocks;
-import com.fravokados.mindim.block.tile.IEntityPortalComponent;
-import com.fravokados.mindim.block.tile.IEntityPortalMandatoryComponent;
+import com.fravokados.mindim.block.tileentity.IEntityPortalComponent;
+import com.fravokados.mindim.block.tileentity.IEntityPortalMandatoryComponent;
 import com.fravokados.mindim.util.BlockUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -121,6 +121,7 @@ public class PortalMetrics {
 
 	@SuppressWarnings("ConstantConditions")
 	public boolean placePortalsInsideFrame(World world, int x, int y, int z) {
+		int meta = BlockPortalMinDim.convertFacingToMeta(front.ordinal());
 		for(int j = minX; j <= maxX; j++) { //X
 			for(int k = minY; k <= maxY; k++) { //Y
 				for(int l = minZ; l <= maxZ; l++) { //Z
@@ -133,7 +134,7 @@ public class PortalMetrics {
 					if(minZ - maxZ != 0 && (l == minZ || l == maxZ)) {
 						continue;
 					}
-					BlockPortalMinDim.placePortalInWorld(world, j, k, l, x, y, z);
+					BlockPortalMinDim.placePortalInWorld(world, j, k, l, x, y, z, meta);
 				}
 			}
 		}

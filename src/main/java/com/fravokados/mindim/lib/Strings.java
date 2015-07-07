@@ -45,6 +45,11 @@ public class Strings {
 		public static final String CONTROLLER_STATE = "gui.mindim.controller.state";
 		public static final String CONTROLLER_ERROR = "gui.mindim.controller.error";
 
+		public static final String CONTROLLER_DESTINATION_UNKNOWN = "gui.mindim.controller.destination.unknown";
+		public static final String CONTROLLER_DESTINATION_MINDIM = "gui.mindim.controller.destination.mindim";
+		public static final String CONTROLLER_DESTINATION_ERROR = "gui.mindim.controller.destination.error";
+		public static final String CONTROLLER_DESTINATION_NONE = "gui.mindim.controller.destination.none";
+
 		public static final String GUI_ADD = "gui.add";
 		public static final String GUI_START = "gui.start";
 		public static final String GUI_STOP = "gui.stop";
@@ -57,6 +62,9 @@ public class Strings {
 	public static final class Tooltip {
 		public static final String ITEM_DESTINATION_CARD_TYPE = "tooltip.item.destinationCard.type";
 		public static final String ITEM_DESTINATION_CARD_DESTINATION = "tooltip.item.destinationCard.destination";
+		public static final String ITEM_DESTINATION_CARD_EMPTY = "tooltip.item.destinationCard.empty";
+		public static final String ITEM_DESTINATION_CARD_MINDIM = "tooltip.item.destinationCard.mindim";
+		public static final String ITEM_DESTINATION_CARD_MINDIM_INFO_1 = "tooltip.item.destinationCard.mindim.info_1";
 	}
 
 	public static final class Sounds {

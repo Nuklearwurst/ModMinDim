@@ -4,7 +4,7 @@ import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.block.ModBlocks;
-import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tileentity.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.util.LogHelper;
@@ -125,15 +125,6 @@ public class PortalManager extends WorldSavedData {
 				double posX = entity.posX - originMetrics.originX;
 				double posY = entity.posY - originMetrics.originY;
 				double posZ = entity.posZ - originMetrics.originZ;
-//
-//				//make sure player spawns inside the portal
-//				if(originMetrics.front.posX != 0) {
-//					posX = 0;
-//				} else if(originMetrics.front.posY != 0) {
-//					posY = 0;
-//				} else if(originMetrics.front.posZ != 0) {
-//					posZ = 0;
-//				}
 
 				////////////////
 				//  position  //
@@ -185,18 +176,6 @@ public class PortalManager extends WorldSavedData {
 				double speed_x = targetMetrics.front.offsetX * (-1) * speed_rel_x + targetMetrics.top.offsetX * speed_rel_y + sideAxisTarget.offsetX * speed_rel_z;
 				double speed_y = targetMetrics.front.offsetY * (-1) * speed_rel_x + targetMetrics.top.offsetY * speed_rel_y + sideAxisTarget.offsetY * speed_rel_z;
 				double speed_z = targetMetrics.front.offsetZ * (-1) * speed_rel_x + targetMetrics.top.offsetZ * speed_rel_y + sideAxisTarget.offsetZ * speed_rel_z;
-
-				//FIXME: working so far, can be removed in the future
-				if (Settings.DEBUG) {
-					LogHelper.info("Teleporting entity | Momentum | Total");
-					LogHelper.info("Old square velocity: " + (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ));
-					LogHelper.info("Relative square velocity: " + (speed_rel_x * speed_rel_x + speed_rel_y * speed_rel_y + speed_rel_z * speed_rel_z));
-					LogHelper.info("New square velocity: " + (speed_x * speed_x + speed_y * speed_y + speed_z * speed_z));
-					LogHelper.info("Teleporting entity | Momentum | Components");
-					LogHelper.info("Old velocity: " + entity.motionX + "; " + entity.motionY + "; " + entity.motionZ);
-					LogHelper.info("Relative velocity: " + speed_rel_x + "; " + speed_rel_y + "; " + speed_rel_z);
-					LogHelper.info("New velocity: " + speed_x + "; " + speed_y + "; " + speed_z);
-				}
 
 				//update entity
 				entity.motionX = speed_x;
@@ -305,6 +284,17 @@ public class PortalManager extends WorldSavedData {
 
 	public BlockPositionDim getEntityPortalForId(int id) {
 		return entityPortals.get(id);
+	}
+
+	public PortalMetrics getPortalMetricsForId(int id) {
+		BlockPositionDim pos = getEntityPortalForId(id);
+		if(pos != null) {
+			TileEntityPortalControllerEntity te = pos.getControllerEntity();
+			if(te != null) {
+				return te.getMetrics();
+			}
+		}
+		return null;
 	}
 
 	public boolean removeEntityPortal(int id) {

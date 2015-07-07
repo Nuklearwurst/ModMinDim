@@ -1,4 +1,4 @@
-package com.fravokados.mindim.block.tile.energy;
+package com.fravokados.mindim.block.tileentity.energy;
 
 import net.minecraft.nbt.NBTTagCompound;
 

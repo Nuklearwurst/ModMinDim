@@ -1,15 +1,17 @@
 package com.fravokados.mindim.client.gui;
 
-import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tileentity.TileEntityPortalControllerEntity;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.network.ModNetworkManager;
-import com.fravokados.mindim.network.network.MessageGuiElementClicked;
+import com.fravokados.mindim.network.message.MessageGuiElementClicked;
+import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.util.GeneralUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.opengl.GL11;
 
@@ -91,7 +93,7 @@ public class GuiEntityPortalController extends GuiContainer {
 		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
 		//TODO hide/prettify destination and portal id
 		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_ID, te.getId()), 58, 18, 0xa2cc42);
-		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_DESTINATION, te.getDestination()), 58, 30, 0xa2cc42);
+		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_DESTINATION, getDestinationString(te.getDestination(), te.getStackInSlot(0))), 58, 30, 0xa2cc42);
 		//TODO translate State
 		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_STATE, te.getState()), 58, 40, 0xa2cc42);
 		drawString(this.fontRendererObj, Strings.translateWithFormat(Strings.Gui.CONTROLLER_ERROR, te.getLastError() == TileEntityPortalControllerEntity.Error.NO_ERROR ? te.getLastError().getTranslationShort() : (EnumChatFormatting.RED + te.getLastError().getTranslationShort() + EnumChatFormatting.RESET)), 58, 50, 0xa2cc42);
@@ -119,5 +121,18 @@ public class GuiEntityPortalController extends GuiContainer {
 	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
+	}
+
+	private String getDestinationString(int dest, ItemStack stack) {
+		switch (dest) {
+			case PortalManager.PORTAL_MINING_DIMENSION:
+				return Strings.translate(Strings.Gui.CONTROLLER_DESTINATION_MINDIM);
+			case PortalManager.PORTAL_NOT_CONNECTED:
+				return Strings.translate(Strings.Gui.CONTROLLER_DESTINATION_NONE);
+		}
+		if(dest < 0) {
+			return Strings.translate(Strings.Gui.CONTROLLER_DESTINATION_ERROR) + " (" + dest + ")";
+		}
+		return Strings.translate(Strings.Gui.CONTROLLER_DESTINATION_UNKNOWN) + " (" + dest + ")";
 	}
 }

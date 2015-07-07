@@ -20,6 +20,6 @@ public class EnergyManager {
 			case IC2:
 				return item.getItem() instanceof IElectricItem && ((IElectricItem) item.getItem()).canProvideEnergy(item);
 		}
-		return false;
+		return true;
 	}
 }

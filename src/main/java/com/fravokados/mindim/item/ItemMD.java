@@ -1,6 +1,6 @@
 package com.fravokados.mindim.item;
 
-import com.fravokados.mindim.creativetab.CreativeTabMinDim;
+import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.lib.Textures;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
@@ -10,7 +10,7 @@ public class ItemMD extends Item {
 
 	public ItemMD() {
 		super();
-		this.setCreativeTab(CreativeTabMinDim.TAB_MD);
+		this.setCreativeTab(ModMiningDimension.TAB_MD);
 	}
 
 	public ItemMD(String name) {

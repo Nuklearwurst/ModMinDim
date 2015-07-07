@@ -4,6 +4,7 @@ import com.fravokados.techmobs.upgrade.IUpgradable;
 import com.fravokados.techmobs.upgrade.IUpgradeInventory;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -122,5 +123,9 @@ public class BlockUtils {
 		Block block = world.getBlock(x, y, z);
 		return block == null || world.isAirBlock(x, y, z) || block.isReplaceable(world, x, y, z) ||
 				block == Blocks.vine  || block == Blocks.tallgrass || block == Blocks.deadbush;
+	}
+
+	public static boolean isTileEntityUsableByPlayer(TileEntity te, EntityPlayer player) {
+		return te.getWorldObj().getTileEntity(te.xCoord, te.yCoord, te.zCoord) == te && player.getDistanceSq((double) te.xCoord + 0.5D, (double) te.yCoord + 0.5D, (double) te.zCoord + 0.5D) <= 64.0D;
 	}
 }

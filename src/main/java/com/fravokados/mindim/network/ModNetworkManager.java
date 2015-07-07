@@ -1,8 +1,8 @@
 package com.fravokados.mindim.network;
 
 import com.fravokados.mindim.lib.Reference;
-import com.fravokados.mindim.network.network.MessageContainerIntegerUpdate;
-import com.fravokados.mindim.network.network.MessageGuiElementClicked;
+import com.fravokados.mindim.network.message.MessageContainerIntegerUpdate;
+import com.fravokados.mindim.network.message.MessageGuiElementClicked;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 

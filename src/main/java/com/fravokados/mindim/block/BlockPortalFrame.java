@@ -1,8 +1,8 @@
 package com.fravokados.mindim.block;
 
 import com.fravokados.mindim.ModMiningDimension;
-import com.fravokados.mindim.block.tile.TileEntityPortalControllerEntity;
-import com.fravokados.mindim.block.tile.TileEntityPortalFrame;
+import com.fravokados.mindim.block.tileentity.TileEntityPortalControllerEntity;
+import com.fravokados.mindim.block.tileentity.TileEntityPortalFrame;
 import com.fravokados.mindim.lib.GUIIDs;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.plugin.PluginIC2;
@@ -184,6 +184,11 @@ public class BlockPortalFrame extends BlockMD implements ITileEntityProvider {
 					index = 0;
 				} else if(state == TileEntityPortalControllerEntity.State.INCOMING_PORTAL || state == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL) {
 					index = 2;
+				}
+				if(state == TileEntityPortalControllerEntity.State.INCOMING_CONNECTION || state == TileEntityPortalControllerEntity.State.INCOMING_PORTAL || state == TileEntityPortalControllerEntity.State.OUTGOING_PORTAL || state == TileEntityPortalControllerEntity.State.CONNECTING) {
+					if(((TileEntityPortalFrame) te).getClientRenderInfo() != null) {
+						facing = (short) ((TileEntityPortalFrame) te).getClientRenderInfo().originDirection.ordinal();
+					}
 				}
 				if(facing == side) {
 					return iconFrameFront[index];

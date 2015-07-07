@@ -28,6 +28,7 @@ public class Settings {
 	public static int ENERGY_USAGE_INIT = 10000;
 	public static int ENERGY_USAGE_CREATE_PORTAL = ENERGY_USAGE_INIT;
 	public static int ENERGY_USAGE = 100;
+	public static int ENERGY_STORAGE = 300000;
 
 	public static float ENERGY_USAGE_MODIFIER_SAME_DIMENSION = 2F;
 

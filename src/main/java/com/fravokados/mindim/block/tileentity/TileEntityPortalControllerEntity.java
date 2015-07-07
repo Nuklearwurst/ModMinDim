@@ -1,18 +1,23 @@
-package com.fravokados.mindim.block.tile;
+package com.fravokados.mindim.block.tileentity;
 
 import com.fravokados.mindim.ModMiningDimension;
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.block.ModBlocks;
-import com.fravokados.mindim.block.tile.energy.EnergyStorage;
+import com.fravokados.mindim.block.tileentity.energy.EnergyStorage;
+import com.fravokados.mindim.client.ClientPortalInfo;
 import com.fravokados.mindim.configuration.Settings;
 import com.fravokados.mindim.inventory.ContainerEntityPortalController;
 import com.fravokados.mindim.item.ItemDestinationCard;
 import com.fravokados.mindim.lib.Strings;
+import com.fravokados.mindim.plugin.EnergyManager;
 import com.fravokados.mindim.plugin.EnergyTypes;
-import com.fravokados.mindim.plugin.PluginIC2;
-import com.fravokados.mindim.portal.*;
+import com.fravokados.mindim.portal.BlockPositionDim;
+import com.fravokados.mindim.portal.PortalConstructor;
+import com.fravokados.mindim.portal.PortalManager;
+import com.fravokados.mindim.portal.PortalMetrics;
+import com.fravokados.mindim.util.BlockUtils;
 import com.fravokados.mindim.util.ItemUtils;
 import com.fravokados.mindim.util.LogHelper;
 import com.fravokados.techmobs.inventory.InventoryUpgrade;
@@ -21,6 +26,8 @@ import com.fravokados.techmobs.upgrade.IUpgradeInventory;
 import com.fravokados.techmobs.upgrade.UpgradeStatCollection;
 import com.fravokados.techmobs.upgrade.UpgradeTypes;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;
@@ -72,6 +79,11 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		}
 	}
 
+	public static final int SLOT_DESTINATION = 0;
+	public static final int SLOT_FUEL = 1;
+	public static final int SLOT_WRITER_IN = 2;
+	public static final int SLOT_WRITER_OUT = 3;
+
 	/**
 	 * flag indicating that the controller is able to disconnect from incoming portals
 	 */
@@ -80,6 +92,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 * flag indicating that the controller can reverse the portal direction
 	 */
 	public static final int FLAG_CAN_REVERSE_PORTAL = 2;
+
+	@SideOnly(Side.CLIENT)
+	public ClientPortalInfo renderInfo;
 
 	/**
 	 * Portal id
@@ -133,7 +148,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	/**
 	 * Energy Storage
 	 */
-	private final EnergyStorage energy = new EnergyStorage(100000);
+	private final EnergyStorage energy = new EnergyStorage(Settings.ENERGY_STORAGE);
 
 	/**
 	 * Upgrades
@@ -195,7 +210,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	@Override
 	public void updateUpgradeInformation() {
 		UpgradeStatCollection col = UpgradeStatCollection.getUpgradeStatsFromDefinitions(upgrades.getUpgrades());
-		energy.setCapacity(100000 + col.getInt(UpgradeTypes.ENERGY_STORAGE.id, 0) * PluginIC2.ENERGY_STORAGE_UPGRADE);
+		energy.setCapacity(Settings.ENERGY_STORAGE + col.getInt(UpgradeTypes.ENERGY_STORAGE.id, 0));
 		upgradeTrackerFlags = 0;
 		if (col.hasKey(UpgradeTypes.DISCONNECT_INCOMING)) {
 			upgradeTrackerFlags += FLAG_CAN_DISCONNECT_INCOMING;
@@ -551,12 +566,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public String getInventoryName() {
-		return "Portal Controller";
+		return hasCustomInventoryName() ? name : "Portal Controller";
 	}
 
 	@Override
 	public boolean hasCustomInventoryName() {
-		return false;
+		return name != null;
 	}
 
 	@Override
@@ -566,7 +581,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && player.getDistanceSq((double) this.xCoord + 0.5D, (double) this.yCoord + 0.5D, (double) this.zCoord + 0.5D) <= 64.0D;
+		return BlockUtils.isTileEntityUsableByPlayer(this, player);
 	}
 
 	@Override
@@ -579,8 +594,16 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		//TODO improve slot validation
-		return slot != 3;
+		switch (slot) {
+			case SLOT_DESTINATION:
+			case SLOT_WRITER_IN:
+				return stack.getItem() instanceof ItemDestinationCard;
+			case SLOT_FUEL:
+				return EnergyManager.canItemProvideEnergy(stack, getEnergyType());
+			case SLOT_WRITER_OUT:
+				return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -763,19 +786,44 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setShort("facing", facing);
 		nbt.setInteger("state", state.ordinal());
+		if(metrics != null) {
+			nbt.setByte("portalFacing", (byte) metrics.front.ordinal());
+			if(isActive()) {
+				PortalMetrics target = PortalManager.getInstance().getPortalMetricsForId(portalDestination);
+				if(target != null) {
+					nbt.setByte("targetFacing", (byte) target.front.ordinal());
+					nbt.setDouble("targetX", target.originX);
+					nbt.setDouble("targetY", target.originY);
+					nbt.setDouble("targetZ", target.originZ);
+				}
+			}
+		}
 		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		NBTTagCompound nbt = pkt.func_148857_g();
-		if (nbt != null && nbt.hasKey("facing")) {
-			int oldFacing = facing;
-			facing = nbt.getShort("facing");
-			State oldState = state;
-			state = State.values()[nbt.getInteger("state")];
-			if (oldFacing != facing || oldState != state) {
-				this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		if (nbt != null) {
+			renderInfo = null;
+			if (nbt.hasKey("facing")) {
+				int oldFacing = facing;
+				facing = nbt.getShort("facing");
+				State oldState = state;
+				state = State.values()[nbt.getInteger("state")];
+				if (oldFacing != facing || oldState != state) {
+					this.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+				}
+			}
+			if(nbt.hasKey("portalFacing")) {
+				renderInfo = new ClientPortalInfo();
+				renderInfo.originDirection = ForgeDirection.getOrientation(nbt.getByte("portalFacing"));
+				if(nbt.hasKey("targetFacing")) {
+					renderInfo.targetDirection = ForgeDirection.getOrientation(nbt.getByte("targetFacing"));
+					renderInfo.targetX = nbt.getInteger("targetX");
+					renderInfo.targetY = nbt.getInteger("targetY");
+					renderInfo.targetZ = nbt.getInteger("targetZ");
+				}
 			}
 		}
 	}

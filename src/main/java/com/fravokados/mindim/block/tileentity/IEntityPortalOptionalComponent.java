@@ -1,4 +1,4 @@
-package com.fravokados.mindim.block.tile;
+package com.fravokados.mindim.block.tileentity;
 
 /**
  * @author Nuklearwurst

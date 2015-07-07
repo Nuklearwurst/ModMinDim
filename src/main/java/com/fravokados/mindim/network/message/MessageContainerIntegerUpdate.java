@@ -1,4 +1,4 @@
-package com.fravokados.mindim.network.network;
+package com.fravokados.mindim.network.message;
 
 import com.fravokados.mindim.network.IContainerIntegerListener;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;

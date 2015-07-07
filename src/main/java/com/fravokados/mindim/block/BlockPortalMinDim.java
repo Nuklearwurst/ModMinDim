@@ -1,12 +1,15 @@
 package com.fravokados.mindim.block;
 
-import com.fravokados.mindim.block.tile.TileEntityPortal;
+import com.fravokados.mindim.block.tileentity.TileEntityPortal;
 import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.util.LogHelper;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
@@ -38,14 +41,32 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 	}
 
 	@Override
-	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side) {
-		TileEntity te = world.getTileEntity(x, y, z);
-		if(te != null && te instanceof TileEntityPortal) {
-			short facing = ((TileEntityPortal) te).getFacing();
-			return side == facing || ForgeDirection.getOrientation(side) == ForgeDirection.getOrientation(facing).getOpposite();
-		} else {
-			return true;
+	public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+		switch (world.getBlockMetadata(x, y, z)) {
+			case 1: //X axis
+				setBlockBounds(0.2F, 0, 0, 0.8F, 1, 1);
+				break;
+			case 2: //Y axis
+				setBlockBounds(0, 0.2F, 0, 1, 0.8F, 1);
+				break;
+			case 3: //Z axis
+				setBlockBounds(0, 0, 0.2F, 1, 1, 0.8F);
+				break;
+			default:
+				setBlockBounds(0, 0, 0, 1, 1, 1);
+				break;
 		}
+	}
+
+	@Override
+	public boolean renderAsNormalBlock() {
+		return false;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public int getRenderBlockPass()
+	{
+		return 1;
 	}
 
 	@Override
@@ -79,14 +100,35 @@ public class BlockPortalMinDim extends BlockMD implements ITileEntityProvider{
 		return new TileEntityPortal();
 	}
 
-	public static void placePortalInWorld(World world, int x, int y, int z, int cx, int cy, int cz) {
-		world.setBlock(x, y, z, ModBlocks.blockPortalBlock, 0, 3);
+	@Override
+	public int quantityDropped(Random r) {
+		return 0;
+	}
+
+	@Override
+	public Item getItem(World world, int x, int y, int z) {
+		return Item.getItemById(0);
+	}
+
+	public static void placePortalInWorld(World world, int x, int y, int z, int cx, int cy, int cz, int meta) {
+		world.setBlock(x, y, z, ModBlocks.blockPortalBlock, meta, 3);
 		TileEntityPortal te = (TileEntityPortal) world.getTileEntity(x, y, z);
 		te.setPortalController(cx, cy, cz);
 	}
 
-	@Override
-	public int quantityDropped(Random r) {
-		return 0;
+	public static int convertFacingToMeta(int facing) {
+		switch (facing) {
+			case 0:
+			case 1:
+				return 2;
+			case 2:
+			case 3:
+				return 3;
+			case 4:
+			case 5:
+				return 1;
+			default:
+				return 0;
+		}
 	}
 }

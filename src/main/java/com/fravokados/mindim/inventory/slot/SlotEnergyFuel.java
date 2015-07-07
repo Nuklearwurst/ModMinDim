@@ -1,7 +1,7 @@
 package com.fravokados.mindim.inventory.slot;
 
+import com.fravokados.mindim.plugin.EnergyManager;
 import com.fravokados.mindim.plugin.EnergyTypes;
-import ic2.api.item.IElectricItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -20,10 +20,6 @@ public class SlotEnergyFuel extends Slot {
 
 	@Override
 	public boolean isItemValid(ItemStack stack) {
-		switch (type) {
-			case IC2:
-				return stack.getItem() instanceof IElectricItem && ((IElectricItem) stack.getItem()).canProvideEnergy(stack);
-		}
-		return true;
+		return EnergyManager.canItemProvideEnergy(stack, type);
 	}
 }

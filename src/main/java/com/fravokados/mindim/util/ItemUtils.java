@@ -12,6 +12,7 @@ public class ItemUtils {
 
 	/**
 	 * gets the {@link NBTTagCompound} of an {@link ItemStack}, generates one if not available
+	 *
 	 * @param stack the ItemStack which contains the NBTTagCompound
 	 * @return the NBTTagCompound of the ItemStack
 	 */
@@ -24,11 +25,12 @@ public class ItemUtils {
 
 	/**
 	 * writes the content of an {@link IUpgradeInventory} to the nbtData of an ItemStack
+	 *
 	 * @param inventory the inventory that should be saved
-	 * @param stack the stack that should hold the information
+	 * @param stack     the stack that should hold the information
 	 */
 	public static void writeUpgradesToItemStack(IUpgradeInventory inventory, ItemStack stack) {
-		if(inventory == null) {
+		if (inventory == null) {
 			return;
 		}
 		NBTTagCompound nbt = getNBTTagCompound(stack);
@@ -47,12 +49,12 @@ public class ItemUtils {
 
 	/**
 	 * reads upgrade inventory from stack<br><br>
-	 *
+	 * <p/>
 	 * <b>DO NOT</b> use this if you don't know whether the UpgradeInventory is big enough.<br>
 	 * <u>Doing so will result in a loss of items!</u>
 	 *
 	 * @param inventory the inventory that is to be populated
-	 * @param stack the stack containing the infomation
+	 * @param stack     the stack containing the infomation
 	 */
 	public static void readUpgradesFromItemStack(IUpgradeInventory inventory, ItemStack stack) {
 		NBTTagCompound nbt = getNBTTagCompound(stack);

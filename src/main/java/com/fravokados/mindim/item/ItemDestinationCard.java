@@ -6,12 +6,14 @@ import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.lib.Textures;
 import com.fravokados.mindim.portal.PortalMetrics;
 import com.fravokados.mindim.util.ItemUtils;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
@@ -51,13 +53,19 @@ public class ItemDestinationCard extends ItemMDMultiType {
 	public void addInformation(ItemStack stack, EntityPlayer player, List info, boolean b) {
 		super.addInformation(stack, player, info, b);
 		if(stack.getItemDamage() != META_MIN_DIM) {
-			if (stack.stackTagCompound != null) {
-				if (stack.stackTagCompound.hasKey("destinationPortalType") && stack.stackTagCompound.hasKey("destinationPortal")) {
+				if (stack.stackTagCompound != null && stack.stackTagCompound.hasKey("destinationPortalType") && stack.stackTagCompound.hasKey("destinationPortal")) {
 					int type = stack.stackTagCompound.getInteger("destinationPortalType");
 					int dest = stack.stackTagCompound.getInteger("destinationPortal");
 					info.add(Strings.translateWithFormat(Strings.Tooltip.ITEM_DESTINATION_CARD_TYPE, PortalMetrics.Type.getType(type)));
 					info.add(Strings.translateWithFormat(Strings.Tooltip.ITEM_DESTINATION_CARD_DESTINATION, dest));
+				} else {
+					info.add(EnumChatFormatting.ITALIC + Strings.translate(Strings.Tooltip.ITEM_DESTINATION_CARD_EMPTY) + EnumChatFormatting.RESET);
 				}
+		} else {
+			int count = ItemUtils.getNBTTagCompound(stack).getInteger("frame_blocks");
+			info.add(Strings.translateWithFormat(Strings.Tooltip.ITEM_DESTINATION_CARD_MINDIM, count));
+			if(GuiScreen.isShiftKeyDown()) {
+				info.add(Strings.translate(Strings.Tooltip.ITEM_DESTINATION_CARD_MINDIM_INFO_1));
 			}
 		}
 	}

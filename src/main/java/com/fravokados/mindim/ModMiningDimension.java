@@ -10,7 +10,9 @@ import com.fravokados.mindim.dimension.WorldProviderMiningDimension;
 import com.fravokados.mindim.event.ModEventHandler;
 import com.fravokados.mindim.item.ModItems;
 import com.fravokados.mindim.lib.Reference;
+import com.fravokados.mindim.lib.Strings;
 import com.fravokados.mindim.network.ModNetworkManager;
+import com.fravokados.mindim.plugin.PluginTechMobs;
 import com.fravokados.mindim.portal.PortalManager;
 import com.fravokados.mindim.recipes.RecipeManager;
 import com.fravokados.mindim.util.LogHelper;
@@ -21,12 +23,22 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.MOD_VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = Reference.MOD_DEPENDENCIES, canBeDeactivated=false)
 public class ModMiningDimension {
+
+    public static final CreativeTabs TAB_MD = new CreativeTabs(Strings.CREATIVE_TAB) {
+	    @Override
+	    public Item getTabIconItem() {
+		    return Items.boat;
+	    }
+    };
 
     public PortalManager portalManager;
 
@@ -67,6 +79,8 @@ public class ModMiningDimension {
 
 	    //initalize NetworkHandler
 	    ModNetworkManager.init();
+
+	    PluginTechMobs.init();
 
 		//register recipes
         RecipeManager.initRecipes();

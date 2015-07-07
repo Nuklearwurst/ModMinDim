@@ -1,9 +1,10 @@
-package com.fravokados.mindim.block.tile;
+package com.fravokados.mindim.block.tileentity;
 
 import com.fravokados.mindim.block.BlockPortalFrame;
 import com.fravokados.mindim.block.IBlockPlacedListener;
 import com.fravokados.mindim.block.IFacingSix;
 import com.fravokados.mindim.block.ModBlocks;
+import com.fravokados.mindim.client.ClientPortalInfo;
 import com.fravokados.mindim.portal.PortalConstructor;
 import ic2.api.tile.IWrenchable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -143,5 +144,15 @@ public class TileEntityPortalFrame extends TileEntity implements IBlockPlacedLis
 			}
 		}
 		return TileEntityPortalControllerEntity.State.NO_MULTIBLOCK;
+	}
+
+	public ClientPortalInfo getClientRenderInfo() {
+		if(validPortal) {
+			TileEntity te = worldObj.getTileEntity(coreX, coreY, coreZ);
+			if(te != null && te instanceof TileEntityPortalControllerEntity) {
+				return ((TileEntityPortalControllerEntity) te).renderInfo;
+			}
+		}
+		return null;
 	}
 }
