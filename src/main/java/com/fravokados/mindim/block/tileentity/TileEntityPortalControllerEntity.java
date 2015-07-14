@@ -32,11 +32,10 @@ import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.item.ElectricItem;
-import ic2.api.item.IElectricItem;
 import ic2.api.tile.IWrenchable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -53,7 +52,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 /**
  * @author Nuklearwurst
  */
-public class TileEntityPortalControllerEntity extends TileEntity implements IInventory, IBlockPlacedListener, IEntityPortalOptionalComponent, IFacingSix, IEnergySink, IWrenchable, IUpgradable {
+public class TileEntityPortalControllerEntity extends TileEntity implements ISidedInventory, IBlockPlacedListener, IEntityPortalOptionalComponent, IFacingSix, IEnergySink, IWrenchable, IUpgradable {
 
 	/**
 	 * possible states of the controller
@@ -449,7 +448,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 										resetOnError(Error.CONNECTION_INTERRUPTED);
 									}
 								} else { //invalid portal (Invalid TE)
-									LogHelper.warn("Error opening portal to: " + portalDestination + " with controller: " + te);
+									LogHelper.warn("Error opening portal to: " + portalDestination);
 									closePortal(true);
 									resetOnError(Error.CONNECTION_INTERRUPTED);
 								}
@@ -487,7 +486,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		//recharge energy
 		if (!energy.isFull() && inventory[1] != null) {
 			if (energyType == EnergyTypes.IC2) {
-				if (inventory[1].getItem() instanceof IElectricItem) {
+				if (EnergyManager.canItemProvideEnergy(inventory[1], EnergyTypes.IC2)) {
 					energy.receiveEnergy(ElectricItem.manager.discharge(inventory[1], getDemandedEnergy(), getSinkTier(), false, true, false), false);
 				}
 			}
@@ -696,11 +695,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 			case INCOMING_PORTAL: {
 				BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 				if (pos != null) {
-					MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-					WorldServer world = server.worldServerForDimension(pos.dimension);
-					TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-					if (te != null && te instanceof TileEntityPortalControllerEntity) {
-						((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
+					TileEntityPortalControllerEntity te = pos.getControllerEntity();
+					if (te != null) {
+						te.setState(State.INCOMING_PORTAL);
 						this.setState(State.OUTGOING_PORTAL);
 					} else {
 						closePortal(true);
@@ -717,8 +714,12 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		switch (state) {
 			case CONNECTING:
 			case OUTGOING_PORTAL:
-			case INCOMING_PORTAL: //For now you can disconnect manually TODO: check if upgrade is available (don't trust client)
 				closePortal(true);
+				break;
+			case INCOMING_PORTAL:
+				if((upgradeTrackerFlags & FLAG_CAN_DISCONNECT_INCOMING) != 0) {
+					closePortal(true);
+				}
 				break;
 		}
 	}
@@ -733,10 +734,9 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		if (closeRemote) {
 			BlockPositionDim pos = PortalManager.getInstance().getEntityPortalForId(portalDestination);
 			if (pos != null) {
-				WorldServer world = pos.getWorldServer();
-				TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-				if (te != null && te instanceof TileEntityPortalControllerEntity) {
-					((TileEntityPortalControllerEntity) te).closePortal(false);
+				TileEntityPortalControllerEntity te = pos.getControllerEntity();
+				if (te != null) {
+					te.closePortal(false);
 				}
 			}
 		}
@@ -868,8 +868,27 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 		return energy;
 	}
 
+	/**
+	 * sets an error message and resets state to default
+	 */
 	public void resetOnError(Error error) {
 		setState(State.READY);
 		lastError = error;
+	}
+
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		return new int[] {0};
+	}
+
+	@Override
+	public boolean canInsertItem(int slot, ItemStack stack, int side) {
+		return slot == 0 && stack.getItem() instanceof ItemDestinationCard;
+	}
+
+	@Override
+	public boolean canExtractItem(int slot, ItemStack stack, int side) {
+		return slot == 0 && stack.getItem() instanceof ItemDestinationCard;
 	}
 }
