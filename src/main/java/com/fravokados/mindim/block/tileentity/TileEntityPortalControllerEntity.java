@@ -187,7 +187,7 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 	 *
 	 * @return success
 	 */
-	public boolean openPortal() {
+	public boolean placePortalBlocks() {
 		return metrics != null && metrics.placePortalsInsideFrame(worldObj, xCoord, yCoord, zCoord);
 	}
 
@@ -420,28 +420,35 @@ public class TileEntityPortalControllerEntity extends TileEntity implements IInv
 							resetOnError(Error.INVALID_DESTINATION);
 						} else {
 							//open portal
-							if (!openPortal()) { //invalid structure
+							if (!placePortalBlocks()) { //invalid structure
 								resetOnError(Error.INVALID_PORTAL_STRUCTURE);
 							} else {
 								//update controllers
-								MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-								WorldServer world = server.worldServerForDimension(pos.dimension);
-								TileEntity te = world.getTileEntity(pos.x, pos.y, pos.z);
-								if (te != null && te instanceof TileEntityPortalControllerEntity && ((TileEntityPortalControllerEntity) te).updateMetrics() && ((TileEntityPortalControllerEntity) te).openPortal()) {
-									if (energy.useEnergy(baseEnergyUseInit)) { //use initial energy
-										//update controller states
-										((TileEntityPortalControllerEntity) te).setState(State.INCOMING_PORTAL);
-										((TileEntityPortalControllerEntity) te).portalDestination = id;
-										setState(State.OUTGOING_PORTAL);
-										lastError = Error.NO_ERROR;
-										worldObj.playSoundEffect(metrics.originX, metrics.originY, metrics.originZ, Strings.Sounds.PORTAL_OPEN, 0.5F, worldObj.rand.nextFloat() * 0.1F + 1.9F);
-									} else {
-										//reset destination if power fails
-										((TileEntityPortalControllerEntity) te).setState(State.READY);
+								TileEntityPortalControllerEntity te = pos.getControllerEntity();
+								if (te != null) {
+									if(te.isActive()) {
+										//Portal already has an open connection
+										closePortal(false);
+										resetOnError(Error.CONNECTION_INTERRUPTED);
+									} else if (te.updateMetrics() && te.placePortalBlocks()) {
+										if (energy.useEnergy(baseEnergyUseInit)) { //use initial energy
+											//update controller states
+											te.setState(State.INCOMING_PORTAL);
+											te.portalDestination = id;
+											setState(State.OUTGOING_PORTAL);
+											lastError = Error.NO_ERROR;
+											worldObj.playSoundEffect(metrics.originX, metrics.originY, metrics.originZ, Strings.Sounds.PORTAL_OPEN, 0.5F, worldObj.rand.nextFloat() * 0.1F + 1.9F);
+										} else {
+											//reset destination if power fails
+											te.setState(State.READY);
+											closePortal(true);
+											resetOnError(Error.POWER_FAILURE);
+										}
+									} else { //invalid portal (Destination has invalid structure [portal creation failed])
 										closePortal(true);
-										resetOnError(Error.POWER_FAILURE);
+										resetOnError(Error.CONNECTION_INTERRUPTED);
 									}
-								} else { //invalid portal (Invalid TE or Destination has invalid structure [portal creation failed])
+								} else { //invalid portal (Invalid TE)
 									LogHelper.warn("Error opening portal to: " + portalDestination + " with controller: " + te);
 									closePortal(true);
 									resetOnError(Error.CONNECTION_INTERRUPTED);
